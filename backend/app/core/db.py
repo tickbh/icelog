@@ -2,6 +2,7 @@ from sqlmodel import Session, create_engine, select
 
 from app.core.config import settings
 from app.models import UserBase, User
+from app.core.security import get_password_hash
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
@@ -17,14 +18,15 @@ def init_db(session: Session) -> None:
     # SQLModel.metadata.create_all(engine)
 
     user = session.exec(
-        select(User).where(User.email == "super@qq.com")
+        select(User).where(User.email == settings.FIRST_SUPER_USER)
     ).first()
     if not user:
         user = User(
-            email="super@qq.com",
+            email=settings.FIRST_SUPER_USER,
             is_active=True,
             is_superuser=True,
-            hashed_password="aaaaaaaaaaaaa",
+            user_type="sys",
+            hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),
         )
         session.add(user)
         session.commit()

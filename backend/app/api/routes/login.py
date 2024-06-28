@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app import crud
+from app import cruds
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
@@ -28,7 +28,7 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    user = crud.authenticate(
+    user = cruds.user.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )
     if not user:

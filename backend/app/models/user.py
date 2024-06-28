@@ -86,8 +86,6 @@ class Item(ItemBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str = Field(max_length=255)
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="items")
-
 
 # Properties to return via API, id is always required
 class ItemPublic(ItemBase):

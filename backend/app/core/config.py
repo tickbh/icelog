@@ -9,11 +9,14 @@ class Settings(BaseSettings):
         env_file=".env", 
         env_ignore_empty=True, extra="ignore"
     )
+    FIRST_SUPER_USER: str = "ice@example.com"
+    FIRST_SUPER_PASS: str = "icelog"
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str
-    SECRET_KEY: str = "this is default key"
+    SECRET_KEY: str = "change this secert"
     
     SQLITE_NAME: Union[str, None] = None
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12
     
     @computed_field  # type: ignore[misc]
     @property

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     )
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str
+    SECRET_KEY: str = "this is default key"
     
     SQLITE_NAME: Union[str, None] = None
     

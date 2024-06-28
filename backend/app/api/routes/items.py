@@ -8,11 +8,12 @@ from sqlmodel import Session, select
 
 from app.models import User
 from app.models.user import UserPublic
+from app.core.security import get_password_hash
 router = APIRouter()
 
 @router.get("/")
 def read_items() -> Any:
-    return {"Hello": "World", "name": os.getenv("PROJECT_NAME")}
+    return {"Hello": "World", "name": os.getenv("PROJECT_NAME"), "pass": get_password_hash("123456")}
 
 @router.get("/a")
 def read_items() -> Any:

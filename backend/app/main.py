@@ -2,6 +2,7 @@ import time
 from typing import Union
 
 from fastapi import FastAPI, Request
+from app.core.config import settings
 
 from app.api.main import api_router
 app = FastAPI()
@@ -14,4 +15,4 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = f"{process_time * 1000:.2f}ms"
     return response
 
-app.include_router(api_router, prefix="/v1")
+app.include_router(api_router, prefix=settings.API_V1_STR)

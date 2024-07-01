@@ -1,6 +1,6 @@
 from datetime import datetime
-from pydantic import EmailStr
-from sqlalchemy import SMALLINT
+from pydantic import ConfigDict, EmailStr
+from sqlalchemy import SMALLINT, DateTime, Integer, func
 from sqlmodel import Field, Relationship, SQLModel, Column
 
 MIN_PASSWORD = 8
@@ -10,12 +10,13 @@ MAX_PASSWORD = 64
 
 
 class UserBase(SQLModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     account: str | None = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
-    gender: SMALLINT | None = Field(
-        default=None, description="性别(1-男，2-女 0-未知)")
+    gender: int | None = Column(Integer,
+        default=None, comment="性别(1-男，2-女 0-未知)")
     telephone: str | None = Field(
         default=None, max_length=15, unique=True, nullable=True, description="电话号码")
     user_type: str = Field(default=None, max_length=15,
@@ -24,11 +25,12 @@ class UserBase(SQLModel):
         default=None, max_length=255, description="用户头像")
     mobile: str | None = Field(
         default=None, max_length=255, description="联系方式")
-    create_time: datetime | None = Field(default=None, description="创建时间")
+    create_time: datetime = Column(DateTime, nullable=False, server_default=func.now(), comment="创建时间")
     create_by: int | None = Field(default=None, description="创建人id")
-    update_time: datetime | None = Field(default=None, description="更新时间")
+    update_time: datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now(), comment="更新时间")
     update_by: int | None = Field(default=None, description="更新人id")
-    is_deleted: SMALLINT = Field(default=0, description="逻辑删除标记")
+    is_deleted: int = Column(Integer(2), default=0, comment="逻辑删除标记")
+    group_pem: int | None = Field(default=None, description="组权限id")
 
 
 class UserCreate(UserBase):

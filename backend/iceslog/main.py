@@ -2,9 +2,9 @@ import time
 from typing import Union
 
 from fastapi import FastAPI, Request
-from app.core.config import settings
+from iceslog.core.config import settings
 
-from app.api.main import api_router
+from iceslog.api.main import api_router
 app = FastAPI()
 
 @app.middleware("http")

@@ -18,6 +18,5 @@ class GroupPerms(SQLModel, table=True):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     id: int = Field(primary_key=True, description="ID")
     name: str = Field(max_length=50, nullable=False, description="名字")
-    permissions: JSON = Column(JSON,
-        max_length=10240, nullable=False, default="[]", comment="拥有权限数,如[1, 2, 3, 4, 5]")
+    permissions: str = Field(   max_length=10240, nullable=False, default="[]", description="拥有权限数,如[1, 2, 3, 4, 5]")
     create_time: datetime = Column(DateTime, server_default=func.now(), comment="创建时间")

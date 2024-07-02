@@ -1,8 +1,8 @@
 from sqlmodel import Session, create_engine, select
 
-from app.core.config import settings
-from app.models import UserBase, User
-from app.core.security import get_password_hash
+from iceslog.core.config import settings
+from iceslog.models import UserBase, User
+from iceslog.core.security import get_password_hash
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 

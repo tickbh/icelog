@@ -16,7 +16,7 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     gender: int | None = Column(SmallInteger,
-        default=None, comment="性别(1-男，2-女 0-未知)")
+        default=None, comment="性别(1-男，2-女 0-未知)", doc="aaaaaaaaaaaaaa")
     telephone: str | None = Field(
         default=None, max_length=15, unique=True, nullable=True, description="电话号码")
     user_type: str = Field(default=None, max_length=15,

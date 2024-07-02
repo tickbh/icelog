@@ -2,13 +2,13 @@ import os
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from app.core.config import settings
-from app.core.db import engine, init_db
+from iceslog.core.config import settings
+from iceslog.core.db import engine, init_db
 from sqlmodel import Session, select
 
-from app.models import User
-from app.models.user import UserPublic
-from app.core.security import get_password_hash
+from iceslog.models import User
+from iceslog.models.user import UserPublic
+from iceslog.core.security import get_password_hash
 router = APIRouter()
 
 @router.get("/")

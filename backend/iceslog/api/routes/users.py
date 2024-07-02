@@ -3,15 +3,15 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
 
-from app import crud
-from app.api.deps import (
+from iceslog import crud
+from iceslog.api.deps import (
     CurrentUser,
     SessionDep,
     get_current_active_superuser,
 )
-from app.core.config import settings
-from app.core.security import get_password_hash, verify_password
-from app.models import (
+from iceslog.core.config import settings
+from iceslog.core.security import get_password_hash, verify_password
+from iceslog.models import (
     Item,
     Message,
     UpdatePassword,
@@ -23,7 +23,7 @@ from app.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from app.utils import generate_new_account_email, send_email
+from iceslog.utils import generate_new_account_email, send_email
 
 router = APIRouter()
 

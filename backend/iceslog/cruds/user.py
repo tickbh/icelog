@@ -2,8 +2,8 @@ from typing import Any
 
 from sqlmodel import Session, select
 
-from app.models.user import Item, ItemCreate, User, UserCreate, UserUpdate
-from app.core.security import get_password_hash, verify_password
+from iceslog.models.user import Item, ItemCreate, User, UserCreate, UserUpdate
+from iceslog.core.security import get_password_hash, verify_password
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from app.api.routes import items
-from app.api.routes import users
-from app.api.routes import login
+from iceslog.api.routes import items
+from iceslog.api.routes import users
+from iceslog.api.routes import login
 
 api_router = APIRouter()
 api_router.include_router(items.router, prefix="/items", tags=["items"])

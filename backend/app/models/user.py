@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import ConfigDict, EmailStr
-from sqlalchemy import SMALLINT, DateTime, Integer, func
+from sqlalchemy import SMALLINT, BigInteger, DateTime, Integer, SmallInteger, func
 from sqlmodel import Field, Relationship, SQLModel, Column
 
 MIN_PASSWORD = 8
@@ -15,7 +15,7 @@ class UserBase(SQLModel):
     account: str | None = Field(default=None, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
-    gender: int | None = Column(Integer,
+    gender: int | None = Column(SmallInteger,
         default=None, comment="性别(1-男，2-女 0-未知)")
     telephone: str | None = Field(
         default=None, max_length=15, unique=True, nullable=True, description="电话号码")
@@ -29,7 +29,7 @@ class UserBase(SQLModel):
     create_by: int | None = Field(default=None, description="创建人id")
     update_time: datetime = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now(), comment="更新时间")
     update_by: int | None = Field(default=None, description="更新人id")
-    is_deleted: int = Column(Integer(2), default=0, comment="逻辑删除标记")
+    is_deleted: int = Column(Integer, default=0, comment="逻辑删除标记")
     group_pem: int | None = Field(default=None, description="组权限id")
 
 

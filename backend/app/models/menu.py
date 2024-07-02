@@ -17,7 +17,7 @@ class Menus(SQLModel, table=True):
     route: str = Field(max_length=1024, nullable=False, description="菜单路由")
     sort: int = Field(nullable=True, default=0, description="菜单排序")
     is_show: bool = Field(default=False, description="是否展示")
-    # groups: JSON = Column(JSON,
-    #     max_length=4096, nullable=False, default="[]", comment="权限ids [1, 2, 3, 4, 5]"
-    # )
+    groups: JSON = Column(JSON,
+        max_length=4096, nullable=False, default="[]", comment="权限ids [1, 2, 3, 4, 5]"
+    )
     create_time: datetime | None = Field(default=None, description="创建时间")

@@ -1,13 +1,16 @@
+from datetime import datetime, timezone
 from sqlmodel import Session, create_engine, select
 
 from iceslog.core.config import settings
-from iceslog.models import UserBase, User
 from iceslog.core.security import get_password_hash
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
+def datetime_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 def init_db(session: Session) -> None:
+    from iceslog.models import UserBase, User
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
     # the tables un-commenting the next lines

@@ -12,8 +12,7 @@ from iceslog.api.deps import (
 from iceslog.core.config import settings
 from iceslog.core.security import get_password_hash, verify_password
 from iceslog.models import (
-    Item,
-    Message,
+    RetMsg,
     UpdatePassword,
     User,
     UserCreate,
@@ -23,6 +22,7 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
+from iceslog.models.user import MsgUserPublic
 from iceslog.utils import generate_new_account_email, send_email
 
 router = APIRouter()
@@ -84,7 +84,7 @@ def update_user_me(
 
     if user_in.email:
         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
-        if existing_user and existing_user.id != current_user.id:
+        if existing_user and existing_user.id != current_user.userId:
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
@@ -96,7 +96,7 @@ def update_user_me(
     return current_user
 
 
-@router.patch("/me/password", response_model=Message)
+@router.patch("/me/password", response_model=RetMsg)
 def update_password_me(
     *, session: SessionDep, body: UpdatePassword, current_user: CurrentUser
 ) -> Any:
@@ -113,18 +113,18 @@ def update_password_me(
     current_user.hashed_password = hashed_password
     session.add(current_user)
     session.commit()
-    return Message(message="Password updated successfully")
+    return RetMsg(message="Password updated successfully")
 
 
-@router.get("/me", response_model=UserPublic)
+@router.get("/me", response_model=MsgUserPublic)
 def read_user_me(current_user: CurrentUser) -> Any:
     """
     Get current user.
     """
-    return current_user
+    return MsgUserPublic(data=current_user)
 
 
-@router.delete("/me", response_model=Message)
+@router.delete("/me", response_model=RetMsg)
 def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
     """
     Delete own user.
@@ -133,11 +133,11 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    statement = delete(Item).where(col(Item.owner_id) == current_user.id)
+    statement = delete(Item).where(col(Item.owner_id) == current_user.userId)
     session.exec(statement)  # type: ignore
     session.delete(current_user)
     session.commit()
-    return Message(message="User deleted successfully")
+    return RetMsg(message="User deleted successfully")
 
 
 @router.post("/signup", response_model=UserPublic)
@@ -214,7 +214,7 @@ def update_user(
 @router.delete("/{user_id}", dependencies=[Depends(get_current_active_superuser)])
 def delete_user(
     session: SessionDep, current_user: CurrentUser, user_id: int
-) -> Message:
+) -> RetMsg:
     """
     Delete a user.
     """
@@ -229,4 +229,4 @@ def delete_user(
     session.exec(statement)  # type: ignore
     session.delete(user)
     session.commit()
-    return Message(message="User deleted successfully")
+    return RetMsg(message="User deleted successfully")

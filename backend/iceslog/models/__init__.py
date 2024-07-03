@@ -1,5 +1,5 @@
 
-from typing import Any
+from .base import *
 from .menu import *
 from .user import *
 from .pems import *
@@ -9,28 +9,20 @@ class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
 
-# Generic message
-class Message(SQLModel):
-    code: str
-    msg: str
-    data: Any
-
-class CommonMessage(SQLModel):
-    def build_message(self, code="00000", msg="ok") -> Message:
-        return Message(data=self, code=code, msg=msg)
     
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: int | None = None
 
 # Contents of JWT token
-class AuthCaptchaMsg(CommonMessage):
+class MsgAuthCaptcha(CommonMessage):
     captchaKey: str
     captchaBase64: str
     
 # Contents of JWT token
-class AuthLogin(SQLModel):
-    username: str
-    password: str
-    captchaKey: str
-    captchaCode: str
+class MsgLoginRet(CommonMessage):
+    accessToken: str
+    tokenType: str = "Bearer"
+    refreshToken: str|None = None
+    expires: str|None = None
+    

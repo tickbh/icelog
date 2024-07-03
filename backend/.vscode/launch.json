@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "重新生成db",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "redb.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "app服务器",
             "type": "debugpy",
             "request": "launch",
@@ -16,7 +23,8 @@
                 "--port",
                 "8001"
             ],
-            "jinja": true
+            "jinja": true,
+            "justMyCode": false
         },
         {
             "name": "生成DDL",

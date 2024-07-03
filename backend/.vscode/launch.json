@@ -9,9 +9,9 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
-            "cwd": "${workspaceFolder}/backend",
+            "cwd": "${workspaceFolder}",
             "args": [
-                "app.main:app",
+                "iceslog.main:app",
                 "--reload",
                 "--port",
                 "8001"
@@ -23,7 +23,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "alembic",
-            "cwd": "${workspaceFolder}/backend",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "revision",
                 "--autogenerate",
@@ -37,7 +37,7 @@
             "type": "debugpy",
             "request": "launch",
             "module": "alembic",
-            "cwd": "${workspaceFolder}/backend",
+            "cwd": "${workspaceFolder}",
             "args": [
                 "upgrade",
                 "head",

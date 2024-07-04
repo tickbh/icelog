@@ -9,8 +9,8 @@ class Settings(BaseSettings):
         env_file=".env", 
         env_ignore_empty=True, extra="ignore"
     )
-    FIRST_SUPER_USER: str = "ice@example.com"
-    FIRST_SUPER_PASS: str = "icelog"
+    FIRST_SUPER_USER: str = "iceslog"
+    FIRST_SUPER_PASS: str = "12345678"
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str
     SECRET_KEY: str = "change this secert"

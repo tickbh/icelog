@@ -27,3 +27,6 @@ if __name__ == "__main__":
     print(file_path)
     ret = subprocess.run("alembic revision --autogenerate -m bypy")
     ret = subprocess.run("alembic upgrade head")
+    
+    from iceslog import initial_data
+    initial_data.init()

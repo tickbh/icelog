@@ -21,11 +21,11 @@ def init_db(session: Session) -> None:
     # SQLModel.metadata.create_all(engine)
 
     user = session.exec(
-        select(User).where(User.email == settings.FIRST_SUPER_USER)
+        select(User).where(User.username == settings.FIRST_SUPER_USER)
     ).first()
     if not user:
         user = User(
-            email=settings.FIRST_SUPER_USER,
+            username=settings.FIRST_SUPER_USER,
             is_active=True,
             is_superuser=True,
             user_type="sys",

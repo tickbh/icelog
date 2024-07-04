@@ -3,6 +3,8 @@ from pydantic import ConfigDict, EmailStr
 from sqlalchemy import JSON
 from sqlmodel import Field, Relationship, SQLModel, Column
 
+from iceslog.core.db import datetime_now
+
 # Database model, database table inferred from class name
 
 
@@ -18,5 +20,5 @@ class Menus(SQLModel, table=True):
     sort: int = Field(nullable=True, default=0, description="菜单排序")
     is_show: bool = Field(default=False, description="是否展示")
     groups: str = Field(max_length=4096, nullable=False, default="[]", description="权限ids [1, 2, 3, 4, 5]"
-    )
-    create_time: datetime | None = Field(default=None, description="创建时间")
+                        )
+    create_time: datetime = Field(nullable=False, default_factory=datetime_now, description="创建时间")

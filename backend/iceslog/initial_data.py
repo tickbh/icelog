@@ -12,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 def init_menu(session: Session):
     from iceslog.models import Menus
-    menu = Menus(id=1, type="sys", name="系统管理", icon="aaa", params="", pid=0, route="/", sort=0, is_show=True, groups="1")
+    menu = Menus(id=1, type="sys", name="系统管理", component="Layout", icon="aaa", params="", pid=0, path="/", redirect="/", sort=0, is_show=True, groups="1")
     session.add(menu)
-    menu = Menus(id=10, type="sys", name="用户管理", icon="aaa", params="", pid=1, route="/user", sort=0, is_show=True, groups="1")
+    menu = Menus(id=10, type="sys", name="用户管理", component="Layout", icon="aaa", params="", pid=1, path="/user", redirect="/user", sort=0, is_show=True, groups="1")
     session.add(menu)
     pass
 

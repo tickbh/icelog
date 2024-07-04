@@ -25,7 +25,8 @@ export function setupPermission() {
       } else {
         const userStore = useUserStore();
         const hasRoles =
-          userStore.user.roles && userStore.user.roles.length > 0;
+          (userStore.user.roles && userStore.user.roles.length > 0) ||
+          userStore.user.user_type != undefined;
 
         if (hasRoles) {
           // 如果未匹配到任何路由，跳转到404页面

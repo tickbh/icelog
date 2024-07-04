@@ -7,7 +7,7 @@ from iceslog.utils import base_utils
 
 class PidTable:
     model: SQLModel
-    def __init__(self, model, use_cache=False, expire_time = 60 * 60, check_redis=True, redis_expire_time=30):
+    def __init__(self, model, use_cache=False, expire_time = 60 * 60, check_redis=True, redis_expire_time=30, deal_func=None):
         self.default_type = "default"
         self.model = model
         self.cache_time = 0
@@ -17,7 +17,7 @@ class PidTable:
         self.count_values = {}
         self.use_cache = use_cache
         self.expire_time = expire_time
-        
+        self.deal_func = deal_func
         self.redis_cache_time = 0
         self.check_redis = check_redis
         self.redis_expire_time = redis_expire_time
@@ -80,7 +80,11 @@ class PidTable:
                 pid = val.pid
                 value_table[type] = value_table.get(type, {})
                 value_table[type][pid] = value_table[type].get(pid, [])
-                data = val.model_dump()
+                
+                if self.deal_func:
+                    data = self.deal_func(val)
+                else:
+                    data = val.model_dump()
                 value_table[type][pid].append(data)
                 self.cache_id_values[val.id] = data
             

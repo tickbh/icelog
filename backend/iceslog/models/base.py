@@ -7,6 +7,9 @@ class RetMsg(SQLModel):
     msg: str="ok"
     data: Any
     
+    @staticmethod
+    def err_msg(code: str, msg: str):
+        return RetMsg(code=code, msg=msg, data=None)
     
 class CommonMessage(SQLModel):
     def build_message(self, code="00000", msg="ok") -> RetMsg:

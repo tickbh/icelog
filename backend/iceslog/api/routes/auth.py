@@ -18,15 +18,14 @@ def get_captcha() -> RetMsg:
 @router.post("/login")
 def do_login(session: SessionDep, username: str = Form(), password: str = Form(), captchaKey: str = Form(), captchaCode: str = Form()) -> RetMsg:
     # if captchaCode.lower() != captchaKey.lower():
-    #     return Message(code="00001", msg="验证码出错", data=None)
-    
+        # return RetMsg.err_msg("00003", "验证码错误")
     user = cruds.user.authenticate(
         session=session, username=username, password=password
     )
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
+        return RetMsg.err_msg("00001", "用户名或者密码错误")
     elif not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        return RetMsg.err_msg("00002", "用户尚未激活")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return MsgLoginRet(
         accessToken=security.create_access_token(

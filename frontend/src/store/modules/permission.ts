@@ -20,11 +20,11 @@ export const usePermissionStore = defineStore("permission", () => {
    * 生成动态路由
    */
   function generateRoutes() {
-    return new Promise<MenuAndPerm>((resolve, reject) => {
+    return new Promise<RouteRecordRaw[]>((resolve, reject) => {
       MenuAPI.getRoutes()
         .then((data) => {
           const value = transformRoutes(data);
-          routes.value = constantRoutes.concat(value.r);
+          routes.value = constantRoutes.concat(value);
           resolve(value);
         })
         .catch((error) => {
@@ -75,16 +75,12 @@ const transformRoutes = (routes: RouteVO[]) => {
     }
 
     if (tmpRoute.children) {
-      tmpRoute.children = transformRoutes(route.children).r;
+      tmpRoute.children = transformRoutes(route.children);
     }
-    if (route.perm) {
-      perms.push(route.perm);
-    } else {
-      asyncRoutes.push(tmpRoute);
-    }
+    asyncRoutes.push(tmpRoute);
   });
 
-  return { r: asyncRoutes, p: perms };
+  return asyncRoutes;
 };
 
 /**

@@ -107,11 +107,8 @@ class PidTable:
     def get_iter(self):
         from iceslog.core.db import engine
         with Session(engine) as session:
-            # menus = session.execute(select(Menus)).scalars().all()
             menus = session.exec(select(Menus)).all()
             for val in menus:
-                print("val", val)
-                print("val.key", val.id)
                 yield val
 
     def is_expire(self):

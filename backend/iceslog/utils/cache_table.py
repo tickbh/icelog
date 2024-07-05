@@ -1,7 +1,6 @@
 import time, logging
 
-from sqlalchemy import select
-from sqlmodel import SQLModel, Session
+from sqlmodel import SQLModel, Session, select
 
 from iceslog.utils import base_utils
 
@@ -26,7 +25,7 @@ class CacheTable:
         logging.info(f'chk perm expire reload data')
         temp_table = {}
         for val in self.get_iter():
-            data = val.json()
+            data = val.model_dump()
             if hasattr(val, "id"):
                 temp_table[val.id] = data
             for attrib in self.attribs:

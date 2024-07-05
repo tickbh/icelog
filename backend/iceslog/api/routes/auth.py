@@ -29,6 +29,6 @@ def do_login(session: SessionDep, username: str = Form(), password: str = Form()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return MsgLoginRet(
         accessToken=security.create_access_token(
-            user.userId, expires_delta=access_token_expires
+            user.id, expires_delta=access_token_expires
         )
     ).build_message()

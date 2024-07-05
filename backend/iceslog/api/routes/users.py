@@ -22,8 +22,8 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from iceslog.models.user import MsgUserPublic, MsgUsersPublic
-from iceslog.utils import generate_new_account_email, send_email
+from iceslog.models.user import MsgUserMePublic, MsgUserPublic, MsgUsersPublic, UserMePublic
+from iceslog.utils import cache_utils, generate_new_account_email, send_email
 
 router = APIRouter()
 
@@ -84,7 +84,7 @@ def update_user_me(
 
     if user_in.email:
         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
-        if existing_user and existing_user.id != current_user.userId:
+        if existing_user and existing_user.id != current_user.id:
             raise HTTPException(
                 status_code=409, detail="User with this email already exists"
             )
@@ -116,12 +116,14 @@ def update_password_me(
     return RetMsg(message="Password updated successfully")
 
 
-@router.get("/me", response_model=MsgUserPublic)
+@router.get("/me", response_model=MsgUserMePublic)
 def read_user_me(current_user: CurrentUser) -> Any:
     """
     Get current user.
     """
-    return MsgUserPublic(data=current_user)
+    me = UserMePublic.model_validate(current_user, update={"perms": []})
+    me.perms = cache_utils.get_all_perms(current_user.group_pem)
+    return MsgUserMePublic(data=me)
 
 @router.get("/page", response_model=MsgUserPublic)
 def read_user_me(current_user: CurrentUser) -> Any:
@@ -139,7 +141,7 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )
-    statement = delete(Item).where(col(Item.owner_id) == current_user.userId)
+    statement = delete(Item).where(col(Item.owner_id) == current_user.id)
     session.exec(statement)  # type: ignore
     session.delete(current_user)
     session.commit()

@@ -47,10 +47,9 @@ export function setupPermission() {
             await userStore.getUserInfo();
             var { perms } = useUserStore().user;
             const value = await permissionStore.generateRoutes();
-            value.r.forEach((route: RouteRecordRaw) => {
+            value.forEach((route: RouteRecordRaw) => {
               return router.addRoute(route);
             });
-            value.p.forEach((p: string) => perms.push(p));
             next({ ...to, replace: true });
           } catch (error) {
             // 移除 token 并重定向到登录页，携带当前页面路由作为跳转参数
@@ -96,6 +95,10 @@ export function hasAuth(
   const { roles, perms } = useUserStore().user;
   // 超级管理员 拥有所有权限
   if (type === "button" && roles.includes("ROOT")) {
+    return true;
+  }
+
+  if (perms.includes("*")) {
     return true;
   }
 

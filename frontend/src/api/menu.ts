@@ -181,7 +181,6 @@ interface KeyValue {
 
 /** RouteVO，路由对象 */
 export interface RouteVO {
-  perm?: string;
   /** 子路由列表 */
   children: RouteVO[];
   /** 组件路径 */

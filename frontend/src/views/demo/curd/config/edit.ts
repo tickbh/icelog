@@ -40,22 +40,22 @@ const modalConfig: IModalConfig<UserForm> = {
         placeholder: "请输入用户昵称",
       },
     },
-    {
-      label: "所属部门",
-      prop: "deptId",
-      rules: [{ required: true, message: "所属部门不能为空", trigger: "blur" }],
-      type: "tree-select",
-      attrs: {
-        placeholder: "请选择所属部门",
-        data: [],
-        filterable: true,
-        "check-strictly": true,
-        "render-after-expand": false,
-      },
-      async initFn(formItem) {
-        formItem.attrs.data = await DeptAPI.getOptions();
-      },
-    },
+    // {
+    //   label: "所属部门",
+    //   prop: "deptId",
+    //   rules: [{ required: true, message: "所属部门不能为空", trigger: "blur" }],
+    //   type: "tree-select",
+    //   attrs: {
+    //     placeholder: "请选择所属部门",
+    //     data: [],
+    //     filterable: true,
+    //     "check-strictly": true,
+    //     "render-after-expand": false,
+    //   },
+    //   async initFn(formItem) {
+    //     formItem.attrs.data = await DeptAPI.getOptions();
+    //   },
+    // },
     {
       type: "custom",
       label: "性别",

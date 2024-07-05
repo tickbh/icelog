@@ -8,8 +8,7 @@ from iceslog.core.db import datetime_now
 class Perms(SQLModel, table=True):
     id: int = Field(primary_key=True, description="id值")
     name: str = Field(max_length=50, nullable=False, description="名字")
-    route: str = Field(max_length=255, nullable=False,
-                       unique=True, description="路由")
+    route: str = Field(max_length=255, nullable=False, description="路由")
     codename: str = Field(max_length=50, nullable=False, description="代码名字")
     sort: int = Field(nullable=False, default=0, description="排序")
     create_time: datetime = Field(nullable=False, default_factory=datetime_now, description="创建时间")

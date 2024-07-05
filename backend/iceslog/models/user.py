@@ -68,17 +68,23 @@ class UpdatePassword(SQLModel):
 
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
-    userId: int | None = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     real_name: str | None = Field(
         default=None, max_length=255, description="实际名称")
     hashed_password: str
 
 # Properties to return via API, id is always required
 
+class UserMePublic(UserBase):
+    id: int
+    perms: list[str] | None
 
+class MsgUserMePublic(RetMsg):
+    data: UserMePublic
+    
 class UserPublic(UserBase):
-    userId: int
-
+    id: int
+    
 class MsgUserPublic(RetMsg):
     data: UserPublic
 

@@ -207,7 +207,7 @@
           <el-input v-model="formData.nickname" placeholder="请输入用户昵称" />
         </el-form-item>
 
-        <el-form-item label="所属部门" prop="deptId">
+        <!-- <el-form-item label="所属部门" prop="deptId">
           <el-tree-select
             v-model="formData.deptId"
             placeholder="请选择所属部门"
@@ -216,13 +216,13 @@
             check-strictly
             :render-after-expand="false"
           />
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="性别" prop="gender">
           <dictionary v-model="formData.gender" code="gender" />
         </el-form-item>
 
-        <el-form-item label="角色" prop="roleIds">
+        <!-- <el-form-item label="角色" prop="roleIds">
           <el-select v-model="formData.roleIds" multiple placeholder="请选择">
             <el-option
               v-for="item in roleOptions"
@@ -231,7 +231,7 @@
               :value="item.value"
             />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="手机号码" prop="mobile">
           <el-input

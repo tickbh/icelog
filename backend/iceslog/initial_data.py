@@ -12,11 +12,25 @@ logger = logging.getLogger(__name__)
 
 def init_menu(session: Session):
     from iceslog.models import Menus
-    menu = Menus(id=1, type="sys", name="系统管理", component="Layout", icon="aaa", params="", pid=0, path="/", redirect="/", sort=0, is_show=True, groups="1")
+    menu = Menus(id=1, belong="sys", type="menu", name="系统管理", component="Layout", icon="aaa", params="", pid=0, path="/system", redirect="/system/user", sort=0, is_show=True, groups="1")
     session.add(menu)
-    menu = Menus(id=10, type="sys", name="用户管理", component="Layout", icon="aaa", params="", pid=1, path="/user", redirect="/user", sort=0, is_show=True, groups="1")
+    menu = Menus(id=10, pid=1, belong="sys|admin", type="menu", name="用户管理", component="system/user/index", icon="aaa", params="", path="user", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
-    pass
+    menu = Menus(id=101, pid=0, belong="sys|admin", type="BUTTON", name="用户查询权限", perm="sys:user:query", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
+    session.add(menu)
+    menu = Menus(id=102, pid=0, belong="sys|admin", type="BUTTON", name="用户新增权限", perm="sys:user:add", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
+    session.add(menu)
+    menu = Menus(id=103, pid=0, belong="sys|admin", type="BUTTON", name="用户编辑", perm="sys:user:edit", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
+    session.add(menu)
+    menu = Menus(id=104, pid=0, belong="sys|admin", type="BUTTON", name="用户删除", perm="sys:user:delete", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
+    session.add(menu)
+    menu = Menus(id=105, pid=0, belong="sys|admin", type="BUTTON", name="重置密码", perm="sys:user:password:reset", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
+    session.add(menu)
+    menu = Menus(id=11, pid=1, belong="sys", type="menu", name="角色管理", component="system/role/index", icon="aaa", params="", path="role", redirect="", sort=0, is_show=True, groups="1")
+    session.add(menu)
+    menu = Menus(id=12, pid=1, belong="sys", type="menu", name="菜单管理", component="system/menu/index", icon="aaa", params="", path="menu", redirect="", sort=0, is_show=True, groups="1")
+    session.add(menu)
+    session.commit()
 
 def init_perm(session: Session):
     from iceslog.models import Perms, GroupPerms
@@ -51,22 +65,36 @@ def init_user(session: Session) -> None:
     # from app.core.engine import engine
     # This works because the models are already imported and registered from app.models
     # SQLModel.metadata.create_all(engine)
-
-    user = session.exec(
-        select(User).where(User.username == settings.FIRST_SUPER_USER)
-    ).first()
-    if not user:
-        user = User(
-            username=settings.FIRST_SUPER_USER,
-            is_active=True,
-            is_superuser=True,
-            user_type="sys",
-            hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),
-            group_pem=1,
-        )
-        session.add(user)
-        session.commit()
-        session.refresh(user)
+    
+    user = User(
+        username=settings.FIRST_SUPER_USER,
+        nickname="系统管理员",
+        gender=0,
+        mobile="13800000000",
+        is_active=True,
+        is_superuser=True,
+        user_type="sys",
+        hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),
+        group_pem=1,
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    # user = session.exec(
+    #     select(User).where(User.username == settings.FIRST_SUPER_USER)
+    # ).first()
+    # if not user:
+    #     user = User(
+    #         username=settings.FIRST_SUPER_USER,
+    #         is_active=True,
+    #         is_superuser=True,
+    #         user_type="sys",
+    #         hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),
+    #         group_pem=1,
+    #     )
+    #     session.add(user)
+    #     session.commit()
+    #     session.refresh(user)
 
 
 def init() -> None:

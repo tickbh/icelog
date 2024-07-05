@@ -22,18 +22,18 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from iceslog.models.user import MsgUserPublic
+from iceslog.models.user import MsgUserPublic, MsgUsersPublic
 from iceslog.utils import generate_new_account_email, send_email
 
 router = APIRouter()
 
 
 @router.get(
-    "/",
+    "/page",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=UsersPublic,
+    response_model=MsgUsersPublic,
 )
-def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100) -> Any:
     """
     Retrieve users.
     """
@@ -41,10 +41,10 @@ def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     count_statement = select(func.count()).select_from(User)
     count = session.exec(count_statement).one()
 
-    statement = select(User).offset(skip).limit(limit)
+    statement = select(User).offset((pageNum - 1) * pageSize).limit(pageSize)
     users = session.exec(statement).all()
 
-    return UsersPublic(data=users, count=count)
+    return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
 
 
 @router.post(
@@ -123,6 +123,12 @@ def read_user_me(current_user: CurrentUser) -> Any:
     """
     return MsgUserPublic(data=current_user)
 
+@router.get("/page", response_model=MsgUserPublic)
+def read_user_me(current_user: CurrentUser) -> Any:
+    """
+    Get current user.
+    """
+    return MsgUserPublic(data=current_user)
 
 @router.delete("/me", response_model=RetMsg)
 def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:

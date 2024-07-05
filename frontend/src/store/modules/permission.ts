@@ -1,7 +1,7 @@
 import { RouteRecordRaw } from "vue-router";
 import { constantRoutes } from "@/router";
 import { store } from "@/store";
-import MenuAPI, { RouteVO } from "@/api/menu";
+import MenuAPI, { MenuAndPerm, RouteVO } from "@/api/menu";
 
 const modules = import.meta.glob("../../views/**/**.vue");
 const Layout = () => import("@/layout/index.vue");
@@ -20,12 +20,12 @@ export const usePermissionStore = defineStore("permission", () => {
    * 生成动态路由
    */
   function generateRoutes() {
-    return new Promise<RouteRecordRaw[]>((resolve, reject) => {
+    return new Promise<MenuAndPerm>((resolve, reject) => {
       MenuAPI.getRoutes()
         .then((data) => {
-          const dynamicRoutes = transformRoutes(data);
-          routes.value = constantRoutes.concat(dynamicRoutes);
-          resolve(dynamicRoutes);
+          const value = transformRoutes(data);
+          routes.value = constantRoutes.concat(value.r);
+          resolve(value);
         })
         .catch((error) => {
           reject(error);
@@ -58,6 +58,7 @@ export const usePermissionStore = defineStore("permission", () => {
  */
 const transformRoutes = (routes: RouteVO[]) => {
   const asyncRoutes: RouteRecordRaw[] = [];
+  const perms: string[] = [];
   routes.forEach((route) => {
     const tmpRoute = { ...route } as RouteRecordRaw;
     // 顶级目录，替换为 Layout 组件
@@ -74,13 +75,16 @@ const transformRoutes = (routes: RouteVO[]) => {
     }
 
     if (tmpRoute.children) {
-      tmpRoute.children = transformRoutes(route.children);
+      tmpRoute.children = transformRoutes(route.children).r;
     }
-
-    asyncRoutes.push(tmpRoute);
+    if (route.perm) {
+      perms.push(route.perm);
+    } else {
+      asyncRoutes.push(tmpRoute);
+    }
   });
 
-  return asyncRoutes;
+  return { r: asyncRoutes, p: perms };
 };
 
 /**

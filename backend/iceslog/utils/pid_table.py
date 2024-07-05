@@ -22,10 +22,10 @@ class PidTable:
         self.check_redis = check_redis
         self.redis_expire_time = redis_expire_time
 
-    def get_type(self, val):
-        if hasattr(val, "type"):
-            return val.type
-        return self.default_type
+    def get_belongs(self, val):
+        if hasattr(val, "belong"):
+            return val.belong.split("|")
+        return [self.default_belong]
 
     def update(self):
         if not self.is_expire():
@@ -74,27 +74,27 @@ class PidTable:
                 return new_table
 
             for val in self.get_iter():
-                type = self.get_type(val)
-                self.count_values[type] = self.count_values.get(type, 0) + 1
-                
-                pid = val.pid
-                value_table[type] = value_table.get(type, {})
-                value_table[type][pid] = value_table[type].get(pid, [])
-                
-                if self.deal_func:
-                    data = self.deal_func(val)
-                else:
-                    data = val.model_dump()
-                value_table[type][pid].append(data)
-                self.cache_id_values[val.id] = data
+                for belong in self.get_belongs(val):
+                    self.count_values[belong] = self.count_values.get(belong, 0) + 1
+                    
+                    pid = val.pid
+                    value_table[belong] = value_table.get(belong, {})
+                    value_table[belong][pid] = value_table[belong].get(pid, [])
+                    
+                    if self.deal_func:
+                        data = self.deal_func(val)
+                    else:
+                        data = val.model_dump()
+                    value_table[belong][pid].append(data)
+                    self.cache_id_values[val.id] = data
             
-            for type, table in value_table.items():
+            for belong, table in value_table.items():
                 for _, list in table.items():
                     list.sort(key = _sort_value_func)
                 
                 main_value = _build_value(table, 0)
-                self.cache_values[type] = main_value
-                self.cache_show_values[type] = _filter_show(main_value)
+                self.cache_values[belong] = main_value
+                self.cache_show_values[belong] = _filter_show(main_value)
         except :
             base_utils.print_exec()
             self.cache_time = 0
@@ -127,21 +127,21 @@ class PidTable:
             return False
         return False
 
-    def get_values(self, type="default", default={}):
+    def get_values(self, belong="default", default={}):
         self.update()
-        return self.cache_values.get(type, default)
+        return self.cache_values.get(belong, default)
 
-    def get_id_value(self, type="default", default={}):
+    def get_id_value(self, belong="default", default={}):
         self.update()
-        return self.cache_id_values.get(type, default)
+        return self.cache_id_values.get(belong, default)
         
-    def get_show_values(self, type="default", default={}):
+    def get_show_values(self, belong="default", default={}):
         self.update()
-        return self.cache_show_values.get(type, default)
+        return self.cache_show_values.get(belong, default)
     
-    def get_counts(self, type="default", default = 0):
+    def get_counts(self, belong="default", default = 0):
         self.update()
-        return self.count_values.get(type, default)
+        return self.count_values.get(belong, default)
 
     def force_update(self):
         self.cache_time = 0

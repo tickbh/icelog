@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel, Column
 from iceslog.core.db import datetime_now
 from iceslog.models.base import RetMsg
 
-MIN_PASSWORD = 8
+MIN_PASSWORD = 6
 MAX_PASSWORD = 64
 
 # Shared properties
@@ -83,9 +83,12 @@ class MsgUserPublic(RetMsg):
     data: UserPublic
 
 class UsersPublic(SQLModel):
-    data: list[UserPublic]
-    count: int
+    list: list[UserPublic]
+    total: int
 
+class MsgUsersPublic(RetMsg):
+    data: UsersPublic
+    
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=40)

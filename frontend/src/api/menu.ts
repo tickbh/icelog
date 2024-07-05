@@ -102,6 +102,7 @@ class MenuAPI {
 export default MenuAPI;
 
 import { MenuTypeEnum } from "@/enums/MenuTypeEnum";
+import { RouteRecordRaw } from "vue-router";
 
 /** 菜单查询参数 */
 export interface MenuQuery {
@@ -180,6 +181,7 @@ interface KeyValue {
 
 /** RouteVO，路由对象 */
 export interface RouteVO {
+  perm?: string;
   /** 子路由列表 */
   children: RouteVO[];
   /** 组件路径 */
@@ -206,4 +208,11 @@ export interface Meta {
   keepAlive?: boolean;
   /** 路由title */
   title?: string;
+}
+
+/** RouteVO，路由对象 */
+export interface MenuAndPerm {
+  r: RouteRecordRaw[];
+  /** 子路由列表 */
+  p: string[];
 }

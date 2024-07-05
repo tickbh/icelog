@@ -20,10 +20,11 @@ def deal_func(data: Menus):
         "component": data.component,
         "redirect": data.redirect,
         "name": data.name,
+        "perm": data.perm,
         "meta": {
             "title": data.name,
             "icon": data.icon,
-            "hidden": False,
+            "hidden": not data.is_show or len(data.perm or "") > 0,
             "alwaysShow": False,
             "params": data.params,
         }

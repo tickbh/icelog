@@ -3,9 +3,9 @@
   <div class="app-container">
     <el-row :gutter="20">
       <!-- 部门树 -->
-      <el-col :lg="4" :xs="24" class="mb-[12px]">
+      <!-- <el-col :lg="4" :xs="24" class="mb-[12px]">
         <dept-tree v-model="queryParams.deptId" @node-click="handleQuery" />
-      </el-col>
+      </el-col> -->
 
       <!-- 用户列表 -->
       <el-col :lg="20" :xs="24">
@@ -117,15 +117,9 @@
               label="性别"
               width="100"
               align="center"
-              prop="genderLabel"
+              prop="gender"
             />
 
-            <el-table-column
-              label="部门"
-              width="120"
-              align="center"
-              prop="deptName"
-            />
             <el-table-column
               label="手机号码"
               align="center"

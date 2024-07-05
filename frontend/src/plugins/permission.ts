@@ -45,10 +45,12 @@ export function setupPermission() {
           const permissionStore = usePermissionStore();
           try {
             await userStore.getUserInfo();
-            const dynamicRoutes = await permissionStore.generateRoutes();
-            dynamicRoutes.forEach((route: RouteRecordRaw) =>
-              router.addRoute(route)
-            );
+            var { perms } = useUserStore().user;
+            const value = await permissionStore.generateRoutes();
+            value.r.forEach((route: RouteRecordRaw) => {
+              return router.addRoute(route);
+            });
+            value.p.forEach((p: string) => perms.push(p));
             next({ ...to, replace: true });
           } catch (error) {
             // 移除 token 并重定向到登录页，携带当前页面路由作为跳转参数

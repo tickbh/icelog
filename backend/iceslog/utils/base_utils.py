@@ -102,3 +102,9 @@ def print_exec(logging_type=''):
     error_logging = logging.getLogger('error')
     error_logging.warning("------------exception occur----------------")
     error_logging.error(info)
+    
+def split_to_int_list(val: str, split=",") -> list[int]:
+    rets = []
+    for v in val.split(split):
+        rets.append(safe_int(v))
+    return rets

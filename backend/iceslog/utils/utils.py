@@ -8,6 +8,8 @@ import emails  # type: ignore
 import jwt
 from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
+from sqlalchemy import func
+from sqlmodel import SQLModel, Session, select
 
 from iceslog.core.config import settings
 
@@ -115,3 +117,17 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+def page_view_condition(session: Session, condition: list, model: SQLModel, pageNum: int = 0, pageSize: int = 100):
+    statement = select(model)
+    count_statement = select(func.count()).select_from(model)
+    
+    for c in condition:
+        statement = statement.where(c)
+        count_statement = count_statement.where(c)
+
+    statement = statement.offset((pageNum - 1) * pageSize).limit(pageSize)
+    datas = session.exec(statement).all()
+    count = session.exec(count_statement).one()
+    return datas, count

@@ -76,7 +76,7 @@ class UserAPI {
    */
   static updatePassword(id: number, password: string) {
     return request({
-      url: `${USER_BASE_URL}/${id}/password`,
+      url: `${USER_BASE_URL}/password/${id}`,
       method: "patch",
       params: { password: password },
     });
@@ -236,5 +236,5 @@ export interface UserForm {
   /** 密码 */
   password?: string;
   // 是否激活
-  is_active: boolean;
+  is_active?: boolean;
 }

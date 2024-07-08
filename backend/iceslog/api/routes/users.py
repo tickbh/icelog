@@ -1,7 +1,8 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, or_, select
+from sqlalchemy import all_
+from sqlmodel import and_, col, delete, func, or_, select
 
 from iceslog import cruds
 from iceslog.api.deps import (
@@ -23,7 +24,8 @@ from iceslog.models import (
     UserUpdateMe,
 )
 from iceslog.models.user import MsgUserMePublic, MsgUserPublic, MsgUsersPublic, UserMePublic
-from iceslog.utils import cache_utils, generate_new_account_email, send_email
+from iceslog.utils import base_utils, cache_utils, generate_new_account_email, send_email
+from iceslog.utils.utils import page_view_condition
 
 router = APIRouter()
 
@@ -33,37 +35,23 @@ router = APIRouter()
     dependencies=[Depends(get_current_active_superuser)],
     response_model=MsgUsersPublic,
 )
-def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, key: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
+def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
     """
     Retrieve users.
     """
-    statement = select(User)
-    if key:
-        statement = statement.where(or_(User.username.like(f"%{key}%"), User.nickname.like(f"%{key}%"), User.mobile.like(f"%{key}%")))
-    
+    condition = []
+    if keywords:
+        condition.append(or_(User.username.like(f"%{keywords}%"), User.nickname.like(f"%{keywords}%"), User.mobile.like(f"%{keywords}%")))
     if is_active != None:
-        statement = statement.where(User.is_active == is_active)
-    
-    if startTime:
-        statement = statement.where(User.create_time__gt == startTime)
-    
-    if endTime:
-        statement = statement.where(User.create_time__lt == endTime)
+        condition.append(User.is_active == is_active)
         
-    # count1 = session.exec(statement).one_or_none()
+    if startTime:
+        condition.append(User.create_time > startTime)
+        
+    if endTime:
+        condition.append(User.create_time < endTime)
     
-    # statement = select(User).where(User.username.like("a%"))
-    # count2 = session.exec(statement).one_or_none()
-
-    # count_statement = select(func.count()).select_from(User)
-    # count_statement = select(func.count()).from_statement(statement)
-    
-    # count = session.exec(count_statement).one()
-    count = session.exec(statement).all().count()
-
-    statement = statement.offset((pageNum - 1) * pageSize).limit(pageSize)
-    users = session.exec(statement).all()
-
+    users, count = page_view_condition(session, condition, User, pageNum, pageSize)
     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
 
 @router.get(
@@ -90,7 +78,7 @@ def read_user_me(current_user: CurrentUser) -> Any:
     return MsgUserMePublic(data=me)
 
 @router.post(
-    "/create", dependencies=[Depends(get_current_active_superuser)], response_model=UserPublic
+    "/create", dependencies=[Depends(get_current_active_superuser)], response_model=RetMsg
 )
 def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
@@ -98,22 +86,10 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
     user = cruds.user.get_user_by_username(session=session, username=user_in.username)
     if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
-        )
+        return RetMsg.err_msg("00001", "用户名已存在")
 
     user = cruds.user.create_user(session=session, user_create=user_in)
-    # if settings.emails_enabled and user_in.email:
-    #     email_data = generate_new_account_email(
-    #         email_to=user_in.email, username=user_in.email, password=user_in.password
-    #     )
-    #     send_email(
-    #         email_to=user_in.email,
-    #         subject=email_data.subject,
-    #         html_content=email_data.html_content,
-    #     )
-    return user
+    return MsgUserPublic(data=user)
 
 
 # @router.patch("/me", response_model=UserPublic)
@@ -253,22 +229,50 @@ def update_user(
     return MsgUserPublic(data=db_user)
 
 
-# @router.delete("/{user_id}", dependencies=[Depends(get_current_active_superuser)])
-# def delete_user(
-#     session: SessionDep, current_user: CurrentUser, user_id: int
-# ) -> RetMsg:
-#     """
-#     Delete a user.
-#     """
-#     user = session.get(User, user_id)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     if user == current_user:
-#         raise HTTPException(
-#             status_code=403, detail="Super users are not allowed to delete themselves"
-#         )
-#     statement = delete(Item).where(col(Item.owner_id) == user_id)
-#     session.exec(statement)  # type: ignore
-#     session.delete(user)
-#     session.commit()
-#     return RetMsg(message="User deleted successfully")
+@router.patch(
+    "/password/{user_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=MsgUserPublic,
+)
+def update_password(
+    *,
+    session: SessionDep,
+    user_id: int,
+    password: str,
+) -> Any:
+    """
+    Update a user.
+    """
+
+    db_user = session.get(User, user_id)
+    if not db_user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this id does not exist in the system",
+        )
+
+    hashed_password = get_password_hash(password)
+    db_user.hashed_password = hashed_password
+    session.add(db_user)
+    session.commit()
+    return MsgUserPublic(msg="Password updated successfully", data=db_user)
+
+@router.delete("/{users}", dependencies=[Depends(get_current_active_superuser)])
+def delete_user(
+    session: SessionDep, current_user: CurrentUser, users: str
+) -> RetMsg:
+    """
+    Delete a user.
+    """
+    user_ids = base_utils.split_to_int_list(users)
+    for user_id in user_ids:
+        user = session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        if user == current_user:
+            raise HTTPException(
+                status_code=403, detail="Super users are not allowed to delete themselves"
+            )
+        session.delete(user)
+        session.commit()
+    return RetMsg(msg="User deleted successfully")

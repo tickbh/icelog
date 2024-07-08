@@ -5,7 +5,7 @@ from sqlmodel import SQLModel
 class RetMsg(SQLModel):
     code: str="00000"
     msg: str="ok"
-    data: Any
+    data: Any = None
     
     @staticmethod
     def err_msg(code: str, msg: str):

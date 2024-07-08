@@ -70,6 +70,17 @@ def init_perm(session: Session):
     session.commit()
     pass
 
+def init_dict(session: Session):
+    from iceslog.models import DictMap, DictMapItem
+    dict_map = DictMap(id=1, name="性别", code="gender", status=0, remark="性别字典")
+    session.add(dict_map)
+    dict_map = DictMapItem(id=1, dict_id=1, label="男", value="1", status=0, remark="性别字典")
+    session.add(dict_map)
+    dict_map = DictMapItem(id=2, dict_id=1, label="女", value="2", status=0, remark="性别字典")
+    session.add(dict_map)
+    dict_map = DictMapItem(id=3, dict_id=1, label="保密", value="0", status=0, remark="性别字典")
+    session.add(dict_map)
+    session.commit()
 
 def init_user(session: Session) -> None:
     from iceslog.models import UserBase, User
@@ -116,6 +127,7 @@ def init_user(session: Session) -> None:
 def init() -> None:
     logger.info("Creating initial data")
     with Session(engine) as session:
+        init_dict(session)
         init_perm(session)
         init_menu(session)
         init_user(session)

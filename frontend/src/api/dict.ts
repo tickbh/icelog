@@ -80,7 +80,7 @@ class DictAPI {
    */
   static getOptions(code: string) {
     return request<any, OptionType[]>({
-      url: `${DICT_BASE_URL}/${code}/options`,
+      url: `${DICT_BASE_URL}/options?key=${code}`,
       method: "get",
     });
   }

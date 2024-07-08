@@ -21,15 +21,15 @@
               />
             </el-form-item>
 
-            <el-form-item label="状态" prop="status">
+            <el-form-item label="状态" prop="is_active">
               <el-select
-                v-model="queryParams.status"
+                v-model="queryParams.is_active"
                 placeholder="全部"
                 clearable
                 class="!w-[100px]"
               >
-                <el-option label="启用" value="1" />
-                <el-option label="禁用" value="0" />
+                <el-option label="启用" value="true" />
+                <el-option label="禁用" value="false" />
               </el-select>
             </el-form-item>
 
@@ -127,17 +127,17 @@
               width="120"
             />
 
-            <el-table-column label="状态" align="center" prop="status">
+            <el-table-column label="状态" align="center" prop="is_active">
               <template #default="scope">
-                <el-tag :type="scope.row.status == 1 ? 'success' : 'info'">{{
-                  scope.row.status == 1 ? "启用" : "禁用"
+                <el-tag :type="scope.row.is_active ? 'success' : 'info'">{{
+                  scope.row.is_active ? "启用" : "禁用"
                 }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column
               label="创建时间"
               align="center"
-              prop="createTime"
+              prop="create_time"
               width="180"
             />
             <el-table-column label="操作" fixed="right" width="220">
@@ -207,6 +207,14 @@
           <el-input v-model="formData.nickname" placeholder="请输入用户昵称" />
         </el-form-item>
 
+        <el-form-item required label="密码" prop="password" v-if="!formData.id">
+          <el-input
+            v-model="formData.password"
+            placeholder="请输入密码, 6位到50位"
+            maxlength="50"
+          />
+        </el-form-item>
+
         <!-- <el-form-item label="所属部门" prop="deptId">
           <el-tree-select
             v-model="formData.deptId"
@@ -249,10 +257,10 @@
           />
         </el-form-item>
 
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="formData.status">
-            <el-radio :label="1">正常</el-radio>
-            <el-radio :label="0">禁用</el-radio>
+        <el-form-item label="状态" prop="is_active">
+          <el-radio-group v-model="formData.is_active">
+            <el-radio :label="true">正常</el-radio>
+            <el-radio :label="false">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -323,6 +331,7 @@ const importDialogVisible = ref(false);
 // 用户表单数据
 const formData = reactive<UserForm>({
   status: 1,
+  is_active: true,
 });
 
 /** 用户表单校验规则  */
@@ -406,9 +415,7 @@ function hancleResetPassword(row: { [key: string]: any }) {
 async function handleOpenDialog(id?: number) {
   dialog.visible = true;
   // 加载角色下拉数据源
-  roleOptions.value = await RoleAPI.getOptions();
-  // 加载部门下拉数据源
-  deptOptions.value = await DeptAPI.getOptions();
+  roleOptions.value = [];
 
   if (id) {
     dialog.title = "修改用户";

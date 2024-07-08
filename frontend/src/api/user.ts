@@ -36,7 +36,7 @@ class UserAPI {
    */
   static getFormData(userId: number) {
     return request<any, UserForm>({
-      url: `${USER_BASE_URL}/${userId}/form`,
+      url: `${USER_BASE_URL}/form?user_id=${userId}`,
       method: "get",
     });
   }
@@ -48,7 +48,7 @@ class UserAPI {
    */
   static add(data: UserForm) {
     return request({
-      url: `${USER_BASE_URL}`,
+      url: `${USER_BASE_URL}/create`,
       method: "post",
       data: data,
     });
@@ -181,6 +181,8 @@ export interface UserPageQuery extends PageQuery {
 
   /** 结束时间 */
   endTime?: string;
+  // 是否激活
+  is_active?: boolean;
 }
 
 /** 用户分页对象 */
@@ -231,4 +233,8 @@ export interface UserForm {
   status?: number;
   /** 用户名 */
   username?: string;
+  /** 密码 */
+  password?: string;
+  // 是否激活
+  is_active: boolean;
 }

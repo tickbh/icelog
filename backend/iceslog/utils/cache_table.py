@@ -6,12 +6,14 @@ from iceslog.utils import base_utils
 
 class CacheTable:
     model: SQLModel
-    def __init__(self, model, use_cache=False, expire_time = 60 * 60, attribs=[], check_redis=True, redis_expire_time=30):
+    def __init__(self, model, use_cache=False, expire_time = 60 * 60, attribs=[], groups=[], check_redis=True, redis_expire_time=30):
         self.model = model
         self.cache_time = 0
         self.expire_time = expire_time
         self.cache_table = {}
+        self.cache_group_table = {}
         self.attribs = attribs
+        self.groups = groups
         self.use_cache = use_cache
         
         self.redis_cache_time = 0
@@ -24,6 +26,7 @@ class CacheTable:
         
         logging.info(f'chk perm expire reload data')
         temp_table = {}
+        temp_group_table = {}
         for val in self.get_iter():
             data = val.model_dump()
             if hasattr(val, "id"):
@@ -37,7 +40,14 @@ class CacheTable:
                     else:
                         temp_table[data[attrib]] = data
                         
+            for group in self.groups:
+                if group in data and data[group]:
+                    key = data[group]
+                    temp_group_table[key] = temp_group_table.get(key, [])
+                    temp_group_table[key].append(data)
+                        
         self.cache_table = temp_table
+        self.cache_group_table = temp_group_table
         self.cache_time = time.time()
         self.redis_cache_time = time.time()
         logging.info(f'chk perm done')
@@ -64,6 +74,10 @@ class CacheTable:
     def get_value(self, key=0):
         self.update()
         return self.cache_table.get(key, None)
+    
+    def get_group(self, key=0):
+        self.update()
+        return self.cache_group_table.get(key, None)
     
     def cache_iter(self):
         for it in self.cache_table:

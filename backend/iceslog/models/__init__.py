@@ -3,6 +3,7 @@ from .base import *
 from .menu import *
 from .user import *
 from .pems import *
+from .dictmap import *
 
 # JSON payload containing access token
 class Token(SQLModel):

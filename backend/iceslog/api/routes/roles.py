@@ -1,9 +1,8 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, or_, select
+from sqlmodel import col, delete, func, select
 
-from iceslog import cruds
 from iceslog.api.deps import (
     CurrentUser,
     SessionDep,
@@ -33,87 +32,59 @@ router = APIRouter()
     dependencies=[Depends(get_current_active_superuser)],
     response_model=MsgUsersPublic,
 )
-def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, key: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
+def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100) -> Any:
     """
     Retrieve users.
     """
-    statement = select(User)
-    if key:
-        statement = statement.where(or_(User.username.like(f"%{key}%"), User.nickname.like(f"%{key}%"), User.mobile.like(f"%{key}%")))
-    
-    if is_active != None:
-        statement = statement.where(User.is_active == is_active)
-    
-    if startTime:
-        statement = statement.where(User.create_time__gt == startTime)
-    
-    if endTime:
-        statement = statement.where(User.create_time__lt == endTime)
-        
-    # count1 = session.exec(statement).one_or_none()
-    
-    # statement = select(User).where(User.username.like("a%"))
-    # count2 = session.exec(statement).one_or_none()
 
-    # count_statement = select(func.count()).select_from(User)
-    # count_statement = select(func.count()).from_statement(statement)
-    
-    # count = session.exec(count_statement).one()
-    count = session.exec(statement).all().count()
+    count_statement = select(func.count()).select_from(User)
+    count = session.exec(count_statement).one()
 
-    statement = statement.offset((pageNum - 1) * pageSize).limit(pageSize)
+    statement = select(User).offset((pageNum - 1) * pageSize).limit(pageSize)
     users = session.exec(statement).all()
 
     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
 
-@router.get(
-    "/form", 
-    dependencies=[Depends(get_current_active_superuser)], 
-    response_model=MsgUserPublic
-)
-def read_user_form(*, session: SessionDep, user_id: int) -> Any:
+
+
+# @router.get(
+#     "/data", 
+#     # dependencies=[Depends(get_current_active_superuser)], 
+#     response_model=MsgUserPublic
+# )
+# def read_user_form(*, session: SessionDep) -> Any:
     
-    user = session.get(User, user_id)
-    if not user:
-        return RetMsg("00001", "账号不存在")
+#     user = session.get(User, id)
+#     if not user:
+#         return RetMsg("00001", "账号不存在")
     
-    return MsgUserPublic(data = user)
+#     return MsgUserPublic(data = user)
 
+# @router.post(
+#     "/", dependencies=[Depends(get_current_active_superuser)], response_model=UserPublic
+# )
+# def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
+#     """
+#     Create new user.
+#     """
+#     user = crud.get_user_by_email(session=session, email=user_in.email)
+#     if user:
+#         raise HTTPException(
+#             status_code=400,
+#             detail="The user with this email already exists in the system.",
+#         )
 
-@router.get("/me", response_model=MsgUserMePublic)
-def read_user_me(current_user: CurrentUser) -> Any:
-    """
-    Get current user.
-    """
-    me = UserMePublic.model_validate(current_user, update={"perms": []})
-    me.perms = cache_utils.get_all_perms(current_user.group_pem)
-    return MsgUserMePublic(data=me)
-
-@router.post(
-    "/create", dependencies=[Depends(get_current_active_superuser)], response_model=UserPublic
-)
-def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
-    """
-    Create new user.
-    """
-    user = cruds.user.get_user_by_username(session=session, username=user_in.username)
-    if user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
-        )
-
-    user = cruds.user.create_user(session=session, user_create=user_in)
-    # if settings.emails_enabled and user_in.email:
-    #     email_data = generate_new_account_email(
-    #         email_to=user_in.email, username=user_in.email, password=user_in.password
-    #     )
-    #     send_email(
-    #         email_to=user_in.email,
-    #         subject=email_data.subject,
-    #         html_content=email_data.html_content,
-    #     )
-    return user
+#     user = crud.create_user(session=session, user_create=user_in)
+#     if settings.emails_enabled and user_in.email:
+#         email_data = generate_new_account_email(
+#             email_to=user_in.email, username=user_in.email, password=user_in.password
+#         )
+#         send_email(
+#             email_to=user_in.email,
+#             subject=email_data.subject,
+#             html_content=email_data.html_content,
+#         )
+#     return user
 
 
 # @router.patch("/me", response_model=UserPublic)
@@ -158,6 +129,14 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
 #     return RetMsg(message="Password updated successfully")
 
 
+# @router.get("/me", response_model=MsgUserMePublic)
+# def read_user_me(current_user: CurrentUser) -> Any:
+#     """
+#     Get current user.
+#     """
+#     me = UserMePublic.model_validate(current_user, update={"perms": []})
+#     me.perms = cache_utils.get_all_perms(current_user.group_pem)
+#     return MsgUserMePublic(data=me)
 
 # @router.get("/page", response_model=MsgUserPublic)
 # def read_user_me(current_user: CurrentUser) -> Any:
@@ -221,36 +200,36 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
 #     return user
 
 
-@router.put(
-    "/{user_id}",
-    dependencies=[Depends(get_current_active_superuser)],
-    response_model=MsgUserPublic,
-)
-def update_user(
-    *,
-    session: SessionDep,
-    user_id: int,
-    user_in: UserUpdate,
-) -> Any:
-    """
-    Update a user.
-    """
+# @router.patch(
+#     "/{user_id}",
+#     dependencies=[Depends(get_current_active_superuser)],
+#     response_model=UserPublic,
+# )
+# def update_user(
+#     *,
+#     session: SessionDep,
+#     user_id: int,
+#     user_in: UserUpdate,
+# ) -> Any:
+#     """
+#     Update a user.
+#     """
 
-    db_user = session.get(User, user_id)
-    if not db_user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this id does not exist in the system",
-        )
-    if user_in.email:
-        existing_user = cruds.user.get_user_by_email(session=session, email=user_in.email)
-        if existing_user and existing_user.id != user_id:
-            raise HTTPException(
-                status_code=409, detail="User with this email already exists"
-            )
+#     db_user = session.get(User, user_id)
+#     if not db_user:
+#         raise HTTPException(
+#             status_code=404,
+#             detail="The user with this id does not exist in the system",
+#         )
+#     if user_in.email:
+#         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
+#         if existing_user and existing_user.id != user_id:
+#             raise HTTPException(
+#                 status_code=409, detail="User with this email already exists"
+#             )
 
-    db_user = cruds.user.update_user(session=session, db_user=db_user, user_in=user_in)
-    return MsgUserPublic(data=db_user)
+#     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
+#     return db_user
 
 
 # @router.delete("/{user_id}", dependencies=[Depends(get_current_active_superuser)])

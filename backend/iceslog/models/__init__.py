@@ -16,14 +16,16 @@ class TokenPayload(SQLModel):
     sub: int | None = None
 
 # Contents of JWT token
-class MsgAuthCaptcha(RetMsg):
+class AuthCaptcha(SQLModel):
     captchaKey: str
     captchaBase64: str
     
 # Contents of JWT token
-class MsgLoginRet(RetMsg):
+class LoginRet(SQLModel):
     accessToken: str
     tokenType: str = "Bearer"
     refreshToken: str|None = None
     expires: str|None = None
     
+class LoginoutRet(RetMsg):
+    pass

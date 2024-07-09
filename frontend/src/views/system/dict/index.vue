@@ -141,8 +141,8 @@
           >
             <el-table-column label="字典项名称" width="200">
               <template #default="scope">
-                <el-form-item :prop="'dictItems.' + scope.$index + '.name'">
-                  <el-input v-model="scope.row.name" />
+                <el-form-item :prop="'dictItems.' + scope.$index + '.label'">
+                  <el-input v-model="scope.row.label" />
                 </el-form-item>
               </template>
             </el-table-column>
@@ -307,6 +307,7 @@ function handleSubmitClick() {
           })
           .finally(() => (loading.value = false));
       } else {
+        formData.id = 0;
         DictAPI.add(formData)
           .then(() => {
             ElMessage.success("新增成功");
@@ -343,23 +344,31 @@ function handleDelete(id?: number) {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
-  }).then(
-    () => {
-      DictAPI.deleteByIds(attrGroupIds).then(() => {
-        ElMessage.success("删除成功");
-        handleResetClick();
-      });
-    },
-    () => {
-      ElMessage.info("已取消删除");
-    }
-  );
+  })
+    .then(
+      () => {
+        DictAPI.deleteByIds(attrGroupIds)
+          .then(() => {
+            ElMessage.success("删除成功");
+            handleResetClick();
+          })
+          .catch(() => {
+            ElMessage.success("删除失败");
+          });
+      },
+      () => {
+        ElMessage.info("已取消删除");
+      }
+    )
+    .catch(() => {
+      ElMessageBox.close();
+    });
 }
 
 // 新增字典
 function handleAddAttrClick() {
   formData.dictItems = formData.dictItems ?? [];
-  formData.dictItems.push({ sort: 1, status: 1 });
+  formData.dictItems.push({ id: 0, sort: 1, status: 1 });
 }
 // 删除字典
 function handleDeleteAttrClick(index: number) {

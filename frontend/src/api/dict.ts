@@ -25,7 +25,7 @@ class DictAPI {
    */
   static getFormData(id: number) {
     return request<any, ResponseData<DictForm>>({
-      url: `${DICT_BASE_URL}/${id}/form`,
+      url: `${DICT_BASE_URL}/form/${id}`,
       method: "get",
     });
   }
@@ -79,17 +79,9 @@ class DictAPI {
    * @returns 字典数据项
    */
   static getOptions(code: string) {
-    return new Promise<OptionType[]>((resolve, reject) => {
-      request<any, OptionList>({
-        url: `${DICT_BASE_URL}/options?key=${code}`,
-        method: "get",
-      })
-        .then((data) => {
-          resolve(data.list);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+    return request<any, OptionType[]>({
+      url: `${DICT_BASE_URL}/options?key=${code}`,
+      method: "get",
     });
   }
 }

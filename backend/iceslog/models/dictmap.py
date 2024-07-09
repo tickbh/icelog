@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Union
 from pydantic import ConfigDict, EmailStr
 from sqlalchemy import JSON
 from sqlmodel import Field, Relationship, SQLModel, Column
@@ -43,20 +44,20 @@ class MsgDictItemsPublic(RetMsg):
     list: list[OneDictItem]
     
 class OneEditDictItem(SQLModel):
-    id: int
+    id: Union[int, None]
     label: str
     value: str
     status: int
     sort: int
     
 class OneEditDictMap(SQLModel):
-    id: int
+    id: Union[int, None]
     name: str
     code: str
     status: int
     dictItems: list[OneEditDictItem]
     
-class MsgEditDictMap(RetMsg):
+class MsgEditDictMap(SQLModel):
     list: list[OneEditDictMap]
     total: int
     

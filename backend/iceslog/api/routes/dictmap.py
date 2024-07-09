@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import col, delete, func, select
@@ -22,7 +22,8 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from iceslog.models.dictmap import DictMap, MsgDictItemsPublic, MsgEditDictMap, OneEditDictMap
+from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
+from iceslog.utils import base_utils
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
 
@@ -40,19 +41,19 @@ def get_dict_items(id):
 
 @router.get(
     "/options",
-    response_model=MsgDictItemsPublic,
+    response_model=List[OneDictItem],
 )
 def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     group = get_dict(key)
     if not group:
         return
     items = get_dict_items(group["id"])
-    return MsgDictItemsPublic(list=items)
+    return items
 
 @router.get(
     "/page",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=RetMsg|MsgEditDictMap,
+    response_model=MsgEditDictMap,
 )
 def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
     condition = []
@@ -62,8 +63,108 @@ def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
     dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
     vals = []
     for val in dicts:
-        items = get_dict_items(val.id)
-        val = OneEditDictMap.model_validate(val, update={"dictItems": get_dict_items(val.id)})
+        items = []
+        for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == val.id)).all():
+            items.append(sub)
+        val = OneEditDictMap.model_validate(val, update={"dictItems": items})
         vals.append(val)
     
     return MsgEditDictMap(list=vals, total=count) 
+
+
+@router.get(
+    "/form/{dict_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=OneEditDictMap,
+)
+def get_dict(session: SessionDep, dict_id: int) -> Any:
+    dict_map = session.exec(select(DictMap).where(DictMap.id==dict_id)).first()
+    if not dict_map:
+        raise HTTPException(status_code=400, detail="不存在该字典id")
+    
+    items = []
+    for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == dict_id)).all():
+        items.append(sub)
+    val = OneEditDictMap.model_validate(dict_map, update={"dictItems": items})
+    return val
+
+@router.put(
+    "/{dict_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def modify_dict(session: SessionDep, dict_id: int, dict_map: OneEditDictMap) -> Any:
+    map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
+    if not map:
+        raise HTTPException(400, "不存在该字典选项")
+    
+    if map.name != dict_map.name or map.code != dict_map.code or map.status != dict_map.status:
+        map.name = dict_map.name
+        map.code = dict_map.code
+        map.status = dict_map.status
+        session.add(map)
+        session.commit()
+        
+    for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == dict_id)).all():
+        find = None
+        for child in dict_map.dictItems:
+            if sub.id == child.id:
+                find = child
+                break
+        if not find:
+            session.delete(sub)
+            session.commit()
+        elif find.label != sub.label or find.value != sub.value or find.status != sub.status or find.sort != sub.sort:
+            sub.label = find.label
+            sub.value = find.value
+            sub.status = find.status
+            sub.sort = find.sort
+            session.add(map)
+            session.commit()
+            
+    for child in dict_map.dictItems:
+        if 0 == child.id:
+            del child.id
+            item = DictMapItem.model_validate(child)
+            item.dict_id = dict_id
+            session.add(item)
+            session.commit()
+    return RetMsg()
+
+
+@router.delete(
+    "/{dicts}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def delete_dict(session: SessionDep, dicts: str) -> Any:
+    # for dict_id in base_utils.split_to_int_list(dicts):
+    #     map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
+    #     if not map:
+    #         raise HTTPException(400, "不存在该字典选项")
+        
+    #     session.delete(map)
+    #     session.exec(delete(DictMapItem).where(DictMapItem.dict_id == dict_id))
+    #     session.commit()
+    return RetMsg()
+
+
+@router.post(
+    "",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def add_dict(session: SessionDep, dict_map: OneEditDictMap) -> Any:
+    del dict_map.id
+    map = DictMap.model_validate(dict_map)
+    session.add(map)
+    session.commit()
+    session.refresh(map)
+    
+    for child in dict_map.dictItems:
+        del child.id
+        item = DictMapItem.model_validate(child)
+        item.dict_id = map.id
+        session.add(item)
+        session.commit()
+    return RetMsg()

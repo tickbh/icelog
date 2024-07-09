@@ -256,7 +256,7 @@ def update_password(
     db_user.hashed_password = hashed_password
     session.add(db_user)
     session.commit()
-    return MsgUserPublic(msg_="Password updated successfully", data=db_user)
+    return MsgUserPublic(msg="Password updated successfully", data=db_user)
 
 @router.delete("/{users}", dependencies=[Depends(get_current_active_superuser)])
 def delete_user(
@@ -276,4 +276,4 @@ def delete_user(
             )
         session.delete(user)
         session.commit()
-    return RetMsg(msg_="User deleted successfully")
+    return RetMsg(msg="User deleted successfully")

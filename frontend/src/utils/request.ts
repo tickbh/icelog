@@ -35,21 +35,22 @@ service.interceptors.response.use(
       return response;
     }
 
-    var { code_, msg_ } = response.data;
-    delete response.data["code"];
-    delete response.data["msg"];
+    return response.data;
+    // var { code_, msg_ } = response.data;
+    // delete response.data["code"];
+    // delete response.data["msg"];
 
-    if (code_ === ResultEnum.SUCCESS) {
-      return response.data;
-    }
+    // if (code_ === ResultEnum.SUCCESS) {
+    //   return response.data;
+    // }
 
-    ElMessage.error(msg_ || "系统出错");
-    return Promise.reject(new Error(msg_ || "Error"));
+    // ElMessage.error(msg_ || "系统出错");
+    // return Promise.reject(new Error(msg_ || "Error"));
   },
   (error: any) => {
     // 异常处理
     if (error.response.data) {
-      if (error.response.status > 400 && error.response.status < 500) {
+      if (error.response.status >= 400 && error.response.status < 500) {
         var { detail } = error.response.data;
         ElMessage.error(detail || "系统出错");
         return Promise.reject(new Error(detail || "Error"));

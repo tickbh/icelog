@@ -9,7 +9,7 @@ from iceslog.api.deps import CurrentUser, SessionDep, get_current_active_superus
 from iceslog.captcha import img_captcha
 from iceslog.core import security
 from iceslog.core.config import settings
-from iceslog.models import MsgAuthCaptcha, RetMsg, MsgLoginRet, Token
+from iceslog.models import AuthCaptcha, RetMsg, LoginRet, Token
 from iceslog.models.dictmap import DictMap, MsgEditDictMap
 from iceslog.models.menu import Menus
 from iceslog.utils import PidTable

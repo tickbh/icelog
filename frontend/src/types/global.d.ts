@@ -91,5 +91,13 @@ declare global {
     /** 子列表  */
     children?: OptionType[];
   }
+
+  /**
+   * 组件数据源
+   */
+  interface OptionList {
+    /** 子列表  */
+    list: OptionType[];
+  }
 }
 export {};

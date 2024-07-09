@@ -79,9 +79,17 @@ class DictAPI {
    * @returns 字典数据项
    */
   static getOptions(code: string) {
-    return request<any, OptionType[]>({
-      url: `${DICT_BASE_URL}/options?key=${code}`,
-      method: "get",
+    return new Promise<OptionType[]>((resolve, reject) => {
+      request<any, OptionList>({
+        url: `${DICT_BASE_URL}/options?key=${code}`,
+        method: "get",
+      })
+        .then((data) => {
+          resolve(data.list);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 }

@@ -40,7 +40,7 @@ class OneDictItem(SQLModel):
     label: str = ""
     
 class MsgDictItemsPublic(RetMsg):
-    data: list[OneDictItem]
+    list: list[OneDictItem]
     
 class OneEditDictItem(SQLModel):
     id: int
@@ -57,6 +57,6 @@ class OneEditDictMap(SQLModel):
     dictItems: list[OneEditDictItem]
     
 class MsgEditDictMap(RetMsg):
-    data: list[OneEditDictMap]
+    list: list[OneEditDictMap]
     total: int
     

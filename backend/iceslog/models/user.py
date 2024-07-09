@@ -78,22 +78,16 @@ class User(UserBase, table=True):
 class UserMePublic(UserBase, RetMsg):
     id: int
     perms: list[str] | None
-
-class MsgUserMePublic(RetMsg):
-    data: UserMePublic
     
-class UserPublic(UserBase):
+class UserPublic(UserBase, RetMsg):
     id: int
     
 class MsgUserPublic(RetMsg):
     data: UserPublic
 
-class UsersPublic(SQLModel):
+class UsersPublic(RetMsg):
     list: list[UserPublic]
     total: int
-
-class MsgUsersPublic(RetMsg):
-    data: UsersPublic
     
 class NewPassword(SQLModel):
     token: str

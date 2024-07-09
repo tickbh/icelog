@@ -21,29 +21,28 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from iceslog.models.user import MsgUserMePublic, MsgUserPublic, MsgUsersPublic, UserMePublic
 from iceslog.utils import cache_utils, generate_new_account_email, send_email
 
 router = APIRouter()
 
 
-@router.get(
-    "/page",
-    dependencies=[Depends(get_current_active_superuser)],
-    response_model=MsgUsersPublic,
-)
-def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100) -> Any:
-    """
-    Retrieve users.
-    """
+# @router.get(
+#     "/page",
+#     dependencies=[Depends(get_current_active_superuser)],
+#     response_model=MsgUsersPublic,
+# )
+# def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100) -> Any:
+#     """
+#     Retrieve users.
+#     """
 
-    count_statement = select(func.count()).select_from(User)
-    count = session.exec(count_statement).one()
+#     count_statement = select(func.count()).select_from(User)
+#     count = session.exec(count_statement).one()
 
-    statement = select(User).offset((pageNum - 1) * pageSize).limit(pageSize)
-    users = session.exec(statement).all()
+#     statement = select(User).offset((pageNum - 1) * pageSize).limit(pageSize)
+#     users = session.exec(statement).all()
 
-    return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
+#     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
 
 
 

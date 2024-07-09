@@ -23,7 +23,7 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from iceslog.models.user import MsgUserMePublic, MsgUserPublic, MsgUsersPublic, UserMePublic
+from iceslog.models.user import MsgUserPublic, UserMePublic
 from iceslog.utils import base_utils, cache_utils, generate_new_account_email, send_email
 from iceslog.utils.utils import page_view_condition
 
@@ -33,7 +33,7 @@ router = APIRouter()
 @router.get(
     "/page",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=MsgUsersPublic,
+    response_model=UsersPublic,
 )
 def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
     """
@@ -52,12 +52,12 @@ def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
         condition.append(User.create_time < endTime)
     
     users, count = page_view_condition(session, condition, User, pageNum, pageSize)
-    return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
+    return UsersPublic(list=users, total=count)
 
 @router.get(
     "/form", 
     dependencies=[Depends(get_current_active_superuser)], 
-    response_model=MsgUserPublic
+    response_model=UserPublic
 )
 def read_user_form(*, session: SessionDep, user_id: int) -> Any:
     
@@ -65,20 +65,20 @@ def read_user_form(*, session: SessionDep, user_id: int) -> Any:
     if not user:
         return RetMsg("00001", "账号不存在")
     
-    return MsgUserPublic(data = user)
+    return user
 
 
-@router.get("/me", response_model=MsgUserMePublic)
+@router.get("/me", response_model=UserMePublic)
 def read_user_me(current_user: CurrentUser) -> Any:
     """
     Get current user.
     """
     me = UserMePublic.model_validate(current_user, update={"perms": []})
     me.perms = cache_utils.get_all_perms(current_user.group_pem)
-    return MsgUserMePublic(data=me)
+    return me
 
 @router.post(
-    "/create", dependencies=[Depends(get_current_active_superuser)], response_model=RetMsg
+    "/create", dependencies=[Depends(get_current_active_superuser)], response_model=RetMsg|UserPublic
 )
 def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     """
@@ -87,9 +87,10 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
     user = cruds.user.get_user_by_username(session=session, username=user_in.username)
     if user:
         return RetMsg.err_msg("00001", "用户名已存在")
-
+    if not user_in.user_type:
+        user_in.user_type = "sys"
     user = cruds.user.create_user(session=session, user_create=user_in)
-    return MsgUserPublic(data=user)
+    return user
 
 
 # @router.patch("/me", response_model=UserPublic)
@@ -255,7 +256,7 @@ def update_password(
     db_user.hashed_password = hashed_password
     session.add(db_user)
     session.commit()
-    return MsgUserPublic(msg="Password updated successfully", data=db_user)
+    return MsgUserPublic(msg_="Password updated successfully", data=db_user)
 
 @router.delete("/{users}", dependencies=[Depends(get_current_active_superuser)])
 def delete_user(
@@ -275,4 +276,4 @@ def delete_user(
             )
         session.delete(user)
         session.commit()
-    return RetMsg(msg="User deleted successfully")
+    return RetMsg(msg_="User deleted successfully")

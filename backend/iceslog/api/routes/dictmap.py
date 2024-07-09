@@ -23,8 +23,6 @@ from iceslog.models import (
     UserUpdateMe,
 )
 from iceslog.models.dictmap import DictMap, MsgDictItemsPublic, MsgEditDictMap, OneEditDictMap
-from iceslog.models.user import MsgUserMePublic, MsgUserPublic, MsgUsersPublic, UserMePublic
-from iceslog.utils import cache_utils, generate_new_account_email, send_email
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
 
@@ -49,13 +47,12 @@ def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     if not group:
         return
     items = get_dict_items(group["id"])
-    return MsgDictItemsPublic(data=items)
-
+    return MsgDictItemsPublic(list=items)
 
 @router.get(
     "/page",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=RetMsg,
+    response_model=RetMsg|MsgEditDictMap,
 )
 def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
     condition = []
@@ -69,4 +66,4 @@ def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
         val = OneEditDictMap.model_validate(val, update={"dictItems": get_dict_items(val.id)})
         vals.append(val)
     
-    return RetMsg(data = MsgEditDictMap(data=vals, total=count)) 
+    return MsgEditDictMap(list=vals, total=count) 

@@ -47,7 +47,7 @@
         <el-table-column type="expand" label="字典项列表" width="100">
           <template #default="props">
             <el-table :data="props.row.dictItems">
-              <el-table-column label="字典项键" prop="name" width="200" />
+              <el-table-column label="字典项键" prop="label" width="200" />
               <el-table-column label="字典项值" prop="value" align="center" />
               <el-table-column label="排序" prop="sort" align="center" />
             </el-table>

@@ -12,7 +12,6 @@ from iceslog.core.config import settings
 from iceslog.models import MsgAuthCaptcha, RetMsg, MsgLoginRet, Token
 from iceslog.models.dictmap import DictMap, MsgEditDictMap
 from iceslog.models.menu import Menus
-from iceslog.models.user import MsgUsersPublic
 from iceslog.utils import PidTable
 from iceslog.utils.utils import page_view_condition
 router = APIRouter()
@@ -46,8 +45,8 @@ pid_cls = PidTable(Menus, deal_func=deal_func)
 
 @router.get("/routes", response_class=ORJSONResponse)
 def get_routes(current_user: CurrentUser):
-    menus = pid_cls.get_values(current_user.user_type)
-    return ORJSONResponse({"code": "00000", "msg": "ok", "data": menus })
+    menus = pid_cls.get_values(current_user.user_type).copy()
+    return ORJSONResponse({"code_": "00000", "msg_": "ok", "list": menus })
 
 
 # @router.get(

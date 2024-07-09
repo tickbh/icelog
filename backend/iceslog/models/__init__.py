@@ -21,7 +21,7 @@ class MsgAuthCaptcha(RetMsg):
     captchaBase64: str
     
 # Contents of JWT token
-class MsgLoginRet(CommonMessage):
+class MsgLoginRet(RetMsg):
     accessToken: str
     tokenType: str = "Bearer"
     refreshToken: str|None = None

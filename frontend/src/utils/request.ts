@@ -35,17 +35,26 @@ service.interceptors.response.use(
       return response;
     }
 
-    const { code, data, msg } = response.data;
-    if (code === ResultEnum.SUCCESS) {
-      return data;
+    var { code_, msg_ } = response.data;
+    delete response.data["code"];
+    delete response.data["msg"];
+
+    if (code_ === ResultEnum.SUCCESS) {
+      return response.data;
     }
 
-    ElMessage.error(msg || "系统出错");
-    return Promise.reject(new Error(msg || "Error"));
+    ElMessage.error(msg_ || "系统出错");
+    return Promise.reject(new Error(msg_ || "Error"));
   },
   (error: any) => {
     // 异常处理
     if (error.response.data) {
+      if (error.response.status > 400 && error.response.status < 500) {
+        var { detail } = error.response.data;
+        ElMessage.error(detail || "系统出错");
+        return Promise.reject(new Error(detail || "Error"));
+      }
+
       const { code, msg } = error.response.data;
       if (code === ResultEnum.TOKEN_INVALID) {
         ElNotification({

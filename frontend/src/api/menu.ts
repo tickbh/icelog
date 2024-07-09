@@ -11,7 +11,7 @@ class MenuAPI {
    * @returns 路由列表
    */
   static getRoutes() {
-    return request<any, RouteVO[]>({
+    return request<any, RouteVODict>({
       url: `${MENU_BASE_URL}/routes`,
       method: "get",
     });
@@ -193,6 +193,10 @@ export interface RouteVO {
   path?: string;
   /** 跳转链接 */
   redirect?: string;
+}
+
+interface RouteVODict {
+  list: RouteVO[];
 }
 
 /** Meta，路由属性 */

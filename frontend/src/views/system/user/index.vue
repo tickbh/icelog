@@ -76,11 +76,14 @@
                 >
               </div>
               <div>
-                <el-button class="ml-3" @click="handleOpenImportDialog"
+                <el-button
+                  class="ml-3"
+                  v-show="false"
+                  @click="handleOpenImportDialog"
                   ><template #icon><i-ep-upload /></template>导入</el-button
                 >
 
-                <el-button class="ml-3" @click="handleExport"
+                <el-button class="ml-3" v-show="false" @click="handleExport"
                   ><template #icon><i-ep-download /></template>导出</el-button
                 >
               </div>

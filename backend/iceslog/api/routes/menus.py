@@ -1,16 +1,20 @@
 
 from datetime import timedelta
 import json
-from fastapi import APIRouter, Form, HTTPException
+from typing import Any
+from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.responses import ORJSONResponse
 from iceslog import cruds
-from iceslog.api.deps import CurrentUser, SessionDep
+from iceslog.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from iceslog.captcha import img_captcha
 from iceslog.core import security
 from iceslog.core.config import settings
 from iceslog.models import MsgAuthCaptcha, RetMsg, MsgLoginRet, Token
+from iceslog.models.dictmap import DictMap, MsgEditDictMap
 from iceslog.models.menu import Menus
+from iceslog.models.user import MsgUsersPublic
 from iceslog.utils import PidTable
+from iceslog.utils.utils import page_view_condition
 router = APIRouter()
 
 def deal_func(data: Menus):
@@ -44,3 +48,24 @@ pid_cls = PidTable(Menus, deal_func=deal_func)
 def get_routes(current_user: CurrentUser):
     menus = pid_cls.get_values(current_user.user_type)
     return ORJSONResponse({"code": "00000", "msg": "ok", "data": menus })
+
+
+# @router.get(
+#     "/page",
+#     dependencies=[Depends(get_current_active_superuser)],
+#     response_model=MsgEditDictMap,
+# )
+# def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
+#     """
+#     Retrieve users.
+#     """
+#     condition = []
+#     if keywords:
+#         condition.append(DictMap.name.like(f"%{keywords}%"))
+
+#     dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
+    
+#     for val in dicts:
+#         val.dictItems = 
+    
+#     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 

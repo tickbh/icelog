@@ -75,7 +75,7 @@ class User(UserBase, table=True):
 
 # Properties to return via API, id is always required
 
-class UserMePublic(UserBase):
+class UserMePublic(UserBase, RetMsg):
     id: int
     perms: list[str] | None
 

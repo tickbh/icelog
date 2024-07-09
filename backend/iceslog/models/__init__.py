@@ -16,7 +16,7 @@ class TokenPayload(SQLModel):
     sub: int | None = None
 
 # Contents of JWT token
-class MsgAuthCaptcha(CommonMessage):
+class MsgAuthCaptcha(RetMsg):
     captchaKey: str
     captchaBase64: str
     

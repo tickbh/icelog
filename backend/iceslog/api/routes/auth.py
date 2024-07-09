@@ -11,9 +11,10 @@ router = APIRouter()
 
 
 @router.get("/captcha")
-def get_captcha() -> RetMsg:
+def get_captcha() -> MsgAuthCaptcha:
     img, text = img_captcha(img_byte="base64")
-    return MsgAuthCaptcha(captchaKey=text, captchaBase64="data:image/png;base64," + img).build_message()
+    return MsgAuthCaptcha(captchaKey=text, captchaBase64="data:image/png;base64," + img)
+# .build_message()
 
 @router.post("/login")
 def do_login(session: SessionDep, username: str = Form(), password: str = Form(), captchaKey: str = Form(), captchaCode: str = Form()) -> RetMsg:

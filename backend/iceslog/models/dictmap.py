@@ -40,4 +40,23 @@ class OneDictItem(SQLModel):
     label: str = ""
     
 class MsgDictItemsPublic(RetMsg):
-    data: list[OneDictItem] 
+    data: list[OneDictItem]
+    
+class OneEditDictItem(SQLModel):
+    id: int
+    label: str
+    value: str
+    status: int
+    sort: int
+    
+class OneEditDictMap(SQLModel):
+    id: int
+    name: str
+    code: str
+    status: int
+    dictItems: list[OneEditDictItem]
+    
+class MsgEditDictMap(RetMsg):
+    data: list[OneEditDictMap]
+    total: int
+    

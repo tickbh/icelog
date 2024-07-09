@@ -35,6 +35,9 @@ def init_menu(session: Session):
     menu = Menus(id=12, pid=1, belong="sys", type="menu", name="菜单管理", component="system/menu/index",
                  icon="aaa", params="", path="menu", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
+    menu = Menus(id=13, pid=1, belong="sys", type="menu", name="字典管理", component="system/dict/index",
+                 icon="dict", params="", path="dict", redirect="", sort=0, is_show=True, groups="1")
+    session.add(menu)
     session.commit()
 
 

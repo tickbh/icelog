@@ -11,7 +11,7 @@ class MenuAPI {
    * @returns 路由列表
    */
   static getRoutes() {
-    return request<any, RouteVODict>({
+    return request<any, RouteVO[]>({
       url: `${MENU_BASE_URL}/routes`,
       method: "get",
     });
@@ -145,19 +145,21 @@ export interface MenuForm {
   /** 菜单ID */
   id?: string;
   /** 父菜单ID */
-  parentId?: number;
+  pid?: number;
   /** 菜单名称 */
   name?: string;
   /** 菜单是否可见(1-是 0-否) */
-  visible: number;
+  is_show: number;
   /** ICON */
   icon?: string;
   /** 排序 */
   sort?: number;
+  /** 归属对象 */
+  belong?: string;
   /** 路由名称 */
   routeName?: string;
   /** 路由路径 */
-  routePath?: string;
+  path?: string;
   /** 组件路径 */
   component?: string;
   /** 跳转路由路径 */
@@ -171,7 +173,7 @@ export interface MenuForm {
   /** 【目录】只有一个子路由是否始终显示 */
   alwaysShow?: number;
   /** 参数 */
-  params?: KeyValue[];
+  params?: string;
 }
 
 interface KeyValue {

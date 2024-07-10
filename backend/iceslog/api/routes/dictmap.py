@@ -77,7 +77,7 @@ def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
     dependencies=[Depends(get_current_active_superuser)],
     response_model=OneEditDictMap,
 )
-def get_dict(session: SessionDep, dict_id: int) -> Any:
+def get_form_dict(session: SessionDep, dict_id: int) -> Any:
     dict_map = session.exec(select(DictMap).where(DictMap.id==dict_id)).first()
     if not dict_map:
         raise HTTPException(status_code=400, detail="不存在该字典id")

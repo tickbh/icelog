@@ -36,7 +36,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
     except (InvalidTokenError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
+            detail="用户验证失败,请重新登陆",
         )
     user = session.get(User, token_data.sub)
     if not user:

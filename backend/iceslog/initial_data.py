@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 def init_menu(session: Session):
     from iceslog.models import Menus
-    menu = Menus(id=1, belong="sys", type="menu", name="系统管理", component="Layout", icon="aaa",
+    menu = Menus(id=1, belong="sys", type="MENU", name="系统管理", component="Layout", icon="aaa",
                  params="", pid=0, path="/system", redirect="/system/user", sort=0, is_show=True, groups="1")
     session.add(menu)
-    menu = Menus(id=10, pid=1, belong="sys|admin", type="menu", name="用户管理", component="system/user/index",
+    menu = Menus(id=10, pid=1, belong="sys|admin", type="MENU", name="用户管理", component="system/user/index",
                  icon="aaa", params="", path="user", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
     # menu = Menus(id=101, pid=0, belong="sys|admin", type="BUTTON", name="用户查询权限", perm="sys:user:query", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
@@ -29,13 +29,13 @@ def init_menu(session: Session):
     # session.add(menu)
     # menu = Menus(id=105, pid=0, belong="sys|admin", type="BUTTON", name="重置密码", perm="sys:user:password:reset", is_show=True, component="", icon="", params="", path="", redirect="", sort=0, groups="1")
     # session.add(menu)
-    menu = Menus(id=11, pid=1, belong="sys", type="menu", name="角色管理", component="system/role/index",
+    menu = Menus(id=11, pid=1, belong="sys", type="MENU", name="角色管理", component="system/role/index",
                  icon="aaa", params="", path="role", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
-    menu = Menus(id=12, pid=1, belong="sys", type="menu", name="菜单管理", component="system/menu/index",
+    menu = Menus(id=12, pid=1, belong="sys", type="MENU", name="菜单管理", component="system/menu/index",
                  icon="aaa", params="", path="menu", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
-    menu = Menus(id=13, pid=1, belong="sys", type="menu", name="字典管理", component="system/dict/index",
+    menu = Menus(id=13, pid=1, belong="sys", type="MENU", name="字典管理", component="system/dict/index",
                  icon="dict", params="", path="dict", redirect="", sort=0, is_show=True, groups="1")
     session.add(menu)
     session.commit()
@@ -43,7 +43,7 @@ def init_menu(session: Session):
 
 def init_perm(session: Session):
     from iceslog.models import Perms, GroupPerms
-    perm = Perms(id=1, name="最高权限", route="*", codename="", sort=0, )
+    perm = Perms(id=1, name="最高权限", route="*", codename="*", sort=0, )
     session.add(perm)
     perm = Perms(id=2, name="用户查询权限", route="",
                  codename="sys:user:query", sort=0, )
@@ -77,11 +77,20 @@ def init_dict(session: Session):
     from iceslog.models import DictMap, DictMapItem
     dict_map = DictMap(id=1, name="性别", code="gender", status=0, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(id=1, dict_id=1, label="男", value="1", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="男", value="1", status=0, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(id=2, dict_id=1, label="女", value="2", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="女", value="2", status=0, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(id=3, dict_id=1, label="保密", value="0", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="保密", value="0", status=0, remark="性别字典")
+    session.add(dict_map)
+    session.commit()
+    
+    
+    dict_map = DictMap(id=2, name="归属", code="belong", status=0, remark="菜单归属")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=2, label="系统", value="sys", status=0, remark="系统级别")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=2, label="用户", value="usr", status=0, remark="用户级别")
     session.add(dict_map)
     session.commit()
 

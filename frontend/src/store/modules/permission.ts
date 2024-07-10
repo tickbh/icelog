@@ -23,7 +23,7 @@ export const usePermissionStore = defineStore("permission", () => {
     return new Promise<RouteRecordRaw[]>((resolve, reject) => {
       MenuAPI.getRoutes()
         .then((data) => {
-          const value = transformRoutes(data.list);
+          const value = transformRoutes(data);
           routes.value = constantRoutes.concat(value);
           resolve(value);
         })

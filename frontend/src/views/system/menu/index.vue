@@ -85,17 +85,17 @@
         </el-table-column>
 
         <el-table-column
-          label="路由名称"
+          label="归属对象"
           align="left"
           width="150"
-          prop="routeName"
+          prop="belong"
         />
 
         <el-table-column
           label="路由路径"
           align="left"
           width="150"
-          prop="routePath"
+          prop="path"
         />
 
         <el-table-column
@@ -114,7 +114,7 @@
 
         <el-table-column label="状态" align="center" width="80">
           <template #default="scope">
-            <el-tag v-if="scope.row.visible === 1" type="success">显示</el-tag>
+            <el-tag v-if="scope.row.is_show === 1" type="success">显示</el-tag>
             <el-tag v-else type="info">隐藏</el-tag>
           </template>
         </el-table-column>
@@ -158,7 +158,7 @@
     </el-card>
 
     <el-drawer
-      v-model="dialog.visible"
+      v-model="dialog.is_show"
       :title="dialog.title"
       @close="handleCloseDialog"
       size="50%"
@@ -171,13 +171,17 @@
       >
         <el-form-item label="父级菜单" prop="parentId">
           <el-tree-select
-            v-model="formData.parentId"
+            v-model="formData.pid"
             placeholder="选择上级菜单"
             :data="menuOptions"
             filterable
             check-strictly
             :render-after-expand="false"
           />
+        </el-form-item>
+
+        <el-form-item label="归属" prop="belong">
+          <el-input v-model="formData.belong" placeholder="请输入归属" />
         </el-form-item>
 
         <el-form-item label="菜单名称" prop="name">
@@ -201,12 +205,9 @@
           label="外链地址"
           prop="path"
         >
-          <el-input
-            v-model="formData.routePath"
-            placeholder="请输入外链完整路径"
-          />
+          <el-input v-model="formData.path" placeholder="请输入外链完整路径" />
         </el-form-item>
-
+        <!-- 
         <el-form-item
           v-if="formData.type == MenuTypeEnum.MENU"
           prop="routeName"
@@ -224,14 +225,14 @@
             </div>
           </template>
           <el-input v-model="formData.routeName" placeholder="User" />
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item
           v-if="
             formData.type == MenuTypeEnum.CATALOG ||
             formData.type == MenuTypeEnum.MENU
           "
-          prop="routePath"
+          prop="path"
         >
           <template #label>
             <div>
@@ -248,10 +249,10 @@
           </template>
           <el-input
             v-if="formData.type == MenuTypeEnum.CATALOG"
-            v-model="formData.routePath"
+            v-model="formData.path"
             placeholder="system"
           />
-          <el-input v-else v-model="formData.routePath" placeholder="user" />
+          <el-input v-else v-model="formData.path" placeholder="user" />
         </el-form-item>
 
         <el-form-item
@@ -285,6 +286,10 @@
           </el-input>
         </el-form-item>
 
+        <el-form-item label="参数信息" prop="params">
+          <el-input v-model="formData.params" placeholder="请输入参数信息" />
+        </el-form-item>
+
         <el-form-item v-if="formData.type == MenuTypeEnum.MENU">
           <template #label>
             <div>
@@ -298,16 +303,16 @@
             </div>
           </template>
 
-          <div v-if="!formData.params || formData.params.length === 0">
+          <!-- <div v-if="!formData.params || formData.params.length === 0">
             <el-button
               type="success"
               plain
               @click="formData.params = [{ key: '', value: '' }]"
               >添加路由参数</el-button
             >
-          </div>
+          </div> -->
 
-          <div v-else>
+          <!-- <div v-else>
             <div v-for="(item, index) in formData.params" :key="index">
               <el-input
                 v-model="item.key"
@@ -343,15 +348,15 @@
                 <DeleteFilled />
               </el-icon>
             </div>
-          </div>
+          </div> -->
         </el-form-item>
 
         <el-form-item
           v-if="formData.type !== MenuTypeEnum.BUTTON"
-          prop="visible"
+          prop="is_show"
           label="显示状态"
         >
-          <el-radio-group v-model="formData.visible">
+          <el-radio-group v-model="formData.is_show">
             <el-radio :value="1">显示</el-radio>
             <el-radio :value="0">隐藏</el-radio>
           </el-radio-group>
@@ -453,7 +458,7 @@ const menuFormRef = ref(ElForm);
 const loading = ref(false);
 const dialog = reactive({
   title: "新增菜单",
-  visible: false,
+  is_show: false,
 });
 
 // 查询参数
@@ -466,8 +471,8 @@ const menuOptions = ref<OptionType[]>([]);
 // 初始菜单表单数据
 const initialMenuFormData = ref<MenuForm>({
   id: undefined,
-  parentId: 0,
-  visible: 1,
+  pid: 0,
+  is_show: 1,
   sort: 1,
   type: MenuTypeEnum.MENU, // 默认菜单
   alwaysShow: 0,
@@ -480,13 +485,13 @@ const formData = ref({ ...initialMenuFormData.value });
 
 // 表单验证规则
 const rules = reactive({
-  parentId: [{ required: true, message: "请选择顶级菜单", trigger: "blur" }],
+  pid: [{ required: true, message: "请选择顶级菜单", trigger: "blur" }],
   name: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
   type: [{ required: true, message: "请选择菜单类型", trigger: "blur" }],
-  routeName: [{ required: true, message: "请输入路由名称", trigger: "blur" }],
-  routePath: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
+  // routeName: [{ required: true, message: "请输入路由名称", trigger: "blur" }],
+  path: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
   component: [{ required: true, message: "请输入组件路径", trigger: "blur" }],
-  visible: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
+  is_show: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
 });
 
 // 选择表格的行菜单ID
@@ -528,7 +533,7 @@ function handleOpenDialog(parentId?: number, menuId?: number) {
       menuOptions.value = [{ value: 0, label: "顶级菜单", children: data }];
     })
     .then(() => {
-      dialog.visible = true;
+      dialog.is_show = true;
       if (menuId) {
         dialog.title = "编辑菜单";
         MenuAPI.getFormData(menuId).then((data) => {
@@ -537,7 +542,7 @@ function handleOpenDialog(parentId?: number, menuId?: number) {
         });
       } else {
         dialog.title = "新增菜单";
-        formData.value.parentId = parentId;
+        formData.value.pid = parentId;
       }
     });
 }
@@ -552,7 +557,7 @@ function handleMenuTypeChange() {
         formData.value.component = "";
       } else {
         // 其他情况，保留原有的组件路径
-        formData.value.routePath = initialMenuFormData.value.routePath;
+        formData.value.path = initialMenuFormData.value.path;
         formData.value.component = initialMenuFormData.value.component;
       }
     }
@@ -612,7 +617,7 @@ function handleDelete(menuId: number) {
 
 // 关闭弹窗
 function handleCloseDialog() {
-  dialog.visible = false;
+  dialog.is_show = false;
   menuFormRef.value.resetFields();
   menuFormRef.value.clearValidate();
   formData.value.id = undefined;

@@ -51,7 +51,7 @@ class MenuAPI {
    */
   static getFormData(id: number) {
     return request<any, MenuForm>({
-      url: `${MENU_BASE_URL}/${id}/form`,
+      url: `${MENU_BASE_URL}/form/${id}`,
       method: "get",
     });
   }
@@ -174,6 +174,8 @@ export interface MenuForm {
   alwaysShow?: number;
   /** 参数 */
   params?: string;
+  /** 权限分组 */
+  groups?: string;
 }
 
 interface KeyValue {

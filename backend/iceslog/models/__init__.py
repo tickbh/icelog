@@ -2,7 +2,7 @@
 from .base import *
 from .menu import *
 from .user import *
-from .pems import *
+from .perms import *
 from .dictmap import *
 
 # JSON payload containing access token

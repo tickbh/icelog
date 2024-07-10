@@ -24,11 +24,11 @@ def deal_func(data: Menus):
         "component": data.component,
         "redirect": data.redirect,
         "name": data.name,
-        "perm": data.perm,
+        "perm": "",
         "meta": {
             "title": data.name,
             "icon": data.icon,
-            "hidden": not data.is_show or len(data.perm or "") > 0,
+            "hidden": not data.is_show ,
             "alwaysShow": False,
             "params": data.params,
         }
@@ -85,6 +85,18 @@ def add_menu(session: SessionDep, user: CurrentUser, menu: Menus) -> Any:
     session.add(menu)
     session.commit()
     session.refresh(menu)
+    return menu
+
+@router.get(
+    "/form/{menu_id}",
+    response_model=Menus,
+)
+def add_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
+    
+    menu = session.exec(select(Menus).where(Menus.is_show == True)).first()
+    if not menu:
+        raise HTTPException(400, "不存在该菜单id")
+        
     return menu
 
 # @router.get(

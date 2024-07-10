@@ -188,6 +188,10 @@
           <dictionary-multi v-model:value="formData.belong" code="belong" />
         </el-form-item>
 
+        <el-form-item label="权限" prop="groups">
+          <perm-multi v-model:value="formData.groups" />
+        </el-form-item>
+
         <el-form-item label="菜单名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入菜单名称" />
         </el-form-item>
@@ -293,7 +297,7 @@
         <el-form-item label="参数信息" prop="params">
           <el-input v-model="formData.params" placeholder="请输入参数信息" />
         </el-form-item>
-
+        <!-- 
         <el-form-item v-if="formData.type == MenuTypeEnum.MENU">
           <template #label>
             <div>
@@ -307,7 +311,7 @@
             </div>
           </template>
 
-          <!-- <div v-if="!formData.params || formData.params.length === 0">
+          <div v-if="!formData.params || formData.params.length === 0">
             <el-button
               type="success"
               plain
@@ -316,7 +320,7 @@
             >
           </div> -->
 
-          <!-- <div v-else>
+        <!-- <div v-else>
             <div v-for="(item, index) in formData.params" :key="index">
               <el-input
                 v-model="item.key"
@@ -352,9 +356,9 @@
                 <DeleteFilled />
               </el-icon>
             </div>
-          </div> -->
+          </div> 
         </el-form-item>
-
+-->
         <el-form-item
           v-if="formData.type !== MenuTypeEnum.BUTTON"
           prop="is_show"
@@ -493,6 +497,7 @@ const rules = reactive({
   pid: [{ required: true, message: "请选择顶级菜单", trigger: "blur" }],
   name: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
   type: [{ required: true, message: "请选择菜单类型", trigger: "blur" }],
+  belong: [{ required: true, message: "请选择归属信息", trigger: "blur" }],
   // routeName: [{ required: true, message: "请输入路由名称", trigger: "blur" }],
   path: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
   component: [{ required: true, message: "请输入组件路径", trigger: "blur" }],

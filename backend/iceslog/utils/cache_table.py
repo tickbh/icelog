@@ -80,6 +80,7 @@ class CacheTable:
         return self.cache_group_table.get(key, None)
     
     def cache_iter(self):
+        self.update()
         for it in self.cache_table:
             yield self.cache_table[it]
 

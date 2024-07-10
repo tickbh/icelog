@@ -16,6 +16,7 @@ declare module "vue" {
     UserImport: (typeof import("./../views/system/user/components/user-import.vue"))["default"];
     Dictionary: (typeof import("./../components/Dictionary/index.vue"))["default"];
     DictionaryMulti: (typeof import("./../components/DictionaryMulti/index.vue"))["default"];
+    PermMulti: (typeof import("./../components/PermMulti/index.vue"))["default"];
     DictItem: (typeof import("./../views/system/dict/components/dict-item.vue"))["default"];
     ElBacktop: (typeof import("element-plus/es"))["ElBacktop"];
     ElBreadcrumb: (typeof import("element-plus/es"))["ElBreadcrumb"];

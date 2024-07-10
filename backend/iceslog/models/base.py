@@ -10,3 +10,7 @@ class RetMsg(SQLModel):
     def err_msg(code: str, msg: str):
         return RetMsg(code=code, msg=msg)
     
+    
+class OptionType(SQLModel):
+    value: str | int
+    label: str = ""

@@ -18,15 +18,12 @@
 
 <script setup lang="ts">
 import DictAPI from "@/api/dict";
+import PermAPI from "@/api/perm";
 
 const props = defineProps({
   /**
    * 字典编码(eg: 性别-gender)
    */
-  code: {
-    type: String,
-    required: true,
-  },
   modelValue: {
     type: String,
   },
@@ -70,7 +67,7 @@ function handleChange(val?: string[] | number[] | undefined) {
 
 onBeforeMount(() => {
   // 根据字典编码获取字典项
-  DictAPI.getOptions(props.code).then((data) => {
+  PermAPI.getOptions().then((data) => {
     selectedValues.value = props.value?.split("|");
     options.value = data;
   });

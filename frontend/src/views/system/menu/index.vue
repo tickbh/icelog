@@ -180,8 +180,12 @@
           />
         </el-form-item>
 
-        <el-form-item label="归属" prop="belong">
+        <!-- <el-form-item label="归属" prop="belong">
           <el-input v-model="formData.belong" placeholder="请输入归属" />
+        </el-form-item> -->
+
+        <el-form-item label="归属" prop="belong">
+          <dictionary-multi v-model:value="formData.belong" code="belong" />
         </el-form-item>
 
         <el-form-item label="菜单名称" prop="name">
@@ -477,7 +481,8 @@ const initialMenuFormData = ref<MenuForm>({
   type: MenuTypeEnum.MENU, // 默认菜单
   alwaysShow: 0,
   keepAlive: 1,
-  params: [],
+  params: "",
+  belong: "sys|usr",
 });
 
 // 菜单表单数据

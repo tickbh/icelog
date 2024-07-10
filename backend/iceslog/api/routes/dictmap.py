@@ -46,7 +46,7 @@ def get_dict_items(id):
 def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     group = get_dict(key)
     if not group:
-        return
+        return []
     items = get_dict_items(group["id"])
     return items
 

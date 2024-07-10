@@ -37,7 +37,7 @@ class DictMapItem(SQLModel, table=True):
     
    
 class OneDictItem(SQLModel):
-    value: int
+    value: str
     label: str = ""
     
 class MsgDictItemsPublic(RetMsg):

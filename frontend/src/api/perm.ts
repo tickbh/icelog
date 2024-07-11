@@ -2,6 +2,47 @@ import request from "@/utils/request";
 
 const PERM_BASE_URL = "/api/v1/perm";
 
+/** 菜单查询参数 */
+export interface PermQuery {
+  /** 搜索关键字 */
+  keywords?: string;
+  groups?: number;
+  pageNum?: number;
+  pageSize?: number;
+}
+
+/** 菜单视图对象 */
+export interface PermVO {
+  /** 菜单ID */
+  id?: number;
+  /** 菜单名称 */
+  name?: string;
+  /** 路由 */
+  route?: string;
+  /** 代码名字 */
+  codename?: string;
+  /** 是否展示 */
+  is_show?: boolean;
+  /** 权限分组 */
+  groups?: string;
+  /** 菜单排序(数字越小排名越靠前) */
+  sort?: number;
+}
+
+/** 菜单表单对象 */
+export interface PermForm {
+  /** 菜单ID */
+  id?: string;
+  /** 菜单名称 */
+  name?: string;
+  /** ICON */
+  route?: string;
+  /** 归属对象 */
+  codename?: string;
+  /** 排序 */
+  sort?: number;
+}
+
 class PermAPI {
   /**
    * 获取字典分页列表
@@ -12,6 +53,20 @@ class PermAPI {
   static getPage(queryParams: DictPageQuery) {
     return request<any, PageResult<DictPageVO[]>>({
       url: `${PERM_BASE_URL}/page`,
+      method: "get",
+      params: queryParams,
+    });
+  }
+
+  /**
+   * 获取菜单树形列表
+   *
+   * @param queryParams 查询参数
+   * @returns 菜单树形列表
+   */
+  static getList(queryParams: PermAPI) {
+    return request<any, PermAPI[]>({
+      url: `${PERM_BASE_URL}`,
       method: "get",
       params: queryParams,
     });

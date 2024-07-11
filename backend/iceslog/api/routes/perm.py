@@ -24,6 +24,7 @@ from iceslog.models import (
 )
 from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
+from iceslog.models.perms import GroupPerms, OnePerm, Perms
 from iceslog.utils import base_utils, cache_utils
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
@@ -31,6 +32,25 @@ from iceslog.utils.utils import page_view_condition
 router = APIRouter()
 
 
+@router.get("", response_model=list[OnePerm])
+def get_perms(session: SessionDep, keywords: str = None):
+    table_perms: dict[int, OnePerm] = {}
+    
+    statement = select(Perms).where(Perms.is_show == True)
+    if keywords:
+        statement = statement.where(Perms.name.like(f"%{keywords}%"))
+    for menu in session.exec(statement).all():
+        one = OnePerm.model_validate(menu)
+        table_perms[one.id] = one
+        
+    for groups in session.exec(select(GroupPerms)).all():
+        for id in base_utils.split_to_int_list(groups.permissions):
+            if not id in table_perms:
+                continue
+            table_perms[id].groups = (table_perms[id].groups or "") + f"{groups.name}|"
+    value = list(table_perms.values())
+    value.sort(key=lambda v: v.sort)
+    return value
 
 @router.get(
     "/options",

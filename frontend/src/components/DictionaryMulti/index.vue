@@ -61,6 +61,10 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
   selectedValues.value = newModelValue as any as string[];
 });
 
+watch([props.value, () => props.value], ([newOptions, newModelValue]) => {
+  selectedValues.value = props.value?.split("|");
+});
+
 function handleChange(val?: string[] | number[] | undefined) {
   emits("update:modelValue", val);
   if (val != undefined) {
@@ -71,7 +75,6 @@ function handleChange(val?: string[] | number[] | undefined) {
 onBeforeMount(() => {
   // 根据字典编码获取字典项
   DictAPI.getOptions(props.code).then((data) => {
-    selectedValues.value = props.value?.split("|");
     options.value = data;
   });
 });

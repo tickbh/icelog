@@ -38,6 +38,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // computed: {
+  //   total() {
+  //     return "";
+  //   },
+  // },
 });
 
 const emits = defineEmits(["update:modelValue", "update:value"]);
@@ -58,6 +63,14 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
   selectedValues.value = newModelValue as any as string[];
 });
 
+watch([props.value, () => props.value], ([newOptions, newModelValue]) => {
+  var values = [];
+  for (let v of props.value?.split("|") || []) {
+    values.push(parseInt(v));
+  }
+  selectedValues.value = values;
+});
+
 function handleChange(val?: string[] | number[] | undefined) {
   emits("update:modelValue", val);
   if (val != undefined) {
@@ -68,10 +81,11 @@ function handleChange(val?: string[] | number[] | undefined) {
 onBeforeMount(() => {
   // 根据字典编码获取字典项
   PermAPI.getOptions().then((data) => {
-    selectedValues.value = props.value?.split("|");
+    var values = [];
+    for (var v in props.value?.split("|")) {
+      values.push(parseInt(v));
+    }
     options.value = data;
   });
 });
-
-onMounted(() => {});
 </script>

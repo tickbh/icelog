@@ -1,5 +1,5 @@
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 import json
 from typing import Any, List
 from fastapi import APIRouter, Depends, Form, HTTPException
@@ -44,10 +44,13 @@ def get_routes(current_user: CurrentUser):
 
 
 @router.get("", response_model=list[OneEditMenu])
-def get_menus(session: SessionDep):
+def get_menus(session: SessionDep, keywords: str = None):
     all_menus: list[OneEditMenu] = []
     menu_table = {}
-    for menu in session.exec(select(Menus).where(Menus.is_show == True)).all():
+    statement = select(Menus).where(Menus.is_show == True)
+    if keywords:
+        statement = statement.where(Menus.name.like(f"%{keywords}%"))
+    for menu in session.exec(statement).all():
         one = OneEditMenu.model_validate(menu)
         all_menus.append(one)
         menu_table[one.id] = one
@@ -57,8 +60,11 @@ def get_menus(session: SessionDep):
         if menu.pid == 0:
             ret_list.append(menu)
         else:
-            parent = menu_table[menu.pid]
-            parent.children.append(menu)
+            if menu.pid in menu_table:
+                parent = menu_table[menu.pid]
+                parent.children.append(menu)
+            else:
+                ret_list.append(menu)
     return ret_list
 
 def get_onelabel(session: SessionDep) -> OneLabelMenu:
@@ -82,6 +88,7 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
     response_model=Menus,
 )
 def add_menu(session: SessionDep, user: CurrentUser, menu: Menus) -> Any:
+    menu.create_time = datetime.now()
     session.add(menu)
     session.commit()
     session.refresh(menu)
@@ -99,22 +106,34 @@ def add_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
         
     return menu
 
-# @router.get(
-#     "/page",
-#     dependencies=[Depends(get_current_active_superuser)],
-#     response_model=MsgEditDictMap,
-# )
-# def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
-#     """
-#     Retrieve users.
-#     """
-#     condition = []
-#     if keywords:
-#         condition.append(DictMap.name.like(f"%{keywords}%"))
+@router.put(
+    "/{menu_id}",
+    response_model=Menus,
+)
+def add_menu(session: SessionDep, user: CurrentUser, menu_id: int, menu: Menus) -> Any:
+    db_menu = session.exec(select(Menus).where(Menus.id == menu_id)).first()
+    if not db_menu:
+        raise HTTPException(400, "不存在菜单id")
+    menu.create_time = db_menu.create_time
+    db_menu.sqlmodel_update(menu)
+    session.merge(db_menu)
+    session.commit()
+    session.refresh(db_menu)
+    return db_menu
 
-#     dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
+@router.delete(
+    "/{menu_id}",
+    response_model=Menus,
+)
+def add_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
+    db_menu = session.exec(select(Menus).where(Menus.id == menu_id)).first()
+    if not db_menu:
+        raise HTTPException(400, "不存在菜单id")
     
-#     for val in dicts:
-#         val.dictItems = 
+    if session.exec(select(Menus).where(Menus.pid == menu_id)).first():
+        raise HTTPException(400, "字菜单为空, 不能删除")
     
-#     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
+    session.delete(db_menu)
+    session.commit()
+    return db_menu
+

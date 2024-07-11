@@ -149,7 +149,7 @@ export interface MenuForm {
   /** 菜单名称 */
   name?: string;
   /** 菜单是否可见(1-是 0-否) */
-  is_show: number;
+  is_show: boolean;
   /** ICON */
   icon?: string;
   /** 排序 */

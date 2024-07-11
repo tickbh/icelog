@@ -121,6 +121,6 @@ def append_split_to_str(val: str, next: any, split="|") -> str:
     else:
         return f"{val}{split}{next}"
     
-def datetime_now():
+def now():
     from datetime import datetime
     return datetime.now()

@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, select
+from sqlmodel import col, delete, func, or_, select
 
+from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
     SessionDep,
@@ -12,241 +13,154 @@ from iceslog.core.config import settings
 from iceslog.core.security import get_password_hash, verify_password
 from iceslog.models import (
     RetMsg,
-    UpdatePassword,
-    User,
-    UserCreate,
-    UserPublic,
-    UserRegister,
-    UsersPublic,
-    UserUpdate,
-    UserUpdateMe,
 )
-from iceslog.utils import cache_utils, generate_new_account_email, send_email
+from iceslog.models.base import OptionType
+from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
+from iceslog.models.perms import GroupPerms, GroupPermsBase, GroupPermsPublic, OnePerm, Perms, PermsPublic
+from iceslog.utils import base_utils, cache_utils
+from iceslog.utils.cache_table import CacheTable
+from iceslog.utils.utils import page_view_condition
 
 router = APIRouter()
 
 
-# @router.get(
-#     "/page",
-#     dependencies=[Depends(get_current_active_superuser)],
-#     response_model=MsgUsersPublic,
-# )
-# def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100) -> Any:
-#     """
-#     Retrieve users.
-#     """
+@router.get("/page", response_model=GroupPermsPublic)
+def get_perms(session: SessionDep, keywords: str = None, pageNum: int = 0, pageSize: int = 100):
+    condition = []
+    if keywords:
+        condition.append(or_(GroupPerms.name.like(f"%{keywords}%"), GroupPerms.code.like(f"%{keywords}%")))
+    perms, count = page_view_condition(session, condition, GroupPerms, pageNum, pageSize, [GroupPerms.sort])
+    return GroupPermsPublic(list=perms, total=count)
 
-#     count_statement = select(func.count()).select_from(User)
-#     count = session.exec(count_statement).one()
+@router.get(
+    "/options",
+    response_model=List[OptionType],
+)
+def read_options(session: SessionDep, user: CurrentUser) -> Any:
+    rets = []
+    for group in cache_utils.group_perm_cache_table.cache_iter():
+        rets.append(OptionType(value=group["id"], label=group["name"]))
+    return rets
 
-#     statement = select(User).offset((pageNum - 1) * pageSize).limit(pageSize)
-#     users = session.exec(statement).all()
+@router.get(
+    "/page",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=MsgEditDictMap,
+)
+def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
+    condition = []
+    if keywords:
+        condition.append(DictMap.name.like(f"%{keywords}%"))
 
-#     return MsgUsersPublic(data = UsersPublic(list=users, total=count)) 
-
-
-
-# @router.get(
-#     "/data", 
-#     # dependencies=[Depends(get_current_active_superuser)], 
-#     response_model=MsgUserPublic
-# )
-# def read_user_form(*, session: SessionDep) -> Any:
+    dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
+    vals = []
+    for val in dicts:
+        items = []
+        for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == val.id)).all():
+            items.append(sub)
+        val = OneEditDictMap.model_validate(val, update={"dictItems": items})
+        vals.append(val)
     
-#     user = session.get(User, id)
-#     if not user:
-#         return RetMsg("00001", "账号不存在")
+    return MsgEditDictMap(list=vals, total=count) 
+
+
+@router.get(
+    "/form/{perm_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=OnePerm,
+)
+def get_form_dict(session: SessionDep, perm_id: int) -> Any:
+    perm = session.exec(select(Perms).where(Perms.id==perm_id)).first()
+    if not perm:
+        raise HTTPException(status_code=400, detail="不存在该权限id")
+    perm = OnePerm.model_validate(perm)
     
-#     return MsgUserPublic(data = user)
+    for groups in session.exec(select(GroupPerms)).all():
+        for perm_id in base_utils.split_to_int_list(groups.permissions):
+            if perm_id != perm.id:
+                continue
+            perm.groups = base_utils.append_split_to_str(perm.groups, groups.id)
+            perm.groups_name = base_utils.append_split_to_str(perm.groups_name, groups.name)
+    
+    return perm
 
-# @router.post(
-#     "/", dependencies=[Depends(get_current_active_superuser)], response_model=UserPublic
-# )
-# def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
-#     """
-#     Create new user.
-#     """
-#     user = crud.get_user_by_email(session=session, email=user_in.email)
-#     if user:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="The user with this email already exists in the system.",
-#         )
-
-#     user = crud.create_user(session=session, user_create=user_in)
-#     if settings.emails_enabled and user_in.email:
-#         email_data = generate_new_account_email(
-#             email_to=user_in.email, username=user_in.email, password=user_in.password
-#         )
-#         send_email(
-#             email_to=user_in.email,
-#             subject=email_data.subject,
-#             html_content=email_data.html_content,
-#         )
-#     return user
-
-
-# @router.patch("/me", response_model=UserPublic)
-# def update_user_me(
-#     *, session: SessionDep, user_in: UserUpdateMe, current_user: CurrentUser
-# ) -> Any:
-#     """
-#     Update own user.
-#     """
-
-#     if user_in.email:
-#         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
-#         if existing_user and existing_user.id != current_user.id:
-#             raise HTTPException(
-#                 status_code=409, detail="User with this email already exists"
-#             )
-#     user_data = user_in.model_dump(exclude_unset=True)
-#     current_user.sqlmodel_update(user_data)
-#     session.add(current_user)
-#     session.commit()
-#     session.refresh(current_user)
-#     return current_user
+@router.put(
+    "/{perm_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def modify_perm(session: SessionDep, perm_id: int, perm_map: OnePerm) -> Any:
+    map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
+    if not map:
+        raise HTTPException(400, "不存在该权限选项")
+    
+    map.codename = perm_map.codename
+    map.name = perm_map.name
+    map.route = perm_map.route
+    map.sort = perm_map.sort
+    map.is_show = perm_map.is_show
+    session.merge(map)
+    session.commit()
+    
+    group_perms = base_utils.split_to_int_list(perm_map.groups) 
+        
+    for groups in session.exec(select(GroupPerms)).all():
+        now_perms = base_utils.split_to_int_list(groups.permissions)
+        if perm_id in now_perms and not groups.id in group_perms:
+            now_perms.remove(perm_id)
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
+            session.commit()
+        elif not perm_id in now_perms and groups.id in group_perms:
+            now_perms.append(perm_id)
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
+            session.commit()
+        
+    return RetMsg()
 
 
-# @router.patch("/me/password", response_model=RetMsg)
-# def update_password_me(
-#     *, session: SessionDep, body: UpdatePassword, current_user: CurrentUser
-# ) -> Any:
-#     """
-#     Update own password.
-#     """
-#     if not verify_password(body.current_password, current_user.hashed_password):
-#         raise HTTPException(status_code=400, detail="Incorrect password")
-#     if body.current_password == body.new_password:
-#         raise HTTPException(
-#             status_code=400, detail="New password cannot be the same as the current one"
-#         )
-#     hashed_password = get_password_hash(body.new_password)
-#     current_user.hashed_password = hashed_password
-#     session.add(current_user)
-#     session.commit()
-#     return RetMsg(message="Password updated successfully")
+@router.delete(
+    "/{perms}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def delete_dict(session: SessionDep, perms: str) -> Any:
+    del_ids = []
+    for perm_id in base_utils.split_to_int_list(perms):
+        map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
+        if not map:
+            raise HTTPException(400, "不存在该字典选项")
+        
+        del_ids.append(perm_id)
+        session.delete(map)
+        session.commit()
+        
+    for groups in session.exec(select(GroupPerms)).all():
+        now_perms = base_utils.split_to_int_list(groups.permissions)
+        has_del = False
+        for id in del_ids:
+            if id in now_perms:
+                now_perms.remove(id)
+                has_del = True
+        
+        if has_del:
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
+            session.commit()
+        
+    return RetMsg()
 
 
-# @router.get("/me", response_model=MsgUserMePublic)
-# def read_user_me(current_user: CurrentUser) -> Any:
-#     """
-#     Get current user.
-#     """
-#     me = UserMePublic.model_validate(current_user, update={"perms": []})
-#     me.perms = cache_utils.get_all_perms(current_user.group_pem)
-#     return MsgUserMePublic(data=me)
-
-# @router.get("/page", response_model=MsgUserPublic)
-# def read_user_me(current_user: CurrentUser) -> Any:
-#     """
-#     Get current user.
-#     """
-#     return MsgUserPublic(data=current_user)
-
-# @router.delete("/me", response_model=RetMsg)
-# def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
-#     """
-#     Delete own user.
-#     """
-#     if current_user.is_superuser:
-#         raise HTTPException(
-#             status_code=403, detail="Super users are not allowed to delete themselves"
-#         )
-#     statement = delete(Item).where(col(Item.owner_id) == current_user.id)
-#     session.exec(statement)  # type: ignore
-#     session.delete(current_user)
-#     session.commit()
-#     return RetMsg(message="User deleted successfully")
-
-
-# @router.post("/signup", response_model=UserPublic)
-# def register_user(session: SessionDep, user_in: UserRegister) -> Any:
-#     """
-#     Create new user without the need to be logged in.
-#     """
-#     if not settings.USERS_OPEN_REGISTRATION:
-#         raise HTTPException(
-#             status_code=403,
-#             detail="Open user registration is forbidden on this server",
-#         )
-#     user = crud.get_user_by_email(session=session, email=user_in.email)
-#     if user:
-#         raise HTTPException(
-#             status_code=400,
-#             detail="The user with this email already exists in the system",
-#         )
-#     user_create = UserCreate.model_validate(user_in)
-#     user = crud.create_user(session=session, user_create=user_create)
-#     return user
-
-
-# @router.get("/{user_id}", response_model=UserPublic)
-# def read_user_by_id(
-#     user_id: int, session: SessionDep, current_user: CurrentUser
-# ) -> Any:
-#     """
-#     Get a specific user by id.
-#     """
-#     user = session.get(User, user_id)
-#     if user == current_user:
-#         return user
-#     if not current_user.is_superuser:
-#         raise HTTPException(
-#             status_code=403,
-#             detail="The user doesn't have enough privileges",
-#         )
-#     return user
-
-
-# @router.patch(
-#     "/{user_id}",
-#     dependencies=[Depends(get_current_active_superuser)],
-#     response_model=UserPublic,
-# )
-# def update_user(
-#     *,
-#     session: SessionDep,
-#     user_id: int,
-#     user_in: UserUpdate,
-# ) -> Any:
-#     """
-#     Update a user.
-#     """
-
-#     db_user = session.get(User, user_id)
-#     if not db_user:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="The user with this id does not exist in the system",
-#         )
-#     if user_in.email:
-#         existing_user = crud.get_user_by_email(session=session, email=user_in.email)
-#         if existing_user and existing_user.id != user_id:
-#             raise HTTPException(
-#                 status_code=409, detail="User with this email already exists"
-#             )
-
-#     db_user = crud.update_user(session=session, db_user=db_user, user_in=user_in)
-#     return db_user
-
-
-# @router.delete("/{user_id}", dependencies=[Depends(get_current_active_superuser)])
-# def delete_user(
-#     session: SessionDep, current_user: CurrentUser, user_id: int
-# ) -> RetMsg:
-#     """
-#     Delete a user.
-#     """
-#     user = session.get(User, user_id)
-#     if not user:
-#         raise HTTPException(status_code=404, detail="User not found")
-#     if user == current_user:
-#         raise HTTPException(
-#             status_code=403, detail="Super users are not allowed to delete themselves"
-#         )
-#     statement = delete(Item).where(col(Item.owner_id) == user_id)
-#     session.exec(statement)  # type: ignore
-#     session.delete(user)
-#     session.commit()
-#     return RetMsg(message="User deleted successfully")
+@router.post(
+    "",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RetMsg,
+)
+def add_perm(session: SessionDep, one: GroupPermsBase) -> Any:
+    map = GroupPerms.model_validate(one)
+    del map.id
+    session.add(map)
+    session.commit()
+    session.refresh(map)
+    return RetMsg()

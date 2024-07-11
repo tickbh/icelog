@@ -13,14 +13,6 @@ from iceslog.core.config import settings
 from iceslog.core.security import get_password_hash, verify_password
 from iceslog.models import (
     RetMsg,
-    UpdatePassword,
-    User,
-    UserCreate,
-    UserPublic,
-    UserRegister,
-    UsersPublic,
-    UserUpdate,
-    UserUpdateMe,
 )
 from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
@@ -177,7 +169,6 @@ def delete_dict(session: SessionDep, perms: str) -> Any:
     response_model=RetMsg,
 )
 def add_perm(session: SessionDep, one: OnePerm) -> Any:
-    one.create_time = base_utils.datetime_now()
     map = Perms.model_validate(one)
     del map.id
     session.add(map)
@@ -185,12 +176,12 @@ def add_perm(session: SessionDep, one: OnePerm) -> Any:
     session.refresh(map)
     
     now_perms = base_utils.split_to_int_list(one.groups)
-    
-    for groups in session.exec(select(GroupPerms).where(col(GroupPerms.id).in_(now_perms))).all():
-        perms = base_utils.split_to_int_list(groups.permissions)
-        perms.append(map.id)
-        groups.permissions = base_utils.join_list_to_str(perms)
-        session.merge(groups)
-        session.commit()
+    if len(now_perms) > 0:
+        for groups in session.exec(select(GroupPerms).where(col(GroupPerms.id).in_(now_perms))).all():
+            perms = base_utils.split_to_int_list(groups.permissions)
+            perms.append(map.id)
+            groups.permissions = base_utils.join_list_to_str(perms)
+            session.merge(groups)
+            session.commit()
     
     return RetMsg()

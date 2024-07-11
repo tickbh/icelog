@@ -113,7 +113,7 @@
         <el-form-item label="角色编码" prop="code">
           <el-input v-model="formData.code" placeholder="请输入角色编码" />
         </el-form-item>
-
+        <!-- 
         <el-form-item label="数据权限" prop="dataScope">
           <el-select v-model="formData.dataScope">
             <el-option :key="0" label="全部数据" :value="0" />
@@ -121,7 +121,7 @@
             <el-option :key="2" label="本部门数据" :value="2" />
             <el-option :key="3" label="本人数据" :value="3" />
           </el-select>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="formData.status">
@@ -253,6 +253,7 @@ const formData = reactive<RoleForm>({
   status: 1,
   code: "",
   name: "",
+  id: 0,
 });
 
 const rules = reactive({
@@ -346,7 +347,7 @@ function handleCloseDialog() {
   roleFormRef.value.resetFields();
   roleFormRef.value.clearValidate();
 
-  formData.id = undefined;
+  formData.id = 0;
   formData.sort = 1;
   formData.status = 1;
 }

@@ -129,8 +129,6 @@ export interface RoleForm {
   id?: number;
   /** 角色编码 */
   code: string;
-  /** 数据权限 */
-  dataScope?: number;
   /** 角色名称 */
   name: string;
   /** 排序 */

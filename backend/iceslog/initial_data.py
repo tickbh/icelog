@@ -69,6 +69,7 @@ def init_perm(session: Session):
     gp = GroupPerms(
         id=1,
         name="管理员",
+        code="ROOT",
         permissions="1|2|3|4|5|6",
         sort=0,
     )

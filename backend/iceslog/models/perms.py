@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Self
 from pydantic import ConfigDict, EmailStr
 from sqlalchemy import JSON, DateTime, func
 from sqlmodel import Field, Relationship, SQLModel, Column
@@ -7,6 +8,7 @@ from iceslog.core.db import datetime_now
 
 class PermsBase(SQLModel):
     id: int = Field(primary_key=True, description="id值")
+    pid: int = Field(index=True, default=0, description="父id值")
     name: str = Field(max_length=50, nullable=False, description="名字")
     route: str = Field(max_length=255, nullable=False, description="路由")
     codename: str = Field(max_length=50, nullable=False, description="代码名字")
@@ -33,6 +35,7 @@ class GroupPerms(GroupPermsBase, table=True):
 class OnePerm(PermsBase):
     groups: str = None
     groups_name: str = None
+    children: list[Self] = []
     
 class PermsPublic(SQLModel):
     list: list[OnePerm]

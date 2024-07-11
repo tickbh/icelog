@@ -47,7 +47,7 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=MsgEditDictMap,
 )
-def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
+def read_roles(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
     condition = []
     if keywords:
         condition.append(DictMap.name.like(f"%{keywords}%"))
@@ -67,21 +67,12 @@ def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
 @router.get(
     "/form/{perm_id}",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=OnePerm,
+    response_model=GroupPermsBase,
 )
-def get_form_dict(session: SessionDep, perm_id: int) -> Any:
-    perm = session.exec(select(Perms).where(Perms.id==perm_id)).first()
+def get_form_role(session: SessionDep, perm_id: int) -> Any:
+    perm = session.exec(select(GroupPerms).where(GroupPerms.id==perm_id)).first()
     if not perm:
         raise HTTPException(status_code=400, detail="不存在该权限id")
-    perm = OnePerm.model_validate(perm)
-    
-    for groups in session.exec(select(GroupPerms)).all():
-        for perm_id in base_utils.split_to_int_list(groups.permissions):
-            if perm_id != perm.id:
-                continue
-            perm.groups = base_utils.append_split_to_str(perm.groups, groups.id)
-            perm.groups_name = base_utils.append_split_to_str(perm.groups_name, groups.name)
-    
     return perm
 
 @router.put(
@@ -89,33 +80,17 @@ def get_form_dict(session: SessionDep, perm_id: int) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=RetMsg,
 )
-def modify_perm(session: SessionDep, perm_id: int, perm_map: OnePerm) -> Any:
-    map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
+def modify_perm(session: SessionDep, perm_id: int, perm_map: GroupPermsBase) -> Any:
+    map = session.exec(select(GroupPerms).where(GroupPerms.id == perm_id)).first()
     if not map:
         raise HTTPException(400, "不存在该权限选项")
     
-    map.codename = perm_map.codename
+    map.code = perm_map.code
     map.name = perm_map.name
-    map.route = perm_map.route
     map.sort = perm_map.sort
-    map.is_show = perm_map.is_show
+    map.status = perm_map.status
     session.merge(map)
     session.commit()
-    
-    group_perms = base_utils.split_to_int_list(perm_map.groups) 
-        
-    for groups in session.exec(select(GroupPerms)).all():
-        now_perms = base_utils.split_to_int_list(groups.permissions)
-        if perm_id in now_perms and not groups.id in group_perms:
-            now_perms.remove(perm_id)
-            groups.permissions = base_utils.join_list_to_str(now_perms)
-            session.merge(groups)
-            session.commit()
-        elif not perm_id in now_perms and groups.id in group_perms:
-            now_perms.append(perm_id)
-            groups.permissions = base_utils.join_list_to_str(now_perms)
-            session.merge(groups)
-            session.commit()
         
     return RetMsg()
 
@@ -125,29 +100,14 @@ def modify_perm(session: SessionDep, perm_id: int, perm_map: OnePerm) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=RetMsg,
 )
-def delete_dict(session: SessionDep, perms: str) -> Any:
-    del_ids = []
+def delete_role(session: SessionDep, perms: str) -> Any:
     for perm_id in base_utils.split_to_int_list(perms):
-        map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
+        map = session.exec(select(GroupPerms).where(GroupPerms.id == perm_id)).first()
         if not map:
             raise HTTPException(400, "不存在该字典选项")
         
-        del_ids.append(perm_id)
         session.delete(map)
         session.commit()
-        
-    for groups in session.exec(select(GroupPerms)).all():
-        now_perms = base_utils.split_to_int_list(groups.permissions)
-        has_del = False
-        for id in del_ids:
-            if id in now_perms:
-                now_perms.remove(id)
-                has_del = True
-        
-        if has_del:
-            groups.permissions = base_utils.join_list_to_str(now_perms)
-            session.merge(groups)
-            session.commit()
         
     return RetMsg()
 

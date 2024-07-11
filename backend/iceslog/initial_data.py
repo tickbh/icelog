@@ -48,19 +48,27 @@ def init_perm(session: Session):
     from iceslog.models import Perms, GroupPerms
     perm = Perms(id=1, name="最高权限", route="*", codename="*", sort=0, )
     session.add(perm)
-    perm = Perms(id=2, name="用户查询权限", route="",
+    perm = Perms(id=2, name="用户权限", route="~", codename="~", sort=0, )
+    session.add(perm)
+    perm = Perms(id=3, name="菜单权限", route="~", codename="~", sort=0, )
+    session.add(perm)
+    perm = Perms(id=4, name="角色权限", route="~", codename="~", sort=0, )
+    session.add(perm)
+    perm = Perms(id=5, name="管理权限", route="~", codename="~", sort=0, )
+    session.add(perm)
+    perm = Perms(pid=2, name="用户查询权限", route="",
                  codename="sys:user:query", sort=0, )
     session.add(perm)
-    perm = Perms(id=3, name="用户新增权限", route="",
+    perm = Perms(pid=2, name="用户新增权限", route="",
                  codename="sys:user:add", sort=0, )
     session.add(perm)
-    perm = Perms(id=4, name="用户编辑", route="",
+    perm = Perms(pid=2, name="用户编辑", route="",
                  codename="sys:user:edit", sort=0, )
     session.add(perm)
-    perm = Perms(id=5, name="用户删除", route="",
+    perm = Perms(pid=2, name="用户删除", route="",
                  codename="sys:user:delete", sort=0, )
     session.add(perm)
-    perm = Perms(id=6, name="重置密码", route="",
+    perm = Perms(pid=2, name="重置密码", route="",
                  codename="sys:user:password:reset", sort=0, )
     session.add(perm)
 

@@ -80,7 +80,7 @@ function handleChange(val?: string[] | number[] | undefined) {
 
 onBeforeMount(() => {
   // 根据字典编码获取字典项
-  PermAPI.getOptions().then((data) => {
+  PermAPI.getGroupOptions().then((data) => {
     var values = [];
     for (var v in props.value?.split("|")) {
       values.push(parseInt(v));

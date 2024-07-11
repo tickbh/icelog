@@ -35,6 +35,8 @@ export interface PermVO {
 export interface PermForm {
   /** 菜单ID */
   id?: number;
+  /** 父类ID */
+  pid?: number;
   /** 菜单名称 */
   name?: string;
   /** ICON */
@@ -145,6 +147,19 @@ class PermAPI {
   static getOptions() {
     return request<any, OptionType[]>({
       url: `${PERM_BASE_URL}/options`,
+      method: "get",
+    });
+  }
+
+  /**
+   * 获取字典的数据项
+   *
+   * @param typeCode 字典编码
+   * @returns 字典数据项
+   */
+  static getGroupOptions() {
+    return request<any, OptionType[]>({
+      url: `${PERM_BASE_URL}/group/options`,
       method: "get",
     });
   }

@@ -1,5 +1,5 @@
 
-from typing import Any
+from typing import Any, Self
 from sqlmodel import SQLModel
 
 class RetMsg(SQLModel):
@@ -14,3 +14,5 @@ class RetMsg(SQLModel):
 class OptionType(SQLModel):
     value: str | int
     label: str = ""
+    
+    children: list[Self] = []

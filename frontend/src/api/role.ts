@@ -26,9 +26,9 @@ class RoleAPI {
    * @param roleId 角色ID
    * @returns 角色的菜单ID集合
    */
-  static getRoleMenuIds(roleId: number) {
+  static getRolePermIds(roleId: number) {
     return request<any, number[]>({
-      url: `${ROLE_BASE_URL}/${roleId}/menuIds`,
+      url: `${ROLE_BASE_URL}/permids/${roleId}`,
       method: "get",
     });
   }
@@ -40,9 +40,9 @@ class RoleAPI {
    * @param data 菜单ID集合
    * @returns 请求结果
    */
-  static updateRoleMenus(roleId: number, data: number[]) {
+  static updateRolePerms(roleId: number, data: number[]) {
     return request({
-      url: `${ROLE_BASE_URL}/${roleId}/menus`,
+      url: `${ROLE_BASE_URL}/perms/${roleId}`,
       method: "put",
       data: data,
     });
@@ -56,7 +56,7 @@ class RoleAPI {
    */
   static getFormData(id: number) {
     return request<any, RoleForm>({
-      url: `${ROLE_BASE_URL}/${id}/form`,
+      url: `${ROLE_BASE_URL}/form/${id}`,
       method: "get",
     });
   }
@@ -135,4 +135,6 @@ export interface RoleForm {
   sort?: number;
   /** 角色状态(1-正常；0-停用) */
   status?: number;
+  /** 权限 */
+  permissions?: string;
 }

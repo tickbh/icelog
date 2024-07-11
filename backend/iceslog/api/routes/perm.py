@@ -44,36 +44,71 @@ def get_perms(session: SessionDep, keywords: str = None, pageNum: int = 0, pageS
     return PermsPublic(list=perms, total=count)
 
 @router.get(
-    "/options",
+    "/group/options",
     response_model=List[OptionType],
 )
 def read_options(session: SessionDep, user: CurrentUser) -> Any:
     rets = []
-    for group in cache_utils.group_perm_cache_table.cache_iter():
-        rets.append(OptionType(value=group["id"], label=group["name"]))
+    for group in session.exec(select(GroupPerms)).all():
+        rets.append(OptionType(value=group.id, label=group.name))
     return rets
 
+
+def build_option(perm: OnePerm) -> OptionType:
+    value = OptionType(value=perm.id, label=perm.name)
+    for child in perm.children:
+        value.children.append(build_option(child))
+    return value
+
 @router.get(
-    "/page",
-    dependencies=[Depends(get_current_active_superuser)],
-    response_model=MsgEditDictMap,
+    "/options",
+    response_model=List[OptionType],
 )
-def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
-    condition = []
+def read_options(session: SessionDep, user: CurrentUser) -> Any:
+    ret_list = read_all_perms(session)
+    rets = []
+    for v in ret_list:
+        rets.append(build_option(v))
+    return rets
+
+
+@router.get(
+    "",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=list[OnePerm],
+)
+def read_all_perms(session: SessionDep, keywords: str = None) -> Any:
+
+    table_perms: dict[int, OnePerm] = {}
+    statement = select(Perms).where(Perms.is_show==True)
     if keywords:
-        condition.append(DictMap.name.like(f"%{keywords}%"))
+        statement = statement.where(Perms.name.like(f"%{keywords}%"))
 
-    dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
-    vals = []
-    for val in dicts:
-        items = []
-        for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == val.id)).all():
-            items.append(sub)
-        val = OneEditDictMap.model_validate(val, update={"dictItems": items})
-        vals.append(val)
+    all_perms: list[OnePerm] = []
+    perm_table = {}
+    for perm in session.exec(select(Perms).order_by(Perms.sort)).all():
+        one = OnePerm.model_validate(perm)
+        all_perms.append(one)
+        perm_table[one.id] = one
+        
+    for groups in session.exec(select(GroupPerms)).all():
+        for id in base_utils.split_to_int_list(groups.permissions):
+            if not id in table_perms:
+                continue
+            table_perms[id].groups = base_utils.append_split_to_str(table_perms[id].groups, groups.id)
+            table_perms[id].groups_name = base_utils.append_split_to_str(table_perms[id].groups_name, groups.name)
     
-    return MsgEditDictMap(list=vals, total=count) 
-
+    ret_list = []
+    for menu in all_perms:
+        if menu.pid == 0:
+            ret_list.append(menu)
+        else:
+            if menu.pid in perm_table:
+                parent = perm_table[menu.pid]
+                parent.children.append(menu)
+            else:
+                ret_list.append(menu)
+    return ret_list
 
 @router.get(
     "/form/{perm_id}",

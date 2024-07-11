@@ -47,6 +47,10 @@
         :data="permTableData"
         highlight-current-row
         row-key="id"
+        :tree-props="{
+          children: 'children',
+          hasChildren: 'hasChildren',
+        }"
         :expand-row-keys="['1']"
       >
         <el-table-column label="权限名称" min-width="200">
@@ -81,11 +85,21 @@
         <el-table-column fixed="right" align="center" label="操作" width="220">
           <template #default="scope">
             <el-button
-              v-hasPerm="['sys:menu:edit']"
+              v-hasPerm="['sys:menu:add']"
               type="primary"
               link
               size="small"
               @click.stop="handleOpenDialog(scope.row.id)"
+            >
+              <i-ep-plus />新增
+            </el-button>
+
+            <el-button
+              v-hasPerm="['sys:menu:edit']"
+              type="primary"
+              link
+              size="small"
+              @click.stop="handleOpenDialog(0, scope.row.id)"
             >
               <i-ep-edit />编辑
             </el-button>
@@ -131,11 +145,22 @@
           <el-input v-model="formData.name" placeholder="请输入归属" />
         </el-form-item>
 
+        <el-form-item label="父级菜单" prop="pid">
+          <el-tree-select
+            v-model="formData.pid"
+            placeholder="选择上级菜单"
+            :data="permOptions"
+            filterable
+            check-strictly
+            :render-after-expand="false"
+          />
+        </el-form-item>
+
         <el-form-item label="权限路由" prop="route">
           <el-input v-model="formData.route" placeholder="请输入" />
         </el-form-item>
 
-        <el-form-item label="权限代码" prop="route">
+        <el-form-item label="权限代码" prop="codename">
           <el-input v-model="formData.codename" placeholder="请输入" />
         </el-form-item>
 
@@ -203,6 +228,7 @@ const permOptions = ref<OptionType[]>([]);
 // 初始菜单表单数据
 const initialPermFormData = ref<PermForm>({
   id: 0,
+  pid: 0,
   sort: 1,
   route: "",
   codename: "",
@@ -215,7 +241,7 @@ const formData = ref({ ...initialPermFormData.value });
 
 // 表单验证规则
 const rules = reactive({
-  route: [{ required: true, message: "请选择路由", trigger: "blur" }],
+  // route: [{ required: true, message: "请选择路由", trigger: "blur" }],
   codename: [{ required: true, message: "请输入代码", trigger: "blur" }],
   name: [{ required: true, message: "请选择名称", trigger: "blur" }],
 });
@@ -226,10 +252,10 @@ const selectedMenuId = ref<number | undefined>();
 // 查询
 function handleQuery() {
   loading.value = true;
-  PermAPI.getPage(queryParams)
+  PermAPI.getList(queryParams)
     .then((data) => {
-      permTableData.value = data.list;
-      total.value = data.total;
+      permTableData.value = data;
+      // total.value = data.total;
     })
     .finally(() => {
       loading.value = false;
@@ -246,18 +272,26 @@ function handleResetQuery() {
  * 打开表单弹窗
  *
  */
-function handleOpenDialog(permId?: number) {
-  dialog.is_show = true;
-  if (permId) {
-    dialog.title = "编辑菜单";
-    PermAPI.getFormData(permId).then((data) => {
-      console.log("data === ", data);
-      initialPermFormData.value = { ...data };
-      formData.value = data;
+function handleOpenDialog(parentId?: number, permId?: number) {
+  PermAPI.getOptions()
+    .then((data) => {
+      permOptions.value = [{ value: 0, label: "顶级菜单", children: data }];
+    })
+    .then(() => {
+      dialog.is_show = true;
+      if (permId) {
+        dialog.title = "编辑菜单";
+        PermAPI.getFormData(permId).then((data) => {
+          console.log("data === ", data);
+          initialPermFormData.value = { ...data };
+          formData.value = data;
+        });
+      } else {
+        initialPermFormData.value.pid = parentId;
+        formData.value = initialPermFormData.value;
+        dialog.title = "新增菜单";
+      }
     });
-  } else {
-    dialog.title = "新增菜单";
-  }
 }
 
 /** 菜单保存提交 */

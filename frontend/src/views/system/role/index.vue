@@ -254,6 +254,7 @@ const formData = reactive<RoleForm>({
   code: "",
   name: "",
   id: 0,
+  permissions: "",
 });
 
 const rules = reactive({
@@ -350,6 +351,7 @@ function handleCloseDialog() {
   formData.id = 0;
   formData.sort = 1;
   formData.status = 1;
+  formData.permissions = "";
 }
 
 /** 删除角色 */
@@ -394,7 +396,7 @@ async function handleOpenAssignPermDialog(row: RolePageVO) {
     menuPermOptions.value = await MenuAPI.getOptions();
 
     // 回显角色已拥有的菜单
-    RoleAPI.getRoleMenuIds(roleId)
+    RoleAPI.getRolePermIds(roleId)
       .then((data) => {
         const checkedMenuIds = data;
         checkedMenuIds.forEach((menuId) =>
@@ -416,7 +418,7 @@ function handleAssignPermSubmit() {
       .map((node: any) => node.value);
 
     loading.value = true;
-    RoleAPI.updateRoleMenus(roleId, checkedMenuIds)
+    RoleAPI.updateRolePerms(roleId, checkedMenuIds)
       .then(() => {
         ElMessage.success("分配权限成功");
         assignPermDialogVisible.value = false;

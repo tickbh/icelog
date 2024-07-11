@@ -35,7 +35,7 @@ class CacheTable:
                 if attrib in data and data[attrib]:
                     if "sub_" in attrib:
                         value = base_utils.safe_str(data[attrib])
-                        for sub in value.split(","):
+                        for sub in value.split("|"):
                             temp_table[sub] = data
                     else:
                         temp_table[data[attrib]] = data

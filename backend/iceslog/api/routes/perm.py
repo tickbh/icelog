@@ -24,7 +24,7 @@ from iceslog.models import (
 )
 from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
-from iceslog.models.perms import GroupPerms, OnePerm, Perms
+from iceslog.models.perms import GroupPerms, OnePerm, Perms, PermsPublic
 from iceslog.utils import base_utils, cache_utils
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
@@ -32,25 +32,24 @@ from iceslog.utils.utils import page_view_condition
 router = APIRouter()
 
 
-@router.get("", response_model=list[OnePerm])
-def get_perms(session: SessionDep, keywords: str = None):
+@router.get("/page", response_model=PermsPublic)
+def get_perms(session: SessionDep, keywords: str = None, pageNum: int = 0, pageSize: int = 100):
     table_perms: dict[int, OnePerm] = {}
-    
-    statement = select(Perms).where(Perms.is_show == True)
+    condition = [Perms.is_show == True]
     if keywords:
-        statement = statement.where(Perms.name.like(f"%{keywords}%"))
-    for menu in session.exec(statement).all():
-        one = OnePerm.model_validate(menu)
+        condition.append(Perms.name.like(f"%{keywords}%"))
+    perms, count = page_view_condition(session, condition, Perms, pageNum, pageSize, [Perms.sort])
+    for pem in perms:
+        one = OnePerm.model_validate(pem)
         table_perms[one.id] = one
         
     for groups in session.exec(select(GroupPerms)).all():
         for id in base_utils.split_to_int_list(groups.permissions):
             if not id in table_perms:
                 continue
-            table_perms[id].groups = (table_perms[id].groups or "") + f"{groups.name}|"
-    value = list(table_perms.values())
-    value.sort(key=lambda v: v.sort)
-    return value
+            table_perms[id].groups = base_utils.append_split_to_str(table_perms[id].groups, groups.id)
+            table_perms[id].groups_name = base_utils.append_split_to_str(table_perms[id].groups_name, groups.name)
+    return PermsPublic(list=perms, total=count)
 
 @router.get(
     "/options",
@@ -85,79 +84,90 @@ def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywo
 
 
 @router.get(
-    "/form/{dict_id}",
+    "/form/{perm_id}",
     dependencies=[Depends(get_current_active_superuser)],
-    response_model=OneEditDictMap,
+    response_model=OnePerm,
 )
-def get_form_dict(session: SessionDep, dict_id: int) -> Any:
-    dict_map = session.exec(select(DictMap).where(DictMap.id==dict_id)).first()
-    if not dict_map:
-        raise HTTPException(status_code=400, detail="不存在该字典id")
+def get_form_dict(session: SessionDep, perm_id: int) -> Any:
+    perm = session.exec(select(Perms).where(Perms.id==perm_id)).first()
+    if not perm:
+        raise HTTPException(status_code=400, detail="不存在该权限id")
+    perm = OnePerm.model_validate(perm)
     
-    items = []
-    for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == dict_id)).all():
-        items.append(sub)
-    val = OneEditDictMap.model_validate(dict_map, update={"dictItems": items})
-    return val
+    for groups in session.exec(select(GroupPerms)).all():
+        for perm_id in base_utils.split_to_int_list(groups.permissions):
+            if perm_id != perm.id:
+                continue
+            perm.groups = base_utils.append_split_to_str(perm.groups, groups.id)
+            perm.groups_name = base_utils.append_split_to_str(perm.groups_name, groups.name)
+    
+    return perm
 
 @router.put(
-    "/{dict_id}",
+    "/{perm_id}",
     dependencies=[Depends(get_current_active_superuser)],
     response_model=RetMsg,
 )
-def modify_dict(session: SessionDep, dict_id: int, dict_map: OneEditDictMap) -> Any:
-    map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
+def modify_perm(session: SessionDep, perm_id: int, perm_map: OnePerm) -> Any:
+    map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
     if not map:
-        raise HTTPException(400, "不存在该字典选项")
+        raise HTTPException(400, "不存在该权限选项")
     
-    if map.name != dict_map.name or map.code != dict_map.code or map.status != dict_map.status:
-        map.name = dict_map.name
-        map.code = dict_map.code
-        map.status = dict_map.status
-        session.add(map)
-        session.commit()
+    map.codename = perm_map.codename
+    map.name = perm_map.name
+    map.route = perm_map.route
+    map.sort = perm_map.sort
+    map.is_show = perm_map.is_show
+    session.merge(map)
+    session.commit()
+    
+    group_perms = base_utils.split_to_int_list(perm_map.groups) 
         
-    for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == dict_id)).all():
-        find = None
-        for child in dict_map.dictItems:
-            if sub.id == child.id:
-                find = child
-                break
-        if not find:
-            session.delete(sub)
+    for groups in session.exec(select(GroupPerms)).all():
+        now_perms = base_utils.split_to_int_list(groups.permissions)
+        if perm_id in now_perms and not groups.id in group_perms:
+            now_perms.remove(perm_id)
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
             session.commit()
-        elif find.label != sub.label or find.value != sub.value or find.status != sub.status or find.sort != sub.sort:
-            sub.label = find.label
-            sub.value = find.value
-            sub.status = find.status
-            sub.sort = find.sort
-            session.add(map)
+        elif not perm_id in now_perms and groups.id in group_perms:
+            now_perms.append(perm_id)
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
             session.commit()
-            
-    for child in dict_map.dictItems:
-        if 0 == child.id:
-            del child.id
-            item = DictMapItem.model_validate(child)
-            item.dict_id = dict_id
-            session.add(item)
-            session.commit()
+        
     return RetMsg()
 
 
 @router.delete(
-    "/{dicts}",
+    "/{perms}",
     dependencies=[Depends(get_current_active_superuser)],
     response_model=RetMsg,
 )
-def delete_dict(session: SessionDep, dicts: str) -> Any:
-    # for dict_id in base_utils.split_to_int_list(dicts):
-    #     map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
-    #     if not map:
-    #         raise HTTPException(400, "不存在该字典选项")
+def delete_dict(session: SessionDep, perms: str) -> Any:
+    del_ids = []
+    for perm_id in base_utils.split_to_int_list(perms):
+        map = session.exec(select(Perms).where(Perms.id == perm_id)).first()
+        if not map:
+            raise HTTPException(400, "不存在该字典选项")
         
-    #     session.delete(map)
-    #     session.exec(delete(DictMapItem).where(DictMapItem.dict_id == dict_id))
-    #     session.commit()
+        del_ids.append(perm_id)
+        session.delete(map)
+        session.commit()
+        
+    for groups in session.exec(select(GroupPerms)).all():
+        now_perms = base_utils.split_to_int_list(groups.permissions)
+        has_del = False
+        for id in del_ids:
+            if id in now_perms:
+                now_perms.remove(id)
+                has_del = True
+        
+        if has_del:
+            groups.permissions = base_utils.join_list_to_str(now_perms)
+            session.merge(groups)
+            session.commit()
+        
     return RetMsg()
 
 
@@ -166,17 +176,21 @@ def delete_dict(session: SessionDep, dicts: str) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=RetMsg,
 )
-def add_dict(session: SessionDep, dict_map: OneEditDictMap) -> Any:
-    del dict_map.id
-    map = DictMap.model_validate(dict_map)
+def add_perm(session: SessionDep, one: OnePerm) -> Any:
+    one.create_time = base_utils.datetime_now()
+    map = Perms.model_validate(one)
+    del map.id
     session.add(map)
     session.commit()
     session.refresh(map)
     
-    for child in dict_map.dictItems:
-        del child.id
-        item = DictMapItem.model_validate(child)
-        item.dict_id = map.id
-        session.add(item)
+    now_perms = base_utils.split_to_int_list(one.groups)
+    
+    for groups in session.exec(select(GroupPerms).where(col(GroupPerms.id).in_(now_perms))).all():
+        perms = base_utils.split_to_int_list(groups.permissions)
+        perms.append(map.id)
+        groups.permissions = base_utils.join_list_to_str(perms)
+        session.merge(groups)
         session.commit()
+    
     return RetMsg()

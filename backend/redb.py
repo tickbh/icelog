@@ -1,12 +1,19 @@
 import os
 from pathlib import Path
 import subprocess
+import time
 
 if __name__ == "__main__":
-    try:
-        os.remove("./sql_app.db")
-    except:
-        pass
+    db_name = "./sql_app.db"
+    while os.access(db_name, 1):
+        
+        try:
+            os.remove(db_name)
+        except:
+            print("删除失败, 等待下次重试")
+            pass
+        
+        time.sleep(0.4)
  
     # 要删除文件的目录
     directory = 'iceslog/alembic/versions'

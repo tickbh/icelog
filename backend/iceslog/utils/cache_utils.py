@@ -15,7 +15,7 @@ def get_all_perms(group_id: int) -> list[str]:
     group = get_group_perm(group_id)
     vals = []
     if group and "permissions" in group:
-        for id in group["permissions"].split(","):
+        for id in group["permissions"].split("|"):
             perm = get_perm(base_utils.safe_int(id) )
             if perm and len(perm["codename"]) > 0:
                 vals.append(perm["codename"])

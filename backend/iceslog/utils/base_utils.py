@@ -103,8 +103,24 @@ def print_exec(logging_type=''):
     error_logging.warning("------------exception occur----------------")
     error_logging.error(info)
     
-def split_to_int_list(val: str, split=",") -> list[int]:
+def split_to_int_list(val: str, split="|") -> list[int]:
+    if not val or len(val) == 0:
+        return []
     rets = []
-    for v in val.split(split):
+    for v in (val or "").split(split):
         rets.append(safe_int(v))
     return rets
+
+def join_list_to_str(arr: list, split="|") -> str:
+    arr = [str(v) for v in arr]
+    return split.join(arr)
+
+def append_split_to_str(val: str, next: any, split="|") -> str:
+    if not val or len(val) == 0:
+        return f"{next}"
+    else:
+        return f"{val}{split}{next}"
+    
+def datetime_now():
+    from datetime import datetime
+    return datetime.now()

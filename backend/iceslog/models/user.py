@@ -36,7 +36,6 @@ class UserBase(SQLModel):
     is_deleted: int = Field(default=0, description="逻辑删除标记")
     group_pem: int | None = Field(default=None, description="组权限id")
 
-
 class UserCreate(UserBase):
     password: str = Field(min_length=MIN_PASSWORD, max_length=MAX_PASSWORD)
 

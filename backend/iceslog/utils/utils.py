@@ -119,7 +119,7 @@ def verify_password_reset_token(token: str) -> str | None:
         return None
 
 
-def page_view_condition(session: Session, condition: list, model: SQLModel, pageNum: int = 0, pageSize: int = 100):
+def page_view_condition(session: Session, condition: list, model: SQLModel, pageNum: int = 0, pageSize: int = 100, order_by: list = []):
     statement = select(model)
     count_statement = select(func.count()).select_from(model)
     
@@ -128,6 +128,8 @@ def page_view_condition(session: Session, condition: list, model: SQLModel, page
         count_statement = count_statement.where(c)
 
     statement = statement.offset((pageNum - 1) * pageSize).limit(pageSize)
+    if len(order_by) > 0:
+        statement = statement.order_by(*order_by)
     datas = session.exec(statement).all()
     count = session.exec(count_statement).one()
     return datas, count

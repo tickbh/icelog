@@ -25,6 +25,8 @@ export interface PermVO {
   is_show?: boolean;
   /** 权限分组 */
   groups?: string;
+  /** 权限分组名称 */
+  groups_name?: string;
   /** 菜单排序(数字越小排名越靠前) */
   sort?: number;
 }
@@ -32,7 +34,7 @@ export interface PermVO {
 /** 菜单表单对象 */
 export interface PermForm {
   /** 菜单ID */
-  id?: string;
+  id?: number;
   /** 菜单名称 */
   name?: string;
   /** ICON */
@@ -41,6 +43,13 @@ export interface PermForm {
   codename?: string;
   /** 排序 */
   sort?: number;
+  /** 权限分组 */
+  groups?: string;
+  /** 是否显示 */
+  is_show?: boolean;
+
+  /** 创建时间 */
+  create_time?: string;
 }
 
 class PermAPI {
@@ -50,8 +59,8 @@ class PermAPI {
    * @param queryParams 查询参数
    * @returns 字典分页结果
    */
-  static getPage(queryParams: DictPageQuery) {
-    return request<any, PageResult<DictPageVO[]>>({
+  static getPage(queryParams: PermQuery) {
+    return request<any, PageResult<PermPageVO[]>>({
       url: `${PERM_BASE_URL}/page`,
       method: "get",
       params: queryParams,
@@ -79,7 +88,7 @@ class PermAPI {
    * @returns 字典表单数据
    */
   static getFormData(id: number) {
-    return request<any, ResponseData<DictForm>>({
+    return request<any, PermForm>({
       url: `${PERM_BASE_URL}/form/${id}`,
       method: "get",
     });
@@ -91,7 +100,7 @@ class PermAPI {
    * @param data 字典表单数据
    * @returns 请求结果
    */
-  static add(data: DictForm) {
+  static add(data: PermForm) {
     return request({
       url: `${PERM_BASE_URL}`,
       method: "post",
@@ -106,7 +115,7 @@ class PermAPI {
    * @param data 字典表单数据
    * @returns 请求结果
    */
-  static update(id: number, data: DictForm) {
+  static update(id: number, data: PermForm) {
     return request({
       url: `${PERM_BASE_URL}/${id}`,
       method: "put",
@@ -156,7 +165,7 @@ export interface DictPageQuery extends PageQuery {
 /**
  * 字典分页对象
  */
-export interface DictPageVO {
+export interface PermPageVO {
   /**
    * 字典ID
    */

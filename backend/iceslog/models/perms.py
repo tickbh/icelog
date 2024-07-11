@@ -23,3 +23,8 @@ class GroupPerms(SQLModel, table=True):
 
 class OnePerm(Perms):
     groups: str = None
+    groups_name: str = None
+    
+class PermsPublic(SQLModel):
+    list: list[OnePerm]
+    total: int

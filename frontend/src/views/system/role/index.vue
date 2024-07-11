@@ -192,7 +192,7 @@
         ref="permTreeRef"
         node-key="value"
         show-checkbox
-        :data="menuPermOptions"
+        :data="permOptions"
         :filter-node-method="handlePermFilter"
         :default-expand-all="true"
         :check-strictly="!parentChildLinked"
@@ -223,6 +223,7 @@ defineOptions({
 
 import RoleAPI, { RolePageVO, RoleForm, RolePageQuery } from "@/api/role";
 import MenuAPI from "@/api/menu";
+import PermAPI from "@/api/perm";
 
 const queryFormRef = ref(ElForm);
 const roleFormRef = ref(ElForm);
@@ -240,7 +241,7 @@ const queryParams = reactive<RolePageQuery>({
 // 角色表格数据
 const roleList = ref<RolePageVO[]>();
 // 菜单权限下拉
-const menuPermOptions = ref<OptionType[]>([]);
+const permOptions = ref<OptionType[]>([]);
 
 // 弹窗
 const dialog = reactive({
@@ -393,10 +394,10 @@ async function handleOpenAssignPermDialog(row: RolePageVO) {
     checkedRole.value.name = row.name;
 
     // 获取所有的菜单
-    menuPermOptions.value = await MenuAPI.getOptions();
+    permOptions.value = await PermAPI.getOptions();
 
     // 回显角色已拥有的菜单
-    RoleAPI.getRolePermIds(roleId)
+    RoleAPI.getRolePerms(roleId)
       .then((data) => {
         const checkedMenuIds = data;
         checkedMenuIds.forEach((menuId) =>

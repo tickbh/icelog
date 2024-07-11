@@ -124,3 +124,32 @@ def add_perm(session: SessionDep, one: GroupPermsBase) -> Any:
     session.commit()
     session.refresh(map)
     return RetMsg()
+
+
+
+@router.get(
+    "/perms/{group_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=list[int],
+)
+def get_perms(session: SessionDep, group_id: int) -> Any:
+    group = session.exec(select(GroupPerms).where(GroupPerms.id == group_id)).first()
+    if not group:
+        raise HTTPException(400, "不存在id")
+    return base_utils.split_to_int_list(group.permissions)
+
+
+
+@router.put(
+    "/perms/{group_id}",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=list[int],
+)
+def put_perms(session: SessionDep, group_id: int, perms: list[int]) -> Any:
+    group = session.exec(select(GroupPerms).where(GroupPerms.id == group_id)).first()
+    if not group:
+        raise HTTPException(400, "不存在id")
+    group.permissions = base_utils.join_list_to_str(perms)
+    session.merge(group)
+    session.commit()
+    return perms

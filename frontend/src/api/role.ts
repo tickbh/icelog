@@ -26,9 +26,9 @@ class RoleAPI {
    * @param roleId 角色ID
    * @returns 角色的菜单ID集合
    */
-  static getRolePermIds(roleId: number) {
+  static getRolePerms(roleId: number) {
     return request<any, number[]>({
-      url: `${ROLE_BASE_URL}/permids/${roleId}`,
+      url: `${ROLE_BASE_URL}/perms/${roleId}`,
       method: "get",
     });
   }

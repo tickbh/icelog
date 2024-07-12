@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from iceslog.api.routes import items,users, login, auth, menus, roles, dictmap, perm
+from iceslog.api.routes import items,users, login, auth, menus, roles, dictmap, perm, syslog
 
 api_router = APIRouter()
 api_router.include_router(items.router, prefix="/items", tags=["items"])
@@ -10,5 +10,4 @@ api_router.include_router(menus.router, prefix="/menus", tags=["menus"])
 api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
 api_router.include_router(dictmap.router, prefix="/dict", tags=["dict"])
 api_router.include_router(perm.router, prefix="/perm", tags=["perm"])
-# api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
-# api_router.include_router(items.router, prefix="/items", tags=["items"])
+api_router.include_router(syslog.router, prefix="/logs", tags=["logs"])

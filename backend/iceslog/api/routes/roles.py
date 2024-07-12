@@ -6,6 +6,8 @@ from sqlmodel import col, delete, func, or_, select
 from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
+    PageNumType,
+    PageSizeType,
     SessionDep,
     get_current_active_superuser,
 )
@@ -23,14 +25,13 @@ from iceslog.utils.utils import page_view_condition
 
 router = APIRouter()
 
-
 @router.get("/page", response_model=GroupPermsPublic)
-def get_perms(session: SessionDep, keywords: str = None, pageNum: int = 0, pageSize: int = 100):
+def get_roles(session: SessionDep, pageNum: PageNumType = 1, pageSize: PageSizeType = 10, keywords: str = None):
     condition = []
     if keywords:
         condition.append(or_(GroupPerms.name.like(f"%{keywords}%"), GroupPerms.code.like(f"%{keywords}%")))
-    perms, count = page_view_condition(session, condition, GroupPerms, pageNum, pageSize, [GroupPerms.sort])
-    return GroupPermsPublic(list=perms, total=count)
+    roles, count = page_view_condition(session, condition, GroupPerms, pageNum, pageSize, [GroupPerms.sort])
+    return GroupPermsPublic(list=roles, total=count)
 
 @router.get(
     "/options",

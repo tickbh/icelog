@@ -98,9 +98,9 @@ def add_menu(session: SessionDep, user: CurrentUser, menu: Menus) -> Any:
     "/form/{menu_id}",
     response_model=Menus,
 )
-def add_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
+def get_form_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
     
-    menu = session.exec(select(Menus).where(Menus.is_show == True)).first()
+    menu = session.exec(select(Menus).where(Menus.id == menu_id)).first()
     if not menu:
         raise HTTPException(400, "不存在该菜单id")
         
@@ -125,7 +125,7 @@ def add_menu(session: SessionDep, user: CurrentUser, menu_id: int, menu: Menus) 
     "/{menu_id}",
     response_model=Menus,
 )
-def add_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
+def delete_menu(session: SessionDep, user: CurrentUser, menu_id: int) -> Any:
     db_menu = session.exec(select(Menus).where(Menus.id == menu_id)).first()
     if not db_menu:
         raise HTTPException(400, "不存在菜单id")

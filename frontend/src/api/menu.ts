@@ -77,7 +77,7 @@ class MenuAPI {
    * @param data 菜单表单数据
    * @returns 请求结果
    */
-  static update(id: string, data: MenuForm) {
+  static update(id: number, data: MenuForm) {
     return request({
       url: `${MENU_BASE_URL}/${id}`,
       method: "put",
@@ -143,7 +143,7 @@ export interface MenuVO {
 /** 菜单表单对象 */
 export interface MenuForm {
   /** 菜单ID */
-  id?: string;
+  id?: number;
   /** 父菜单ID */
   pid?: number;
   /** 菜单名称 */

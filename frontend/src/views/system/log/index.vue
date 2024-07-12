@@ -27,8 +27,8 @@
         highlight-current-row
         border
       >
-        <el-table-column label="操作时间" prop="createTime" width="180" />
-        <el-table-column label="操作人" prop="operator" width="120" />
+        <el-table-column label="操作时间" prop="create_time" width="180" />
+        <el-table-column label="操作人" prop="create_by" width="120" />
         <el-table-column label="日志模块" prop="module" width="100" />
         <el-table-column label="日志内容" prop="content" min-width="200" />
         <el-table-column label="IP 地址" prop="ip" width="150" />
@@ -42,7 +42,7 @@
         />
         <el-table-column
           label="执行时间(ms)"
-          prop="executionTime"
+          prop="execution_time"
           width="150"
         />
       </el-table>

@@ -73,11 +73,10 @@ function handleChange(val?: string[] | number[] | undefined) {
 }
 
 onBeforeMount(() => {
+  console.log("onBeforeMount!!!!!!!!!!!!");
   // 根据字典编码获取字典项
   DictAPI.getOptions(props.code).then((data) => {
     options.value = data;
   });
 });
-
-onMounted(() => {});
 </script>

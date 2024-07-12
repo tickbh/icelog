@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from datetime import datetime, timezone
 from sqlmodel import Session, create_engine, select
 
@@ -34,3 +35,7 @@ def init_db(session: Session) -> None:
         session.add(user)
         session.commit()
         session.refresh(user)
+
+def get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session

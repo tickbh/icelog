@@ -282,7 +282,6 @@ function handleOpenDialog(parentId?: number, permId?: number) {
       if (permId) {
         dialog.title = "编辑菜单";
         PermAPI.getFormData(permId).then((data) => {
-          console.log("data === ", data);
           initialPermFormData.value = { ...data };
           formData.value = data;
         });

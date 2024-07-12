@@ -488,7 +488,7 @@ const initialMenuFormData = ref<MenuForm>({
   alwaysShow: 0,
   keepAlive: 1,
   params: "",
-  belong: "sys|usr",
+  belong: "",
 });
 
 // 菜单表单数据
@@ -549,7 +549,6 @@ function handleOpenDialog(parentId?: number, menuId?: number) {
       if (menuId) {
         dialog.title = "编辑菜单";
         MenuAPI.getFormData(menuId).then((data) => {
-          console.log("data === ", data);
           initialMenuFormData.value = { ...data };
           formData.value = data;
         });
@@ -633,7 +632,8 @@ function handleCloseDialog() {
   dialog.is_show = false;
   menuFormRef.value.resetFields();
   menuFormRef.value.clearValidate();
-  formData.value.id = undefined;
+  formData.value.id = 0;
+  formData.value.belong = "";
 }
 
 onMounted(() => {

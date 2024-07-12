@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Form, HTTPException
 from fastapi.responses import ORJSONResponse
 from sqlmodel import select
 from iceslog import cruds
-from iceslog.api.deps import CurrentUser, SessionDep, get_current_active_superuser
+from iceslog.api.deps import CurrentUser, SessionDep, check_has_perm, get_current_active_superuser
 from iceslog.captcha import img_captcha
 from iceslog.core import security
 from iceslog.core.config import settings
@@ -15,7 +15,8 @@ from iceslog.models.dictmap import DictMap, MsgEditDictMap
 from iceslog.models.menu import Menus, OneEditMenu, OneLabelMenu
 from iceslog.utils import PidTable
 from iceslog.utils.utils import page_view_condition
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(check_has_perm)])
 
 def deal_func(data: Menus):
     new_data = {

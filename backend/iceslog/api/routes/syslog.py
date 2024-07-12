@@ -9,6 +9,7 @@ from iceslog.api.deps import (
     PageNumType,
     PageSizeType,
     SessionDep,
+    check_has_perm,
     get_current_active_superuser,
 )
 from iceslog.core.config import settings
@@ -24,7 +25,8 @@ from iceslog.utils import base_utils, cache_utils
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(check_has_perm)])
 
 
 @router.get("/page", response_model=LogsPublic)

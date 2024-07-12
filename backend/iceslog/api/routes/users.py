@@ -7,7 +7,10 @@ from sqlmodel import and_, col, delete, func, or_, select
 from iceslog import cruds
 from iceslog.api.deps import (
     CurrentUser,
+    PageNumType,
+    PageSizeType,
     SessionDep,
+    check_has_perm,
     get_current_active_superuser,
 )
 from iceslog.core.config import settings
@@ -27,7 +30,9 @@ from iceslog.models.user import MsgUserPublic, UserMePublic
 from iceslog.utils import base_utils, cache_utils, generate_new_account_email, send_email
 from iceslog.utils.utils import page_view_condition
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(check_has_perm)]
+)
 
 
 @router.get(
@@ -35,7 +40,7 @@ router = APIRouter()
     dependencies=[Depends(get_current_active_superuser)],
     response_model=UsersPublic,
 )
-def read_users(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
+def read_users(session: SessionDep, pageNum: PageNumType = 0, pageSize: PageSizeType = 100, keywords: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
     """
     Retrieve users.
     """

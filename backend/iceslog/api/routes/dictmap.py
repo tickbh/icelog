@@ -6,6 +6,8 @@ from sqlmodel import col, delete, func, select
 from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
+    PageNumType,
+    PageSizeType,
     SessionDep,
     get_current_active_superuser,
 )
@@ -55,7 +57,7 @@ def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     dependencies=[Depends(get_current_active_superuser)],
     response_model=MsgEditDictMap,
 )
-def read_dicts(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
+def read_dicts(session: SessionDep, pageNum: PageNumType = 1, pageSize: PageSizeType = 100, keywords: str = None) -> Any:
     condition = []
     if keywords:
         condition.append(DictMap.name.like(f"%{keywords}%"))

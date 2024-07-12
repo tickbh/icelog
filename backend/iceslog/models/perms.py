@@ -33,8 +33,8 @@ class GroupPerms(GroupPermsBase, table=True):
     pass
 
 class OnePerm(PermsBase):
-    groups: str = None
-    groups_name: str = None
+    groups: str | None = None
+    groups_name: str | None = None
     children: list[Self] = []
     
 class PermsPublic(SQLModel):

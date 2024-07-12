@@ -6,6 +6,8 @@ from sqlmodel import col, delete, func, select
 from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
+    PageNumType,
+    PageSizeType,
     SessionDep,
     get_current_active_superuser,
 )
@@ -25,7 +27,7 @@ router = APIRouter()
 
 
 @router.get("/page", response_model=PermsPublic)
-def get_perms(session: SessionDep, keywords: str = None, pageNum: int = 0, pageSize: int = 100):
+def get_perms(session: SessionDep, keywords: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     table_perms: dict[int, OnePerm] = {}
     condition = [Perms.is_show == True]
     if keywords:

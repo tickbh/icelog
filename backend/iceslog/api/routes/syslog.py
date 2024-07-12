@@ -6,6 +6,8 @@ from sqlmodel import col, delete, func, or_, select
 from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
+    PageNumType,
+    PageSizeType,
     SessionDep,
     get_current_active_superuser,
 )
@@ -26,7 +28,7 @@ router = APIRouter()
 
 
 @router.get("/page", response_model=LogsPublic)
-def get_logs(session: SessionDep, keywords: str = None, pageNum: int = 0, pageSize: int = 100):
+def get_logs(session: SessionDep, keywords: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     condition = []
     if keywords:
         condition.append(or_(SysLog.content.like(f"%{keywords}%"), SysLog.module==keywords))

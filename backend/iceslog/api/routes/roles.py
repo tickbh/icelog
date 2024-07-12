@@ -43,27 +43,6 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
         rets.append(OptionType(value=group["id"], label=group["name"]))
     return rets
 
-@router.get(
-    "/page",
-    dependencies=[Depends(get_current_active_superuser)],
-    response_model=MsgEditDictMap,
-)
-def read_roles(session: SessionDep, pageNum: int = 0, pageSize: int = 100, keywords: str = None) -> Any:
-    condition = []
-    if keywords:
-        condition.append(DictMap.name.like(f"%{keywords}%"))
-
-    dicts, count = page_view_condition(session, condition, DictMap, pageNum, pageSize)
-    vals = []
-    for val in dicts:
-        items = []
-        for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == val.id)).all():
-            items.append(sub)
-        val = OneEditDictMap.model_validate(val, update={"dictItems": items})
-        vals.append(val)
-    
-    return MsgEditDictMap(list=vals, total=count) 
-
 
 @router.get(
     "/form/{perm_id}",

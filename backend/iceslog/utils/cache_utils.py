@@ -19,7 +19,26 @@ def get_all_perms(group_id: int) -> list[str]:
             perm = get_perm(base_utils.safe_int(id) )
             if perm and len(perm["codename"]) > 0:
                 vals.append(perm["codename"])
-    
+    return vals    
+
+def get_all_perms_route(group_id: int) -> list[str]:
+    group = get_group_perm(group_id)
+    vals = []
+    if group and "permissions" in group:
+        for id in group["permissions"].split("|"):
+            perm = get_perm(base_utils.safe_int(id) )
+            if perm and len(perm["route"]) > 0:
+                vals.append(perm["route"])
+    return vals    
+
+def get_all_perms_ids(group_id: int) -> list[int]:
+    group = get_group_perm(group_id)
+    vals = []
+    if group and "permissions" in group:
+        for id in group["permissions"].split("|"):
+            perm = get_perm(base_utils.safe_int(id) )
+            if perm:
+                vals.append(perm["id"])
     return vals    
 
 menus_cache_table = CacheTable(models.Menus, attribs=["id"])

@@ -29,7 +29,7 @@ def deal_func(data: Menus):
         "meta": {
             "title": data.name,
             "icon": data.icon,
-            "hidden": not data.is_show ,
+            "hidden": not data.status ,
             "alwaysShow": False,
             "params": data.params,
         }
@@ -48,7 +48,7 @@ def get_routes(current_user: CurrentUser):
 def get_menus(session: SessionDep, keywords: str = None):
     all_menus: list[OneEditMenu] = []
     menu_table = {}
-    statement = select(Menus).where(Menus.is_show == True)
+    statement = select(Menus).where(Menus.status == True)
     if keywords:
         statement = statement.where(Menus.name.like(f"%{keywords}%"))
     for menu in session.exec(statement).all():

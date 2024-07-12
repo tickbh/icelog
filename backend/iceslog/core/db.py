@@ -39,3 +39,6 @@ def init_db(session: Session) -> None:
 def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
+        
+def get_redisdb() -> None:
+    pass

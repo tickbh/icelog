@@ -114,9 +114,7 @@
 
         <el-table-column label="状态" align="center" width="80">
           <template #default="scope">
-            <el-tag v-if="scope.row.is_show === true" type="success"
-              >显示</el-tag
-            >
+            <el-tag v-if="scope.row.status === 1" type="success">显示</el-tag>
             <el-tag v-else type="info">隐藏</el-tag>
           </template>
         </el-table-column>
@@ -363,12 +361,12 @@
 -->
         <el-form-item
           v-if="formData.type !== MenuTypeEnum.BUTTON"
-          prop="is_show"
+          prop="status"
           label="显示状态"
         >
-          <el-radio-group v-model="formData.is_show">
-            <el-radio :value="true">显示</el-radio>
-            <el-radio :value="false">隐藏</el-radio>
+          <el-radio-group v-model="formData.status">
+            <el-radio :value="1">显示</el-radio>
+            <el-radio :value="0">隐藏</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -482,7 +480,7 @@ const menuOptions = ref<OptionType[]>([]);
 const initialMenuFormData = ref<MenuForm>({
   id: undefined,
   pid: 0,
-  is_show: true,
+  status: true,
   sort: 1,
   type: MenuTypeEnum.MENU, // 默认菜单
   alwaysShow: 0,
@@ -503,7 +501,7 @@ const rules = reactive({
   // routeName: [{ required: true, message: "请输入路由名称", trigger: "blur" }],
   path: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
   component: [{ required: true, message: "请输入组件路径", trigger: "blur" }],
-  is_show: [{ required: true, message: "请输入路由路径", trigger: "blur" }],
+  status: [{ required: true, message: "请输入状态", trigger: "blur" }],
 });
 
 // 选择表格的行菜单ID

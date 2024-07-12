@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     SECRET_KEY: str = "change this secert"
     
+    REDIS_URL: str = "redis://i.haode.fit:6379"
+    
     SQLITE_NAME: Union[str, None] = None
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12
     

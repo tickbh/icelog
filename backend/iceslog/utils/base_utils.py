@@ -93,6 +93,27 @@ def safe_float(value, default_return=0, is_log=False):
     '''
     return super_transfer(float, value, default_return, is_log)
 
+
+def safe_json(source, default={}):
+    '''若转化失败, 则返回默认值'''
+    try:
+        if not source:
+            return {}
+        if isinstance(source, bytes):
+            source = safe_str(source)
+        if not isinstance(source, str):
+            return source
+        try:
+            value = json.loads(source)
+            return value
+        except:
+            pass
+        # value = JSONEncoder().encode(source)
+        value = eval(source)
+        return value
+    except Exception as e:
+        return default
+        
 def print_exec(logging_type=''):
     logging.warning("------------exception occur----------------")
     import traceback

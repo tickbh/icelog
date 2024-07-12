@@ -14,25 +14,25 @@ logger = logging.getLogger(__name__)
 def init_menu(session: Session):
     from iceslog.models import Menus
     menu = Menus(id=1, belong="sys", type="MENU", name="系统管理", component="Layout", icon="system",
-                 params="", pid=0, path="/system", redirect="/system/user", sort=0, is_show=True, groups="1")
+                 params="", pid=0, path="/system", redirect="/system/user", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=10, pid=1, belong="sys|admin", type="MENU", name="用户管理", component="system/user/index",
-                 icon="el-icon-User", params="", path="user", redirect="", sort=0, is_show=True, groups="1")
+                 icon="el-icon-User", params="", path="user", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=11, pid=1, belong="sys", type="MENU", name="角色管理", component="system/role/index",
-                 icon="role", params="", path="role", redirect="", sort=0, is_show=True, groups="1")
+                 icon="role", params="", path="role", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=12, pid=1, belong="sys", type="MENU", name="菜单管理", component="system/menu/index",
-                 icon="menu", params="", path="menu", redirect="", sort=0, is_show=True, groups="1")
+                 icon="menu", params="", path="menu", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=13, pid=1, belong="sys", type="MENU", name="权限管理", component="system/perm/index",
-                 icon="el-icon-Finished", params="", path="perm", redirect="", sort=0, is_show=True, groups="1")
+                 icon="el-icon-Finished", params="", path="perm", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=14, pid=1, belong="sys", type="MENU", name="字典管理", component="system/dict/index",
-                 icon="dict", params="", path="dict", redirect="", sort=0, is_show=True, groups="1")
+                 icon="dict", params="", path="dict", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     menu = Menus(id=15, pid=1, belong="sys", type="MENU", name="日志管理", component="system/log/index",
-                 icon="document", params="", path="log", redirect="", sort=0, is_show=True, groups="1")
+                 icon="document", params="", path="log", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     session.commit()
 

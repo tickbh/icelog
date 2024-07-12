@@ -12,7 +12,7 @@ class PermsBase(SQLModel):
     name: str = Field(max_length=50, nullable=False, description="名字")
     route: str = Field(max_length=255, nullable=False, description="路由")
     codename: str = Field(max_length=50, nullable=False, description="代码名字")
-    is_show: bool = Field(default=True, description="是否展示")
+    status: int = Field(default=1, description="是否展示(1正常, 0禁用)")
     sort: int = Field(nullable=False, default=0, description="排序")
     create_time: datetime = Field(nullable=False, default_factory=datetime_now, description="创建时间")
 

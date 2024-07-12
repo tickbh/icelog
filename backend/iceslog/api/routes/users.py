@@ -75,6 +75,7 @@ def read_user_form(*, session: SessionDep, user_id: int) -> Any:
 
 @router.get("/me", response_model=UserMePublic)
 def read_user_me(current_user: CurrentUser) -> Any:
+    print("me!!!!!!!!!!!!!!!!!")
     """
     Get current user.
     """

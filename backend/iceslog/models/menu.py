@@ -22,7 +22,7 @@ class MenusBase(SQLModel):
     path: str = Field(max_length=1024, nullable=False, description="激活菜单名称")
     redirect: str = Field(max_length=1024, nullable=True, default="", description="菜单路由")
     sort: int = Field(nullable=True, default=0, description="菜单排序")
-    is_show: bool = Field(default=True, description="是否展示")
+    status: int = Field(default=1, description="是否展示(1正常, 0禁用)")
     groups: str = Field(max_length=4096, nullable=False, default="", description="权限ids 1|2|3|4|5]")
 
 class Menus(MenusBase, table=True):

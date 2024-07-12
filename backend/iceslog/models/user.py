@@ -71,6 +71,9 @@ class User(UserBase, table=True):
     real_name: str | None = Field(
         default=None, max_length=255, description="实际名称")
     hashed_password: str
+    
+class UserEx(User):
+    is_changed: bool = False
 
 # Properties to return via API, id is always required
 

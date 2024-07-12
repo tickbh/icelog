@@ -32,7 +32,7 @@ router = APIRouter(
 @router.get("/page", response_model=PermsPublic)
 def get_perms(session: SessionDep, keywords: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     table_perms: dict[int, OnePerm] = {}
-    condition = [Perms.is_show == True]
+    condition = [Perms.status == True]
     if keywords:
         condition.append(Perms.name.like(f"%{keywords}%"))
     perms, count = page_view_condition(session, condition, Perms, pageNum, pageSize, [Perms.sort])
@@ -85,7 +85,7 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
 def read_all_perms(session: SessionDep, keywords: str = None) -> Any:
 
     table_perms: dict[int, OnePerm] = {}
-    statement = select(Perms).where(Perms.is_show==True)
+    statement = select(Perms).where(Perms.status==True)
     if keywords:
         statement = statement.where(Perms.name.like(f"%{keywords}%"))
 
@@ -149,7 +149,7 @@ def modify_perm(session: SessionDep, perm_id: int, perm_map: OnePerm) -> Any:
     map.name = perm_map.name
     map.route = perm_map.route
     map.sort = perm_map.sort
-    map.is_show = perm_map.is_show
+    map.status = perm_map.status
     session.merge(map)
     session.commit()
     

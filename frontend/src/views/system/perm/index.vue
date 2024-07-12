@@ -168,10 +168,10 @@
           <perm-multi v-model:value="formData.groups" />
         </el-form-item>
 
-        <el-form-item prop="is_show" label="显示状态">
-          <el-radio-group v-model="formData.is_show">
-            <el-radio :value="true">显示</el-radio>
-            <el-radio :value="false">隐藏</el-radio>
+        <el-form-item prop="status" label="显示状态">
+          <el-radio-group v-model="formData.status">
+            <el-radio :value="1">显示</el-radio>
+            <el-radio :value="0">隐藏</el-radio>
           </el-radio-group>
         </el-form-item>
 
@@ -233,7 +233,7 @@ const initialPermFormData = ref<PermForm>({
   route: "",
   codename: "",
   name: "",
-  is_show: true,
+  status: true,
 });
 
 // 菜单表单数据

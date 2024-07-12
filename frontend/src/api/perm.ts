@@ -22,7 +22,7 @@ export interface PermVO {
   /** 代码名字 */
   codename?: string;
   /** 是否展示 */
-  is_show?: boolean;
+  status?: number;
   /** 权限分组 */
   groups?: string;
   /** 权限分组名称 */
@@ -48,7 +48,7 @@ export interface PermForm {
   /** 权限分组 */
   groups?: string;
   /** 是否显示 */
-  is_show?: boolean;
+  status?: number;
 
   /** 创建时间 */
   create_time?: string;

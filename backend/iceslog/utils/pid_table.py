@@ -65,7 +65,7 @@ class PidTable:
                 if not table:
                     return new_table
                 for m in table:
-                    if not m.get("is_show"):
+                    if m.get("status") != 1:
                         continue
                     new_m = m.copy()
                     if m.get("children"):

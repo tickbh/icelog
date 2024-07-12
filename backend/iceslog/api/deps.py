@@ -1,7 +1,8 @@
 from collections.abc import Generator
 import logging
-from typing import Annotated
+from typing import Annotated, AsyncGenerator
 
+from redis.asyncio import Redis
 import jwt
 from fastapi import Depends, HTTPException, Path, Query, Request, status
 from fastapi.security import OAuth2PasswordBearer
@@ -13,17 +14,18 @@ from iceslog.core import security
 from iceslog.core.config import settings
 from iceslog.core.db import engine, get_db
 from iceslog.models import TokenPayload, User
+from iceslog.models.user import UserEx
+from iceslog.utils.pool_utils import get_redis_cache
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
 )
 
-
 SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
+RedisDep = Annotated[Redis, Depends(get_redis_cache)]
 
-
-def get_current_user(session: SessionDep, token: TokenDep) -> User:
+async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep) -> AsyncGenerator[UserEx, None]:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -34,15 +36,33 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="用户验证失败,请重新登陆",
         )
-    user = session.get(User, token_data.sub)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    if not user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return user
+        
+    cache_key = f"user:{token_data.sub}"
+    cache_user = await redis.get(cache_key)
+    user_ex: UserEx = None
+    if cache_user:
+        from iceslog.utils import base_utils
+        data = base_utils.safe_json(cache_user)
+        try:
+            user_ex = UserEx.model_validate({}, update=data)
+        except Exception as e:
+            print(e)
+    
+    if not user_ex:    
+        user = session.get(User, token_data.sub)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        if not user.is_active:
+            raise HTTPException(status_code=400, detail="Inactive user")
+        user_ex = UserEx.model_validate(user)
+        await redis.set(cache_key, user_ex.model_dump_json())
+    yield user_ex
+    if user_ex.is_changed:
+        user_ex.is_changed = False
+        await redis.set(cache_key, user_ex.model_dump_json())
 
 
-CurrentUser = Annotated[User, Depends(get_current_user)]
+CurrentUser = Annotated[UserEx, Depends(get_current_user)]
 
 PageNumType = Annotated[int, Query(title="Check Default Page Num", ge=1)]
 PageSizeType = Annotated[int, Query(title="Check Default Page Size", ge=10, le=100)]

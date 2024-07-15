@@ -175,6 +175,11 @@ def append_split_to_str(val: str, next: any, split="|") -> str:
 def now() -> datetime:
     return datetime.now()
 
-def get_now_minute() -> int:
-    n = now()
+def get_now_minute(n:datetime = None) -> int:
+    if not n:
+        n = now()
     return int(n.timestamp() / 60)
+
+def minute_to_datetime(minute: int) -> datetime:
+    stamp = minute * 60
+    return datetime.fromtimestamp(stamp)

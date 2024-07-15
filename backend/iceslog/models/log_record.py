@@ -30,3 +30,13 @@ class RecordLog(SQLModel):
     content: str
     exid: str = None
     extra: str = None
+    
+class OneLogVisit(SQLModel):
+    module: str
+    log_date: datetime
+    times: int
+    
+class LogVisitInfos(SQLModel):
+    dates: list[datetime]
+    times: list[int]
+    module: str

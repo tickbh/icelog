@@ -18,8 +18,8 @@ export default StatsAPI;
 export interface VisitTrendVO {
   /** 日期列表 */
   dates: string[];
-  /** 浏览量(PV) */
-  pvList: number[];
+  /** 访问次数 */
+  times: number[];
   /** 访客数(UV) */
   uvList: number[];
   /** IP数 */
@@ -32,4 +32,6 @@ export interface VisitTrendQuery {
   startDate: string;
   /** 结束日期 */
   endDate: string;
+  /** 按最小分组，0表示按分钟，1表示按10分钟，2表示按30分钟 */
+  minStep: number;
 }

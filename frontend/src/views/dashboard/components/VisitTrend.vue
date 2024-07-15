@@ -18,8 +18,9 @@
           size="small"
           @change="handleDateRangeChange"
         >
-          <el-radio-button label="近7天" :value="1" />
-          <el-radio-button label="近30天" :value="2" />
+          <el-radio-button label="近1小时" :value="0" />
+          <el-radio-button label="近12小时" :value="1" />
+          <el-radio-button label="近1天" :value="2" />
         </el-radio-group>
       </div>
     </template>
@@ -32,7 +33,7 @@
 import * as echarts from "echarts";
 import StatsAPI, { VisitTrendVO, VisitTrendQuery } from "@/api/stats";
 
-const dataRange = ref(1);
+const dataRange = ref(0);
 const chart: Ref<echarts.ECharts | null> = ref(null);
 
 const props = defineProps({
@@ -91,9 +92,9 @@ const setChartOptions = (data: VisitTrendVO) => {
     },
     series: [
       {
-        name: "浏览量(PV)",
+        name: "日志次数",
         type: "line",
-        data: data.pvList,
+        data: data.times,
         areaStyle: {
           color: "rgba(64, 158, 255, 0.3)",
         },
@@ -105,21 +106,6 @@ const setChartOptions = (data: VisitTrendVO) => {
           color: "#409EFF",
         },
       },
-      {
-        name: "IP",
-        type: "line",
-        data: data.ipList,
-        areaStyle: {
-          color: "rgba(103, 194, 58, 0.3)",
-        },
-        smooth: true,
-        itemStyle: {
-          color: "#67C23A",
-        },
-        lineStyle: {
-          color: "#67C23A",
-        },
-      },
     ],
   };
 
@@ -128,34 +114,34 @@ const setChartOptions = (data: VisitTrendVO) => {
 
 /** 计算起止时间范围 */
 const calculateDateRange = () => {
-  const now = new Date();
+  let seconds = 60 * 60;
+  if (dataRange.value == 1) {
+    seconds = 60 * 60 * 12;
+  } else if (dataRange.value == 2) {
+    seconds = 60 * 60 * 24;
+  }
+  const endDate = new Date();
 
-  const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  const days = dataRange.value === 1 ? 7 : 30;
   const startDate = new Date(endDate);
-  startDate.setDate(startDate.getDate() - days);
+  startDate.setSeconds(startDate.getSeconds() - seconds, 0);
 
-  // 手动调整日期为当地时间的 23:59:59
-  const adjustDateToLocal = (date: Date) => {
-    date.setHours(23, 59, 59, 999);
-    return date;
+  const adjustedEndDate = new Date(endDate);
+  const adjustedStartDate = new Date(startDate);
+
+  return {
+    startDate: adjustedStartDate.toISOString(),
+    endDate: adjustedEndDate.toISOString(),
+    minStep: dataRange.value,
   };
-
-  const adjustedEndDate = adjustDateToLocal(new Date(endDate));
-  const adjustedStartDate = adjustDateToLocal(new Date(startDate));
-  const formattedStartDate = adjustedStartDate.toISOString().split("T")[0];
-  const formattedEndDate = adjustedEndDate.toISOString().split("T")[0];
-
-  return { startDate: formattedStartDate, endDate: formattedEndDate };
 };
 
 /** 加载数据 */
 const loadData = () => {
-  const { startDate, endDate } = calculateDateRange();
+  const { startDate, endDate, minStep } = calculateDateRange();
   StatsAPI.getVisitTrend({
     startDate,
     endDate,
+    minStep,
   } as VisitTrendQuery).then((data) => {
     setChartOptions(data);
   });

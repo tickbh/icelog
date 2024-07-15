@@ -5,7 +5,37 @@ from json import JSONEncoder
 import json
 import logging
 import math
+import random
 from urllib.parse import unquote
+from datetime import datetime
+import sys
+
+INT_MAX = sys.maxsize
+
+def random_int(num=255):
+    return random.randint(0, num)
+
+rand_array = [
+        '0', '1', '2', '3', '4', '5', '6', '7',
+        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
+        'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o',
+        'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+        'x', 'y'
+    ]
+def random_url(num=5):
+    result = ''
+    for _ in range(0, num):
+        result = result + random.choice(rand_array)
+    return result
+
+ranhex_array = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
+
+def random_hex(num=32):
+    result = ''
+    for _ in range(0, num):
+        result = result + random.choice(ranhex_array)
+    return result
+
 
 
 def super_transfer(_type, value, default_return=0, is_log=False):
@@ -113,7 +143,7 @@ def safe_json(source, default={}):
         return value
     except Exception as e:
         return default
-        
+
 def print_exec(logging_type=''):
     logging.warning("------------exception occur----------------")
     import traceback
@@ -142,6 +172,9 @@ def append_split_to_str(val: str, next: any, split="|") -> str:
     else:
         return f"{val}{split}{next}"
     
-def now():
-    from datetime import datetime
+def now() -> datetime:
     return datetime.now()
+
+def get_now_minute() -> int:
+    n = now()
+    return int(n.timestamp() / 60)

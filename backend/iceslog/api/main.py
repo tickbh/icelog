@@ -10,3 +10,6 @@ api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
 api_router.include_router(dictmap.router, prefix="/dict", tags=["dict"])
 api_router.include_router(perm.router, prefix="/perm", tags=["perm"])
 api_router.include_router(syslog.router, prefix="/logs", tags=["logs"])
+
+from iceslog.api.public_routes import log
+api_router.include_router(log.router, prefix="/pub/log", tags=["log"])

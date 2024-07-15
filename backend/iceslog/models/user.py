@@ -20,17 +20,14 @@ class UserBase(SQLModel):
     is_superuser: bool = False
     gender: int | None = Field(sa_column=SmallInteger,
         default=0, description="性别(1-男，2-女 0-未知)")
-    telephone: str | None = Field(
-        default=None, max_length=15, unique=True, nullable=True, description="电话号码")
     user_type: str = Field(default=None, max_length=15,
                            description="用户类型, sys管理员")
     avatar: str | None = Field(
         default=None, max_length=255, description="用户头像")
     mobile: str | None = Field(
-        default=None, max_length=255, description="联系方式")
+        default=None, max_length=15, unique=True, description="联系方式")
     create_time: datetime = Field(nullable=False, default_factory=datetime_now, description="创建时间")
     create_by: int | None = Field(default=None, description="创建人id")
-    # onupdate=func.now(), 
     update_time: datetime = Field(nullable=False, default_factory=datetime_now, description="更新时间")
     update_by: int | None = Field(default=None, description="更新人id")
     is_deleted: int = Field(default=0, description="逻辑删除标记")

@@ -40,6 +40,14 @@
       </el-row>
     </el-card>
 
+    <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="do_log">
+      小量日志
+    </el-button>
+
+    <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="do_logs">
+      大量日志
+    </el-button>
+
     <!-- 数据卡片 -->
     <el-row :gutter="10" class="mt-5">
       <el-col
@@ -96,6 +104,33 @@ defineOptions({
 
 import { useUserStore } from "@/store/modules/user";
 import { useTransition, TransitionPresets } from "@vueuse/core";
+import ApiLogAPI from "@/api/api_log";
+
+function do_log() {
+  ApiLogAPI.add_one({
+    log_level: 1,
+    traceId: "",
+    uid: 0,
+    content: "测试日志",
+    exid: "",
+    extra: "",
+  });
+}
+
+function do_logs() {
+  var many = [];
+  for (let index = 0; index < 5; index++) {
+    many.push({
+      log_level: 1,
+      traceId: "",
+      uid: 0,
+      content: "测试日志",
+      exid: "",
+      extra: "",
+    });
+  }
+  ApiLogAPI.add_many(many);
+}
 
 const userStore = useUserStore();
 const date: Date = new Date();

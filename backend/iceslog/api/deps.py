@@ -46,6 +46,7 @@ async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep
         try:
             user_ex = UserEx.model_validate({}, update=data)
         except Exception as e:
+            base_utils.print_exec()
             print(e)
     
     if not user_ex:    
@@ -55,11 +56,11 @@ async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep
         if not user.is_active:
             raise HTTPException(status_code=400, detail="Inactive user")
         user_ex = UserEx.model_validate(user)
-        await redis.set(cache_key, user_ex.model_dump_json())
+        await redis.set(cache_key, user_ex.model_dump_json(), ex=3600 * 3)
     yield user_ex
     if user_ex.is_changed:
         user_ex.is_changed = False
-        await redis.set(cache_key, user_ex.model_dump_json())
+        await redis.set(cache_key, user_ex.model_dump_json(), ex=3600 * 3)
 
 
 CurrentUser = Annotated[UserEx, Depends(get_current_user)]

@@ -1,6 +1,7 @@
 from fastapi import Request
 from redis.asyncio import Redis
 from iceslog.utils import base_utils, http_utils, pool_utils
+from iceslog.utils.scheduler_utils import scheduler
 
 
 def do_record_syslog(request: Request, module: str, content: str):
@@ -46,7 +47,7 @@ async def do_record_apilogs(logs):
     key = get_apilog_key(base_utils.get_now_minute())
     await redis.incr(key, len(logs))
     await redis.expire(key, 180)
-    await try_cache_last(redis)
+    # await try_cache_last(redis)
 
 async def do_record_apilog(log):
     from iceslog.models.log_record import RecordLog
@@ -54,3 +55,8 @@ async def do_record_apilog(log):
     await do_record_apilogs([log])
     
    
+# 每分钟执行的定时任务
+@scheduler.scheduled_job('interval', minutes=1)
+async def write_log_job():
+    redis = await pool_utils.get_redis_cache()
+    await try_cache_last(redis)

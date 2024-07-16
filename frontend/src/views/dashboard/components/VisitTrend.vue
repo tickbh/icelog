@@ -93,7 +93,7 @@ const setChartOptions = (data: VisitTrendVO) => {
     series: [
       {
         name: "日志次数",
-        type: "line",
+        type: "bar",
         data: data.times,
         areaStyle: {
           color: "rgba(64, 158, 255, 0.3)",
@@ -173,7 +173,7 @@ const handleDownloadChart = () => {
     if (ctx) {
       ctx.drawImage(img, 0, 0, img.width, img.height);
       const link = document.createElement("a");
-      link.download = `业绩柱状图.png`;
+      link.download = `访问柱状图.png`;
       link.href = canvas.toDataURL("image/png", 0.9);
       document.body.appendChild(link);
       link.click();

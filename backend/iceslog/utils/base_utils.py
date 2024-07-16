@@ -183,3 +183,10 @@ def get_now_minute(n:datetime = None) -> int:
 def minute_to_datetime(minute: int) -> datetime:
     stamp = minute * 60
     return datetime.fromtimestamp(stamp)
+
+def calc_step_value(start: int, now: int, step: int) -> int:
+    s = now - start
+    return int(s / step) * step + start
+
+def fix_step(now: int, step: int) -> int:
+    return int(now / step) * step

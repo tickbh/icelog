@@ -15,13 +15,28 @@ router = APIRouter()
 
 @router.get("/visit-trend", response_model=LogVisitInfos)
 async def get_visit(session: SessionDep, startDate: datetime, endDate: datetime, minStep: int) -> Any:
-    start_time = base_utils.get_now_minute(startDate) 
-    end_time = base_utils.get_now_minute(endDate)
+
+    min_step = 1
+    if minStep == 1:
+        min_step = 10
+    elif minStep == 2:
+        min_step = 30
+    start_time = base_utils.fix_step(base_utils.get_now_minute(startDate), min_step) 
+    end_time = base_utils.fix_step(base_utils.get_now_minute(endDate), min_step) + min_step
+    hash_tables = {}
+    
+    for val in range(start_time, end_time, min_step):
+        hash_tables[val] = 0
+        
     statement = select(LogFreq).where(LogFreq.log_time >= start_time).where(LogFreq.log_time<end_time)
     infos = LogVisitInfos(dates=[], times=[], module="log")
     for s in session.exec(statement).all():
-        infos.dates.append(base_utils.minute_to_datetime(s.log_time))
-        infos.times.append(s.times)
+        step = base_utils.calc_step_value(start_time, s.log_time, min_step)
+        hash_tables[step] = hash_tables.get(step, 0) + s.times
+    
+    for val in range(start_time, end_time, min_step):
+        infos.dates.append(base_utils.minute_to_datetime(val))
+        infos.times.append(hash_tables.get(val, 0))
     print("start:",startDate)
     return infos
 # .build_message()

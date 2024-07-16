@@ -1,3 +1,4 @@
+import sys
 import time
 from typing import Union
 
@@ -8,7 +9,8 @@ from iceslog.api.main import api_router
 import contextlib
 from starlette.applications import Starlette
 from iceslog.utils.scheduler_utils import scheduler
- 
+from loguru import logger
+
 # 每分钟执行的定时任务
 @scheduler.scheduled_job('interval', seconds=1)
 async def cron_job():
@@ -44,3 +46,4 @@ async def add_process_time_header(request: Request, call_next):
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
+logger.add(sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>")

@@ -24,6 +24,7 @@ class LogFreq(LogFreqBase, table=True):
     )
     
 class RecordLog(SQLModel):
+    time: datetime = None
     log_level: int
     traceId: str
     uid: int

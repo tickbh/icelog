@@ -108,6 +108,7 @@ import ApiLogAPI from "@/api/api_log";
 
 function do_log() {
   ApiLogAPI.add_one({
+    time: new Date(),
     log_level: 1,
     traceId: "",
     uid: 0,
@@ -121,6 +122,7 @@ function do_logs() {
   var many = [];
   for (let index = 0; index < 5; index++) {
     many.push({
+      time: new Date(),
       log_level: 1,
       traceId: "",
       uid: 0,

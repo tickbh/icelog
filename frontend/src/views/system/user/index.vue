@@ -121,7 +121,11 @@
               width="100"
               align="center"
               prop="gender"
-            />
+            >
+              <template #default="scope">
+                <label-dictionary code="sys_gender" :value="scope.row.gender" />
+              </template>
+            </el-table-column>
 
             <el-table-column
               label="手机号码"
@@ -230,7 +234,7 @@
         </el-form-item> -->
 
         <el-form-item label="性别" prop="gender">
-          <dictionary v-model="formData.gender" code="gender" />
+          <dictionary v-model="formData.gender" code="sys_gender" />
         </el-form-item>
 
         <!-- <el-form-item label="角色" prop="roleIds">

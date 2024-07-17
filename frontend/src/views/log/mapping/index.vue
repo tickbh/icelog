@@ -180,12 +180,8 @@
           />
         </el-form-item>
 
-        <!-- <el-form-item label="归属" prop="belong">
-          <el-input v-model="formData.belong" placeholder="请输入归属" />
-        </el-form-item> -->
-
         <el-form-item label="归属" prop="belong">
-          <dictionary-multi v-model:value="formData.belong" code="belong" />
+          <dictionary-multi v-model:value="formData.belong" code="sys_belong" />
         </el-form-item>
 
         <el-form-item label="权限" prop="groups">

@@ -15,14 +15,14 @@ const numberValue = ref(1); // 性别(值为Number)
     >
     <el-form>
       <el-form-item label="性别">
-        <dictionary v-model="stringValue" code="gender" />
+        <dictionary v-model="stringValue" code="sys_gender" />
         <el-link :underline="false" type="primary" class="ml-5"
           >值为String: const value = ref("1");
         </el-link>
       </el-form-item>
 
       <el-form-item label="性别">
-        <dictionary v-model="numberValue" code="gender" />
+        <dictionary v-model="numberValue" code="sys_gender" />
         <el-link :underline="false" type="success" class="ml-5"
           >值为Number: const value = ref(1);
         </el-link>

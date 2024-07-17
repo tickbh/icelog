@@ -99,30 +99,17 @@
               width="100"
             />
             <el-table-column
-              key="username"
-              label="用户名"
+              key="name"
+              label="名字"
               align="center"
-              prop="username"
-            />
-            <el-table-column
-              label="用户昵称"
-              width="120"
-              align="center"
-              prop="nickname"
+              prop="name"
             />
 
             <el-table-column
-              label="性别"
-              width="100"
-              align="center"
-              prop="gender"
-            />
-
-            <el-table-column
-              label="手机号码"
-              align="center"
-              prop="mobile"
+              label="存储方式"
               width="120"
+              align="center"
+              prop="store"
             />
 
             <el-table-column label="状态" align="center" prop="status">
@@ -193,66 +180,29 @@
         :rules="rules"
         label-width="80px"
       >
-        <el-form-item label="用户名" prop="username">
+        <el-form-item label="名称" prop="name">
           <el-input
-            v-model="formData.username"
+            v-model="formData.name"
             :readonly="!!formData.id"
-            placeholder="请输入用户名"
+            placeholder="请输入名称"
           />
         </el-form-item>
 
-        <el-form-item label="用户昵称" prop="nickname">
-          <el-input v-model="formData.nickname" placeholder="请输入用户昵称" />
-        </el-form-item>
-
-        <el-form-item required label="密码" prop="password" v-if="!formData.id">
+        <el-form-item
+          required
+          label="连接信息"
+          prop="connect_url"
+          v-if="!formData.id"
+        >
           <el-input
-            v-model="formData.password"
+            v-model="formData.connect_url"
             placeholder="请输入密码, 6位到50位"
             maxlength="50"
           />
         </el-form-item>
 
-        <!-- <el-form-item label="所属部门" prop="deptId">
-          <el-tree-select
-            v-model="formData.deptId"
-            placeholder="请选择所属部门"
-            :data="deptOptions"
-            filterable
-            check-strictly
-            :render-after-expand="false"
-          />
-        </el-form-item> -->
-
-        <el-form-item label="性别" prop="gender">
-          <dictionary v-model="formData.gender" code="gender" />
-        </el-form-item>
-
-        <!-- <el-form-item label="角色" prop="roleIds">
-          <el-select v-model="formData.roleIds" multiple placeholder="请选择">
-            <el-option
-              v-for="item in roleOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item> -->
-
-        <el-form-item label="手机号码" prop="mobile">
-          <el-input
-            v-model="formData.mobile"
-            placeholder="请输入手机号码"
-            maxlength="11"
-          />
-        </el-form-item>
-
-        <el-form-item label="邮箱" prop="email">
-          <el-input
-            v-model="formData.email"
-            placeholder="请输入邮箱"
-            maxlength="50"
-          />
+        <el-form-item label="存储方式" prop="store">
+          <dictionary v-model="formData.store" code="sys_store" />
         </el-form-item>
 
         <el-form-item label="状态" prop="status">
@@ -286,8 +236,7 @@ defineOptions({
 });
 
 import UserAPI, { UserForm, UserPageQuery, UserPageVO } from "@/api/user";
-import DeptAPI from "@/api/dept";
-import RoleAPI from "@/api/role";
+import { LogStoreForm, LogStorePageQuery, LogStorePageVO } from "@/api/api_log";
 
 const queryFormRef = ref(ElForm);
 const userFormRef = ref(ElForm);
@@ -295,13 +244,11 @@ const userFormRef = ref(ElForm);
 const loading = ref(false);
 const removeIds = ref([]);
 const total = ref(0);
-const pageData = ref<UserPageVO[]>();
-/** 部门下拉选项 */
-const deptOptions = ref<OptionType[]>();
+const pageData = ref<LogStorePageVO[]>();
 /** 角色下拉选项 */
 const roleOptions = ref<OptionType[]>();
 /** 用户查询参数  */
-const queryParams = reactive<UserPageQuery>({
+const queryParams = reactive<LogStorePageQuery>({
   pageNum: 1,
   pageSize: 10,
 });
@@ -327,7 +274,7 @@ const dialog = reactive({
 const importDialogVisible = ref(false);
 
 // 用户表单数据
-const formData = reactive<UserForm>({
+const formData = reactive<LogStoreForm>({
   status: 1,
 });
 
@@ -372,7 +319,6 @@ function handleResetQuery() {
   queryFormRef.value.resetFields();
   dateTimeRange.value = "";
   queryParams.pageNum = 1;
-  queryParams.deptId = undefined;
   queryParams.startTime = undefined;
   queryParams.endTime = undefined;
   handleQuery();

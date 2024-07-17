@@ -153,7 +153,7 @@
                 </el-form-item>
               </template>
             </el-table-column>
-            <el-table-column label="排序">
+            <el-table-column label="排序" width="100">
               <template #default="scope">
                 <el-form-item :prop="'dictItems.' + scope.$index + '.sort'">
                   <el-input v-model="scope.row.sort" />
@@ -284,9 +284,9 @@ function handleAddClick() {
  * @param id 字典ID
  */
 function handleEditClick(id: number, name: string) {
-  dialog.visible = true;
   dialog.title = "【" + name + "】字典修改";
   DictAPI.getFormData(id).then((data) => {
+    dialog.visible = true;
     Object.assign(formData, data);
   });
 }
@@ -353,7 +353,7 @@ function handleDelete(id?: number) {
             handleResetClick();
           })
           .catch(() => {
-            ElMessage.success("删除失败");
+            // ElMessage.success("删除失败");
           });
       },
       () => {

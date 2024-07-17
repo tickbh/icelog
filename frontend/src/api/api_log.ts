@@ -22,9 +22,6 @@ class ApiLogAPI {
 
 export default ApiLogAPI;
 
-/**
- * 字典
- */
 export interface LogForm {
   time?: Date;
   log_level: number;
@@ -33,4 +30,37 @@ export interface LogForm {
   content: string;
   exid?: string;
   extra?: string;
+}
+
+export interface LogStoreForm {
+  create_time?: Date;
+  store?: string;
+  name?: string;
+  connect_url?: string;
+  id?: number;
+  status?: number;
+}
+
+export interface LogStorePageQuery extends PageQuery {
+  /** 搜索关键字 */
+  keywords?: string;
+
+  /** 用户状态 */
+  status?: number;
+
+  /** 开始时间 */
+  startTime?: string;
+
+  /** 结束时间 */
+  endTime?: string;
+}
+
+/** 日志存储分页 */
+export interface LogStorePageVO {
+  create_time?: Date;
+  store?: string;
+  name?: string;
+  connect_url?: string;
+  id?: number;
+  status?: number;
 }

@@ -42,7 +42,6 @@ dict_item_cache_table = CacheTable(models.DictMapItem, attribs=["id"], groups=["
 def get_dict_items(id):
     return dict_item_cache_table.get_group(id)
 
-
 @router.get(
     "/options",
     response_model=List[OneDictItem],
@@ -86,6 +85,8 @@ def get_form_dict(session: SessionDep, dict_id: int) -> Any:
     if not dict_map:
         raise HTTPException(status_code=400, detail="不存在该字典id")
     
+    if dict_map.code.startswith("sys_"):
+        raise HTTPException(status_code=400, detail="系统字段无法修改")
     items = []
     for sub in session.exec(select(DictMapItem).where(DictMapItem.dict_id == dict_id)).all():
         items.append(sub)
@@ -101,6 +102,9 @@ def modify_dict(session: SessionDep, dict_id: int, dict_map: OneEditDictMap) -> 
     map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
     if not map:
         raise HTTPException(400, "不存在该字典选项")
+    
+    if map.code.startswith("sys_"):
+        raise HTTPException(status_code=400, detail="系统字段无法修改")
     
     if map.name != dict_map.name or map.code != dict_map.code or map.status != dict_map.status:
         map.name = dict_map.name
@@ -142,14 +146,17 @@ def modify_dict(session: SessionDep, dict_id: int, dict_map: OneEditDictMap) -> 
     response_model=RetMsg,
 )
 def delete_dict(session: SessionDep, dicts: str) -> Any:
-    # for dict_id in base_utils.split_to_int_list(dicts):
-    #     map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
-    #     if not map:
-    #         raise HTTPException(400, "不存在该字典选项")
+    for dict_id in base_utils.split_to_int_list(dicts):
+        map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
+        if not map:
+            raise HTTPException(400, "不存在该字典选项")
         
-    #     session.delete(map)
-    #     session.exec(delete(DictMapItem).where(DictMapItem.dict_id == dict_id))
-    #     session.commit()
+        if map.code.startswith("sys_"):
+            raise HTTPException(status_code=400, detail="系统字段无法删除")
+        
+        session.delete(map)
+        session.exec(delete(DictMapItem).where(DictMapItem.dict_id == dict_id))
+        session.commit()
     return RetMsg()
 
 
@@ -161,6 +168,8 @@ def delete_dict(session: SessionDep, dicts: str) -> Any:
 def add_dict(session: SessionDep, dict_map: OneEditDictMap) -> Any:
     del dict_map.id
     map = DictMap.model_validate(dict_map)
+    if map.code.startswith("sys_"):
+        raise HTTPException(status_code=400, detail="无法新增系统字典")
     session.add(map)
     session.commit()
     session.refresh(map)

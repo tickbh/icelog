@@ -90,22 +90,35 @@ def init_perm(session: Session):
 
 def init_dict(session: Session):
     from iceslog.models import DictMap, DictMapItem
-    dict_map = DictMap(id=1, name="性别", code="gender", status=0, remark="性别字典")
+    dict_map = DictMap(id=1, name="性别", code="sys_gender", status=1, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(dict_id=1, label="男", value="1", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="男", value="1", status=1, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(dict_id=1, label="女", value="2", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="女", value="2", status=1, remark="性别字典")
     session.add(dict_map)
-    dict_map = DictMapItem(dict_id=1, label="保密", value="0", status=0, remark="性别字典")
+    dict_map = DictMapItem(dict_id=1, label="保密", value="0", status=1, remark="性别字典")
     session.add(dict_map)
     session.commit()
     
     
-    dict_map = DictMap(id=2, name="归属", code="belong", status=0, remark="菜单归属")
+    dict_map = DictMap(id=2, name="归属", code="sys_belong", status=1, remark="菜单归属")
     session.add(dict_map)
-    dict_map = DictMapItem(dict_id=2, label="系统", value="sys", status=0, remark="系统级别")
+    dict_map = DictMapItem(dict_id=2, label="系统", value="sys", status=1, remark="系统级别")
     session.add(dict_map)
-    dict_map = DictMapItem(dict_id=2, label="用户", value="usr", status=0, remark="用户级别")
+    dict_map = DictMapItem(dict_id=2, label="用户", value="usr", status=1, remark="用户级别")
+    session.add(dict_map)
+    session.commit()
+    
+    
+    dict_map = DictMap(id=3, name="存储", code="sys_store", status=1, remark="日志存储方式")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=3, label="ClickHouse", value="ClickHouse", status=1, remark="ClickHouse")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=3, label="MongoDb", value="MongoDb", status=1, remark="MongoDb")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=3, label="Es", value="Es", status=1, remark="Es")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=3, label="Kafka", value="Kafka", status=1, remark="Kafka")
     session.add(dict_map)
     session.commit()
 

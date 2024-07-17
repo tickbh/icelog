@@ -49,7 +49,7 @@
         @submit-click="handleSubmitClick"
       >
         <template #gender="scope">
-          <dictionary v-model="scope.formData[scope.prop]" code="gender" />
+          <dictionary v-model="scope.formData[scope.prop]" code="sys_gender" />
         </template>
       </page-modal>
 
@@ -60,7 +60,7 @@
         @submit-click="handleSubmitClick"
       >
         <template #gender="scope">
-          <dictionary v-model="scope.formData[scope.prop]" code="gender" />
+          <dictionary v-model="scope.formData[scope.prop]" code="sys_gender" />
         </template>
       </page-modal>
     </template>

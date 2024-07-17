@@ -233,7 +233,7 @@ const initialPermFormData = ref<PermForm>({
   route: "",
   codename: "",
   name: "",
-  status: true,
+  status: 1,
 });
 
 // 菜单表单数据

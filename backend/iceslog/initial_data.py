@@ -31,8 +31,18 @@ def init_menu(session: Session):
     menu = Menus(id=14, pid=1, belong="sys", type="MENU", name="字典管理", component="system/dict/index",
                  icon="dict", params="", path="dict", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
-    menu = Menus(id=15, pid=1, belong="sys", type="MENU", name="日志管理", component="system/log/index",
+    menu = Menus(id=15, pid=1, belong="sys", type="MENU", name="系统日志", component="system/log/index",
                  icon="document", params="", path="log", redirect="", sort=0, status=1, groups="1")
+    session.add(menu)
+    
+    menu = Menus(id=2, belong="sys", type="MENU", name="日志管理", component="Layout", icon="el-icon-Document",
+                 params="", pid=0, path="/log", redirect="/log/user", sort=0, status=1, groups="1")
+    session.add(menu)
+    menu = Menus(id=21, pid=2, belong="sys", type="MENU", name="日志落库", component="log/store/index",
+                 icon="document", params="", path="store", redirect="", sort=0, status=1, groups="1")
+    session.add(menu)
+    menu = Menus(id=22, pid=2, belong="sys", type="MENU", name="日志映射", component="log/mapping/index",
+                 icon="document", params="", path="mapping", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     session.commit()
 
@@ -115,7 +125,7 @@ def init_user(session: Session) -> None:
         nickname="系统管理员",
         gender=0,
         mobile="13800000000",
-        is_active=True,
+        status=1,
         is_superuser=True,
         user_type="sys",
         hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),

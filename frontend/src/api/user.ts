@@ -181,8 +181,6 @@ export interface UserPageQuery extends PageQuery {
 
   /** 结束时间 */
   endTime?: string;
-  // 是否激活
-  is_active?: boolean;
 }
 
 /** 用户分页对象 */
@@ -235,6 +233,4 @@ export interface UserForm {
   username?: string;
   /** 密码 */
   password?: string;
-  // 是否激活
-  is_active?: boolean;
 }

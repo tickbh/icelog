@@ -16,7 +16,7 @@ class UserBase(SQLModel):
     email: EmailStr | None = Field(default=None, nullable=True, index=True, max_length=255)
     username: str = Field(unique=True, max_length=255)
     nickname: str | None = Field(default=None, nullable=True, max_length=255)
-    is_active: bool = True
+    status: int = Field(nullable=False, default=1, description="状态(1启用, 0禁用)")
     is_superuser: bool = False
     gender: int | None = Field(sa_column=SmallInteger,
         default=0, description="性别(1-男，2-女 0-未知)")

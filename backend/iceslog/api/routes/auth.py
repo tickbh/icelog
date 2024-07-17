@@ -36,7 +36,7 @@ async def do_login(request: Request, session: SessionDep, redis: RedisDep, usern
     )
     if not user:
       raise HTTPException(400, "用户名或者密码错误")
-    elif not user.is_active:
+    elif user.status != 1:
       raise HTTPException(400, "用户尚未激活")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return LoginRet(

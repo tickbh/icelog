@@ -27,7 +27,7 @@ def init_db(session: Session) -> None:
     if not user:
         user = User(
             username=settings.FIRST_SUPER_USER,
-            is_active=True,
+            status=1,
             is_superuser=True,
             user_type="sys",
             hashed_password=get_password_hash(settings.FIRST_SUPER_PASS),

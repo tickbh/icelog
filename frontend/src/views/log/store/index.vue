@@ -1,12 +1,7 @@
-<!-- 用户管理 -->
+<!-- 日志存储管理 -->
 <template>
   <div class="app-container">
     <el-row :gutter="20">
-      <!-- 部门树 -->
-      <!-- <el-col :lg="4" :xs="24" class="mb-[12px]">
-        <dept-tree v-model="queryParams.deptId" @node-click="handleQuery" />
-      </el-col> -->
-
       <!-- 用户列表 -->
       <el-col :lg="20" :xs="24">
         <div class="search-container">

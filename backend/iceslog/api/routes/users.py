@@ -40,15 +40,15 @@ router = APIRouter(
     dependencies=[Depends(get_current_active_superuser)],
     response_model=UsersPublic,
 )
-def read_users(session: SessionDep, pageNum: PageNumType = 0, pageSize: PageSizeType = 100, keywords: str = None, is_active: bool = None, startTime: str = None, endTime: str = None) -> Any:
+def read_users(session: SessionDep, pageNum: PageNumType = 0, pageSize: PageSizeType = 100, keywords: str = None, status: int = None, startTime: str = None, endTime: str = None) -> Any:
     """
     Retrieve users.
     """
     condition = []
     if keywords:
         condition.append(or_(User.username.like(f"%{keywords}%"), User.nickname.like(f"%{keywords}%"), User.mobile.like(f"%{keywords}%")))
-    if is_active != None:
-        condition.append(User.is_active == is_active)
+    if status != None:
+        condition.append(User.status == status)
         
     if startTime:
         condition.append(User.create_time > startTime)

@@ -12,19 +12,19 @@ from iceslog.utils.scheduler_utils import scheduler
 from loguru import logger
 
 # 每分钟执行的定时任务
-@scheduler.scheduled_job('interval', seconds=1)
+@scheduler.scheduled_job('interval', seconds=60)
 async def cron_job():
     from datetime import datetime
     # 执行任务的内容，例如打印当前时间
-    print(f"The current time is {datetime.now()}")
+    logger.info(f"The current time is {datetime.now()}")
     
 @contextlib.asynccontextmanager
 async def lifespan(app):
     scheduler.start()
 
-    print("Run at startup!")
+    logger.info("Run at startup!")
     yield
-    print("Run on shutdown!")
+    logger.info("Run on shutdown!")
     scheduler.shutdown()
         
 app = FastAPI(lifespan=lifespan)
@@ -46,4 +46,5 @@ async def add_process_time_header(request: Request, call_next):
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-logger.add(sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>")
+# logger.add(sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>")
+logger.add("logs/iceslog_{time:YY-MM-DD_HH_mm}.log", rotation="500 MB")

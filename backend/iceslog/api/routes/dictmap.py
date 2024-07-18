@@ -146,7 +146,7 @@ def modify_dict(session: SessionDep, dict_id: int, dict_map: OneEditDictMap) -> 
     response_model=RetMsg,
 )
 def delete_dict(session: SessionDep, dicts: str) -> Any:
-    for dict_id in base_utils.split_to_int_list(dicts):
+    for dict_id in base_utils.split_to_int_list(dicts, ","):
         map = session.exec(select(DictMap).where(DictMap.id == dict_id)).first()
         if not map:
             raise HTTPException(400, "不存在该字典选项")

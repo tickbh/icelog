@@ -271,7 +271,7 @@ def delete_user(
     """
     Delete a user.
     """
-    user_ids = base_utils.split_to_int_list(users)
+    user_ids = base_utils.split_to_int_list(users, ",")
     for user_id in user_ids:
         user = session.get(User, user_id)
         if not user:

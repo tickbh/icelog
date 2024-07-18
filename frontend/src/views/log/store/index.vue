@@ -227,7 +227,7 @@ defineOptions({
 
 import UserAPI, { UserForm, UserPageQuery, UserPageVO } from "@/api/user";
 import { LogStorePageQuery, LogStorePageVO } from "@/api/api_log";
-import LogsStoreAPI, { LogStoreForm as LogsStoreForm } from "@/api/logs_store";
+import LogsStoreAPI, { LogsStoreForm } from "@/api/logs_store";
 
 const queryFormRef = ref(ElForm);
 const storeFormRef = ref(ElForm);
@@ -318,7 +318,7 @@ function handleResetConnectUrl(row: { [key: string]: any }) {
       ElMessage.warning("链接至少需要6位字符，请重新输入");
       return false;
     }
-    UserAPI.updatePassword(row.id, value).then(() => {
+    LogsStoreAPI.updateConnectUrl(row.id, value).then(() => {
       ElMessage.success("链接重置成功，新链接是：" + value);
     });
   });
@@ -336,7 +336,7 @@ async function handleOpenDialog(id?: number) {
 
   if (id) {
     dialog.title = "修改用户";
-    UserAPI.getFormData(id).then((data) => {
+    LogsStoreAPI.getFormData(id).then((data) => {
       Object.assign(formData, { ...data });
     });
   } else {
@@ -396,7 +396,7 @@ function handleDelete(id?: number) {
   }).then(
     function () {
       loading.value = true;
-      UserAPI.deleteByIds(userIds)
+      LogsStoreAPI.deleteByIds(userIds)
         .then(() => {
           ElMessage.success("删除成功");
           handleResetQuery();

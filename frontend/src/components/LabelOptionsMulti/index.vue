@@ -31,6 +31,10 @@ function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
 }
 
+watch([props.value, () => props.value], ([newOptions, newModelValue]) => {
+  update_value();
+});
+
 function get_options(): Promise<OptionType[]> {
   if (props.options == "role") {
     return RoleAPI.getOptions();
@@ -38,8 +42,7 @@ function get_options(): Promise<OptionType[]> {
   return DictAPI.getOptions(props.code);
 }
 
-onBeforeMount(() => {
-  // 根据字典编码获取字典项
+function update_value() {
   get_options().then((data) => {
     var final = "";
     data.forEach((val) => {
@@ -53,5 +56,9 @@ onBeforeMount(() => {
     });
     selectedValue.value = final;
   });
+}
+
+onBeforeMount(() => {
+  update_value();
 });
 </script>

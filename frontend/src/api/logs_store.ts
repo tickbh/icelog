@@ -16,7 +16,7 @@ class LogsStoreAPI {
     });
   }
 
-  static update(id: number, data: LogStoreForm) {
+  static update(id: number, data: LogsStoreForm) {
     return request({
       url: `${LOG_BASE_URL}/${id}`,
       method: "put",
@@ -24,18 +24,40 @@ class LogsStoreAPI {
     });
   }
 
-  static add(data: LogStoreForm) {
+  static add(data: LogsStoreForm) {
     return request({
       url: `${LOG_BASE_URL}/create`,
       method: "post",
       data: data,
     });
   }
+
+  static getFormData(storeId: number) {
+    return request<any, LogsStoreForm>({
+      url: `${LOG_BASE_URL}/form?store_id=${storeId}`,
+      method: "get",
+    });
+  }
+
+  static updateConnectUrl(id: number, connect_url: string) {
+    return request({
+      url: `${LOG_BASE_URL}/url/${id}`,
+      method: "patch",
+      data: { connect_url: connect_url },
+    });
+  }
+
+  static deleteByIds(ids: string) {
+    return request({
+      url: `${LOG_BASE_URL}/${ids}`,
+      method: "delete",
+    });
+  }
 }
 
 export default LogsStoreAPI;
 
-export interface LogStoreForm {
+export interface LogsStoreForm {
   create_time?: Date;
   store?: string;
   name?: string;

@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import OptionsAPI from "./options";
 
 const ROLE_BASE_URL = "/api/v1/roles";
 
@@ -14,10 +15,12 @@ class RoleAPI {
 
   /** 获取角色下拉数据源 */
   static getOptions() {
-    return request<any, OptionType[]>({
-      url: `${ROLE_BASE_URL}/options`,
-      method: "get",
-    });
+    return OptionsAPI.getOptions("role", "role", () =>
+      request<any, OptionType[]>({
+        url: `${ROLE_BASE_URL}/options`,
+        method: "get",
+      })
+    );
   }
 
   /**

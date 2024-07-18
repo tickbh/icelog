@@ -1,4 +1,5 @@
 import request from "@/utils/request";
+import OptionsAPI from "./options";
 
 const DICT_BASE_URL = "/api/v1/dict";
 
@@ -79,10 +80,12 @@ class DictAPI {
    * @returns 字典数据项
    */
   static getOptions(code: string) {
-    return request<any, OptionType[]>({
-      url: `${DICT_BASE_URL}/options?key=${code}`,
-      method: "get",
-    });
+    return OptionsAPI.getOptions("dict", code, () =>
+      request<any, OptionType[]>({
+        url: `${DICT_BASE_URL}/options?key=${code}`,
+        method: "get",
+      })
+    );
   }
 }
 

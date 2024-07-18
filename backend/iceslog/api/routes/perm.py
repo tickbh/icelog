@@ -84,13 +84,12 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
 )
 def read_all_perms(session: SessionDep, keywords: str = None) -> Any:
 
-    table_perms: dict[int, OnePerm] = {}
     statement = select(Perms).where(Perms.status==True)
     if keywords:
         statement = statement.where(Perms.name.like(f"%{keywords}%"))
 
     all_perms: list[OnePerm] = []
-    perm_table = {}
+    perm_table : dict[int, OnePerm] = {}
     for perm in session.exec(select(Perms).order_by(Perms.sort)).all():
         one = OnePerm.model_validate(perm)
         all_perms.append(one)
@@ -98,10 +97,10 @@ def read_all_perms(session: SessionDep, keywords: str = None) -> Any:
         
     for groups in session.exec(select(GroupPerms)).all():
         for id in base_utils.split_to_int_list(groups.permissions):
-            if not id in table_perms:
+            if not id in perm_table:
                 continue
-            table_perms[id].groups = base_utils.append_split_to_str(table_perms[id].groups, groups.id)
-            table_perms[id].groups_name = base_utils.append_split_to_str(table_perms[id].groups_name, groups.name)
+            perm_table[id].groups = base_utils.append_split_to_str(perm_table[id].groups, groups.id)
+            perm_table[id].groups_name = base_utils.append_split_to_str(perm_table[id].groups_name, groups.name)
     
     ret_list = []
     for menu in all_perms:

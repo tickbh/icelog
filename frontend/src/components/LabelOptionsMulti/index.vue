@@ -4,6 +4,7 @@
 
 <script setup lang="ts">
 import DictAPI from "@/api/dict";
+import RoleAPI from "@/api/role";
 
 const props = defineProps({
   /**
@@ -13,10 +14,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  modelValue: {
-    type: [String, Number],
-  },
   value: {
+    type: String,
+    required: true,
+  },
+  options: {
     type: String,
   },
 });
@@ -29,14 +31,27 @@ function handleChange(val?: string | number | undefined) {
   emits("update:modelValue", val);
 }
 
+function get_options(): Promise<OptionType[]> {
+  if (props.options == "role") {
+    return RoleAPI.getOptions();
+  }
+  return DictAPI.getOptions(props.code);
+}
+
 onBeforeMount(() => {
   // 根据字典编码获取字典项
-  DictAPI.getOptions(props.code).then((data) => {
+  get_options().then((data) => {
+    var final = "";
     data.forEach((val) => {
-      if (val.value == props.value) {
-        selectedValue.value = val.label;
+      var vals = props.value?.split("|");
+      if (vals?.includes(val.value + "")) {
+        if (final.length > 0) {
+          final += "|";
+        }
+        final += val.label;
       }
     });
+    selectedValue.value = final;
   });
 });
 </script>

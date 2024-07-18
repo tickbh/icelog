@@ -72,6 +72,20 @@
           width="250"
           prop="groups_name"
         />
+        <!-- <el-table-column
+          label="分组权限"
+          align="left"
+          width="250"
+          prop="groups"
+        >
+          <template #default="scope">
+            <label-options
+              code="sys_gender"
+              options="role"
+              :value="scope.row.groups"
+            />
+          </template>
+        </el-table-column> -->
 
         <el-table-column label="排序" align="left" width="80" prop="sort" />
 

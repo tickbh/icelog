@@ -89,7 +89,11 @@
           align="left"
           width="150"
           prop="belong"
-        />
+        >
+          <template #default="scope">
+            <label-options-multi code="sys_belong" :value="scope.row.belong" />
+          </template>
+        </el-table-column>
 
         <el-table-column
           label="路由路径"

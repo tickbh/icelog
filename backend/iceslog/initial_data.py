@@ -105,6 +105,8 @@ def init_dict(session: Session):
     session.add(dict_map)
     dict_map = DictMapItem(dict_id=2, label="系统", value="sys", status=1, remark="系统级别")
     session.add(dict_map)
+    dict_map = DictMapItem(dict_id=2, label="管理员", value="admin", status=1, remark="管理员")
+    session.add(dict_map)
     dict_map = DictMapItem(dict_id=2, label="用户", value="usr", status=1, remark="用户级别")
     session.add(dict_map)
     session.commit()

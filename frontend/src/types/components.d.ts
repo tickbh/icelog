@@ -15,7 +15,8 @@ declare module "vue" {
     DeptTree: (typeof import("./../views/system/user/components/dept-tree.vue"))["default"];
     UserImport: (typeof import("./../views/system/user/components/user-import.vue"))["default"];
     Dictionary: (typeof import("./../components/Dictionary/index.vue"))["default"];
-    LabelDictionary: (typeof import("./../components/LabelDictionary/index.vue"))["default"];
+    LabelOptions: (typeof import("./../components/LabelOptions/index.vue"))["default"];
+    LabelOptionsMulti: (typeof import("./../components/LabelOptionsMulti/index.vue"))["default"];
     DictionaryMulti: (typeof import("./../components/DictionaryMulti/index.vue"))["default"];
     PermMulti: (typeof import("./../components/PermMulti/index.vue"))["default"];
     DictItem: (typeof import("./../views/system/dict/components/dict-item.vue"))["default"];

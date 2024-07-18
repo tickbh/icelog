@@ -50,3 +50,4 @@ def do_record_log(request: Request, module: str, content: str, execution_time: i
 class LogsPublic(SQLModel):
     list: list[SysLogBase]
     total: int
+    

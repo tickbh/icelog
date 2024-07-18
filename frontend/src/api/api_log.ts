@@ -32,15 +32,6 @@ export interface LogForm {
   extra?: string;
 }
 
-export interface LogStoreForm {
-  create_time?: Date;
-  store?: string;
-  name?: string;
-  connect_url?: string;
-  id?: number;
-  status?: number;
-}
-
 export interface LogStorePageQuery extends PageQuery {
   /** 搜索关键字 */
   keywords?: string;

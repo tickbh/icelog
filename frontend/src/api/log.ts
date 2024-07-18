@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const LOG_BASE_URL = "/api/v1/logs";
+const LOG_BASE_URL = "/api/v1/syslog";
 
 class LogAPI {
   /**

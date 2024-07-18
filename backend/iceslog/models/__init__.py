@@ -5,7 +5,8 @@ from .user import *
 from .perms import *
 from .dictmap import *
 from .syslog import *
-from .log_record import *
+from .logs.record import *
+from .logs.store import *
 
 # JSON payload containing access token
 class Token(SQLModel):

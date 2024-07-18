@@ -7,7 +7,7 @@ from iceslog.captcha import img_captcha
 from iceslog.core import security
 from iceslog.core.config import settings
 from iceslog.models import AuthCaptcha, LoginoutRet, RetMsg, LoginRet, Token
-from iceslog.models.log_record import RecordLog
+from iceslog.models.logs.record import RecordLog
 from iceslog.utils import base_utils, log_utils
 router = APIRouter()
 

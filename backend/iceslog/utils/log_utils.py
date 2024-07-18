@@ -28,7 +28,7 @@ async def try_cache_last(redis: Redis):
         key = get_apilog_key(idx)
         val = await redis.getdel(key)
         if val:
-            from iceslog.models.log_record import LogFreq
+            from iceslog.models.logs.record import LogFreq
             from iceslog.core.db import get_db
             log_freq = LogFreq.model_validate({
                 "module": "log",
@@ -41,7 +41,7 @@ async def try_cache_last(redis: Redis):
     last_check_minute = now
         
 async def do_record_apilogs(logs):
-    from iceslog.models.log_record import RecordLog
+    from iceslog.models.logs.record import RecordLog
     redis = await pool_utils.get_redis_cache()
     logs: list[RecordLog] = logs
     key = get_apilog_key(base_utils.get_now_minute())
@@ -50,7 +50,7 @@ async def do_record_apilogs(logs):
     # await try_cache_last(redis)
 
 async def do_record_apilog(log):
-    from iceslog.models.log_record import RecordLog
+    from iceslog.models.logs.record import RecordLog
     log: RecordLog = log
     await do_record_apilogs([log])
     

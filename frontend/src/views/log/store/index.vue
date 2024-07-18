@@ -9,7 +9,7 @@
             <el-form-item label="关键字" prop="keywords">
               <el-input
                 v-model="queryParams.keywords"
-                placeholder="用户名/昵称/手机号"
+                placeholder="存储方式/名称"
                 clearable
                 style="width: 200px"
                 @keyup.enter="handleQuery"
@@ -70,18 +70,6 @@
                   ><i-ep-delete />删除</el-button
                 >
               </div>
-              <div>
-                <el-button
-                  class="ml-3"
-                  v-show="false"
-                  @click="handleOpenImportDialog"
-                  ><template #icon><i-ep-upload /></template>导入</el-button
-                >
-
-                <el-button class="ml-3" v-show="false" @click="handleExport"
-                  ><template #icon><i-ep-download /></template>导出</el-button
-                >
-              </div>
             </div>
           </template>
 
@@ -110,7 +98,11 @@
               width="120"
               align="center"
               prop="store"
-            />
+            >
+              <template #default="scope">
+                <label-options code="sys_store" :value="scope.row.store" />
+              </template>
+            </el-table-column>
 
             <el-table-column label="状态" align="center" prop="status">
               <template #default="scope">
@@ -132,8 +124,8 @@
                   type="primary"
                   size="small"
                   link
-                  @click="hancleResetPassword(scope.row)"
-                  ><i-ep-refresh-left />重置密码</el-button
+                  @click="handleResetConnectUrl(scope.row)"
+                  ><i-ep-refresh-left />重置连接</el-button
                 >
                 <el-button
                   v-hasPerm="['sys:user:edit']"
@@ -175,7 +167,7 @@
     >
       <!-- 用户新增/编辑表单 -->
       <el-form
-        ref="userFormRef"
+        ref="storeFormRef"
         :model="formData"
         :rules="rules"
         label-width="80px"
@@ -188,12 +180,7 @@
           />
         </el-form-item>
 
-        <el-form-item
-          required
-          label="连接信息"
-          prop="connect_url"
-          v-if="!formData.id"
-        >
+        <el-form-item label="连接信息" prop="connect_url" v-if="!formData.id">
           <el-input
             v-model="formData.connect_url"
             placeholder="请输入密码, 6位到50位"
@@ -211,6 +198,15 @@
             <el-radio :label="0">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
+
+        <el-form-item label="排序" prop="sort">
+          <el-input-number
+            v-model="formData.sort"
+            style="width: 100px"
+            controls-position="right"
+            :min="0"
+          />
+        </el-form-item>
       </el-form>
 
       <template #footer>
@@ -220,12 +216,6 @@
         </div>
       </template>
     </el-drawer>
-
-    <!-- 用户导入弹窗 -->
-    <user-import
-      v-model:visible="importDialogVisible"
-      @import-success="handleOpenImportDialogSuccess"
-    />
   </div>
 </template>
 
@@ -236,10 +226,11 @@ defineOptions({
 });
 
 import UserAPI, { UserForm, UserPageQuery, UserPageVO } from "@/api/user";
-import { LogStoreForm, LogStorePageQuery, LogStorePageVO } from "@/api/api_log";
+import { LogStorePageQuery, LogStorePageVO } from "@/api/api_log";
+import LogsStoreAPI, { LogStoreForm as LogsStoreForm } from "@/api/logs_store";
 
 const queryFormRef = ref(ElForm);
-const userFormRef = ref(ElForm);
+const storeFormRef = ref(ElForm);
 
 const loading = ref(false);
 const removeIds = ref([]);
@@ -274,36 +265,23 @@ const dialog = reactive({
 const importDialogVisible = ref(false);
 
 // 用户表单数据
-const formData = reactive<LogStoreForm>({
+const formData = reactive<LogsStoreForm>({
   status: 1,
 });
 
 /** 用户表单校验规则  */
 const rules = reactive({
-  username: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
-  nickname: [{ required: true, message: "用户昵称不能为空", trigger: "blur" }],
-  deptId: [{ required: true, message: "所属部门不能为空", trigger: "blur" }],
-  roleIds: [{ required: true, message: "用户角色不能为空", trigger: "blur" }],
-  email: [
-    {
-      pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/,
-      message: "请输入正确的邮箱地址",
-      trigger: "blur",
-    },
+  name: [{ required: true, message: "名称不能为空", trigger: "blur" }],
+  connect_url: [
+    { required: true, message: "连接信息不能为空", trigger: "blur" },
   ],
-  mobile: [
-    {
-      pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
-      message: "请输入正确的手机号码",
-      trigger: "blur",
-    },
-  ],
+  store: [{ required: true, message: "存储方式不能为空", trigger: "blur" }],
 });
 
 /** 查询 */
 function handleQuery() {
   loading.value = true;
-  UserAPI.getPage(queryParams)
+  LogsStoreAPI.getPage(queryParams)
     .then((data) => {
       console.log("handleQuery", data);
       pageData.value = data.list;
@@ -330,22 +308,18 @@ function handleSelectionChange(selection: any) {
 }
 
 /** 重置密码 */
-function hancleResetPassword(row: { [key: string]: any }) {
-  ElMessageBox.prompt(
-    "请输入用户「" + row.username + "」的新密码",
-    "重置密码",
-    {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-    }
-  ).then(({ value }) => {
+function handleResetConnectUrl(row: { [key: string]: any }) {
+  ElMessageBox.prompt("请输入「" + row.name + "」的新连接", "重置链接", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+  }).then(({ value }) => {
     if (!value || value.length < 6) {
       // 检查密码是否为空或少于6位
-      ElMessage.warning("密码至少需要6位字符，请重新输入");
+      ElMessage.warning("链接至少需要6位字符，请重新输入");
       return false;
     }
     UserAPI.updatePassword(row.id, value).then(() => {
-      ElMessage.success("密码重置成功，新密码是：" + value);
+      ElMessage.success("链接重置成功，新链接是：" + value);
     });
   });
 }
@@ -373,8 +347,8 @@ async function handleOpenDialog(id?: number) {
 /** 关闭弹窗 */
 function handleCloseDialog() {
   dialog.visible = false;
-  userFormRef.value.resetFields();
-  userFormRef.value.clearValidate();
+  storeFormRef.value.resetFields();
+  storeFormRef.value.clearValidate();
 
   formData.id = undefined;
   formData.status = 1;
@@ -382,12 +356,12 @@ function handleCloseDialog() {
 
 /** 表单提交 */
 const handleSubmit = useThrottleFn(() => {
-  userFormRef.value.validate((valid: any) => {
+  storeFormRef.value.validate((valid: any) => {
     if (valid) {
       const userId = formData.id;
       loading.value = true;
       if (userId) {
-        UserAPI.update(userId, formData)
+        LogsStoreAPI.update(userId, formData)
           .then(() => {
             ElMessage.success("修改用户成功");
             handleCloseDialog();
@@ -395,7 +369,7 @@ const handleSubmit = useThrottleFn(() => {
           })
           .finally(() => (loading.value = false));
       } else {
-        UserAPI.add(formData)
+        LogsStoreAPI.add(formData)
           .then(() => {
             ElMessage.success("新增用户成功");
             handleCloseDialog();
@@ -437,36 +411,6 @@ function handleDelete(id?: number) {
 /** 打开导入弹窗 */
 function handleOpenImportDialog() {
   importDialogVisible.value = true;
-}
-
-/** 导入用户成功 */
-function handleOpenImportDialogSuccess() {
-  handleQuery();
-}
-
-/** 导出用户 */
-function handleExport() {
-  UserAPI.export(queryParams).then((response: any) => {
-    const fileData = response.data;
-    const fileName = decodeURI(
-      response.headers["content-disposition"].split(";")[1].split("=")[1]
-    );
-    const fileType =
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8";
-
-    const blob = new Blob([fileData], { type: fileType });
-    const downloadUrl = window.URL.createObjectURL(blob);
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = downloadUrl;
-    downloadLink.download = fileName;
-
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    document.body.removeChild(downloadLink);
-    window.URL.revokeObjectURL(downloadUrl);
-  });
 }
 
 onMounted(() => {

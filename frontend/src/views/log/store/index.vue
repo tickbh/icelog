@@ -94,6 +94,30 @@
             />
 
             <el-table-column
+              key="connect_url"
+              label="连接信息"
+              width="200"
+              align="center"
+              prop="connect_url"
+            />
+
+            <el-table-column
+              key="table_name"
+              label="表名或者Topic"
+              width="200"
+              align="center"
+              prop="table_name"
+            />
+
+            <el-table-column
+              key="table_ext"
+              label="表额外信息"
+              width="200"
+              align="center"
+              prop="table_ext"
+            />
+
+            <el-table-column
               label="存储方式"
               width="120"
               align="center"
@@ -117,6 +141,7 @@
               prop="create_time"
               width="180"
             />
+            <el-table-column label="排序" align="center" prop="sort" />
             <el-table-column label="操作" fixed="right" width="220">
               <template #default="scope">
                 <el-button
@@ -173,11 +198,11 @@
         label-width="80px"
       >
         <el-form-item label="名称" prop="name">
-          <el-input
-            v-model="formData.name"
-            :readonly="!!formData.id"
-            placeholder="请输入名称"
-          />
+          <el-input v-model="formData.name" placeholder="请输入名称" />
+        </el-form-item>
+
+        <el-form-item label="存储方式" prop="store">
+          <dictionary v-model="formData.store" code="sys_store" />
         </el-form-item>
 
         <el-form-item label="连接信息" prop="connect_url" v-if="!formData.id">
@@ -188,8 +213,12 @@
           />
         </el-form-item>
 
-        <el-form-item label="存储方式" prop="store">
-          <dictionary v-model="formData.store" code="sys_store" />
+        <el-form-item label="表名信息或者Topic" prop="table_name">
+          <el-input v-model="formData.table_name" placeholder="请输入表名" />
+        </el-form-item>
+
+        <el-form-item label="额外表信息" prop="table_ext">
+          <el-input v-model="formData.table_ext" placeholder="请输入表名" />
         </el-form-item>
 
         <el-form-item label="状态" prop="status">
@@ -307,21 +336,44 @@ function handleSelectionChange(selection: any) {
   removeIds.value = selection.map((item: any) => item.id);
 }
 
-/** 重置密码 */
-function handleResetConnectUrl(row: { [key: string]: any }) {
-  ElMessageBox.prompt("请输入「" + row.name + "」的新连接", "重置链接", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-  }).then(({ value }) => {
-    if (!value || value.length < 6) {
-      // 检查密码是否为空或少于6位
-      ElMessage.warning("链接至少需要6位字符，请重新输入");
+function check_url_right(url: string): boolean {
+  try {
+    let u = new URL(url);
+    if (u.protocol.length == 0) {
       return false;
     }
-    LogsStoreAPI.updateConnectUrl(row.id, value).then(() => {
-      ElMessage.success("链接重置成功，新链接是：" + value);
-    });
-  });
+    return true;
+  } catch (error) {
+    return false;
+  }
+  return false;
+}
+
+/** 重置密码 */
+function handleResetConnectUrl(row: { [key: string]: any }) {
+  ElMessageBox.prompt(
+    "请输入「" + row.name + "」的新连接, 原链接信息为: " + row.connect_url + "",
+    "重置链接",
+    {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    }
+  )
+    .then(({ value }) => {
+      if (!value || value.length < 6) {
+        // 检查密码是否为空或少于6位
+        ElMessage.warning("链接至少需要6位字符，请重新输入");
+        return false;
+      }
+      if (!check_url_right(value)) {
+        ElMessage.warning("非合法的url对象, 请重新输入");
+        return false;
+      }
+      LogsStoreAPI.updateConnectUrl(row.id, value).then(() => {
+        ElMessage.success("链接重置成功，新链接是：" + value);
+      });
+    })
+    .catch((e) => {});
 }
 
 /**
@@ -358,6 +410,10 @@ function handleCloseDialog() {
 const handleSubmit = useThrottleFn(() => {
   storeFormRef.value.validate((valid: any) => {
     if (valid) {
+      if (formData.connect_url && !check_url_right(formData.connect_url)) {
+        ElMessage.warning("非合法的url对象, 请重新输入");
+        return false;
+      }
       const userId = formData.id;
       loading.value = true;
       if (userId) {

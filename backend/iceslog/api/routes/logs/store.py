@@ -26,6 +26,7 @@ from iceslog.models.syslog import LogsPublic, SysLog
 from iceslog.utils import base_utils, cache_utils
 from iceslog.utils.cache_table import CacheTable
 from iceslog.utils.utils import page_view_condition
+from yarl import URL
 
 router = APIRouter(
     dependencies=[Depends(check_has_perm)])
@@ -36,15 +37,26 @@ def get_logs_store(session: SessionDep, keywords: str = None, pageNum: PageNumTy
     if keywords:
         condition.append(or_(LogsStore.name.like(f"%{keywords}%"), LogsStore.store.like(f"%{keywords}%")))
     logs, count = page_view_condition(session, condition, LogsStore, pageNum, pageSize, [col(LogsStore.sort).desc()])
+    for log in logs:
+        parsed_url = URL(log.connect_url)
+        if not parsed_url:
+            continue
+        if parsed_url.user:
+            parsed_url = parsed_url.with_user("***")
+        if parsed_url.password:
+            parsed_url = parsed_url.with_password("***")
+        log.connect_url = parsed_url.human_repr()
+        
     return LogsStorePublices(list=logs, total=count)
 
 @router.post(
     "/create", response_model=LogsStoreBase
 )
 def create_user(*, session: SessionDep, store_in: LogsStoreCreate) -> Any:
-    """
-    Create new user.
-    """
+    url = URL(store_in.connect_url)
+    if not url or not url.scheme:
+        raise HTTPException(400, "无效的url")
+
     store = LogsStore.model_validate(store_in)
     session.add(store)
     session.commit()
@@ -72,6 +84,9 @@ def set_store_connect_url(*, session: SessionDep, store_id: int, body: LogsStore
     store = session.get(LogsStore, store_id)
     if not store:
         return RetMsg("00001", "账号不存在")
+    url = URL(body.connect_url)
+    if not url or not url.scheme:
+        raise HTTPException(400, "无效的url")
     store.connect_url = body.connect_url
     session.merge(store)
     session.commit()

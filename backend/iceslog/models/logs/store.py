@@ -13,13 +13,18 @@ class LogsStoreBase(SQLModel):
     name: str = Field(max_length=255, nullable=False, description="项目名字")
     status: int = Field(nullable=False, default=1, description="状态(1启用, 0禁用)")
     sort: int = Field(default=0, description="排序")
+    table_name: str = Field(max_length=255, nullable=True, default="", description="表名或者topic")
+    table_ext: str = Field(max_length=255, nullable=True, default="", description="表名附加信息")
     create_time: datetime = Field(nullable=False, default_factory=datetime_now, description="创建时间")
     
 class LogsStore(LogsStoreBase, table=True):
     connect_url: str = Field(max_length=255, nullable=False, description="链接地址")
     
+class LogsStoreFull(LogsStoreBase):
+    connect_url: str
+    
 class LogsStorePublices(SQLModel):
-    list: list[LogsStoreBase]
+    list: list[LogsStoreFull]
     total: int
     
 class LogsStoreCreate(LogsStoreBase):

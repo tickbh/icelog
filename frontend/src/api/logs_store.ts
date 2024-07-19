@@ -62,6 +62,8 @@ export interface LogsStoreForm {
   store?: string;
   name?: string;
   connect_url?: string;
+  table_name?: string;
+  table_ext?: string;
   id?: number;
   status?: number;
   sort?: number;

@@ -51,6 +51,8 @@ def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     if not group:
         return []
     items = get_dict_items(group["id"])
+    if not items:
+        return []
     return items
 
 @router.get(

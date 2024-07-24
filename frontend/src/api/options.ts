@@ -14,7 +14,7 @@ export interface CacheOptions {
 
 class OptionsAPI {
   static cacheOptions: { [name: string]: { [key: string]: OptionType[] } } = {};
-  static lastCacheTime: { [name: string]: number } = {};
+  static lastCacheTime: { [name: string]: { [key: string]: number } } = {};
   static callback_cache: { [name: string]: Array<any> } = {};
 
   static doCallback(name: string, data?: OptionType[], error?: any) {
@@ -42,20 +42,21 @@ class OptionsAPI {
     return new Promise<OptionType[]>((resolve, reject) => {
       if (!OptionsAPI.cacheOptions[name]) {
         OptionsAPI.cacheOptions[name] = {};
+        OptionsAPI.lastCacheTime[name] = {};
       }
       if (OptionsAPI.cacheOptions[name][key]) {
         return resolve(OptionsAPI.cacheOptions[name][key]);
       }
       var now = new Date().getTime();
       // 5秒内不在发起请求
-      if (now - (OptionsAPI.lastCacheTime[name] || 0) < 5000) {
+      if (now - (OptionsAPI.lastCacheTime[name][key] || 0) < 5000) {
         if (!OptionsAPI.callback_cache[name]) {
           OptionsAPI.callback_cache[name] = [];
         }
         OptionsAPI.callback_cache[name].push([resolve, reject]);
         return;
       }
-      OptionsAPI.lastCacheTime[name] = now;
+      OptionsAPI.lastCacheTime[name][key] = now;
       callback()
         .then((data) => {
           OptionsAPI.cacheOptions[name][key] = data;

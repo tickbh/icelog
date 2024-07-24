@@ -2,21 +2,21 @@ import request from "@/utils/request";
 
 const LOG_BASE_URL = "/api/v1/logs/read";
 
-class LogsReadAPI {
+class LogsSearchAPI {
   /**
    * 获取日志分页列表
    *
    * @param queryParams 查询参数
    */
-  static getPage(queryParams: LogsReadPageQuery) {
-    return request<any, PageResult<LogsReadPageVO[]>>({
+  static getPage(queryParams: LogsSearchPageQuery) {
+    return request<any, PageResult<LogsSearchPageVO[]>>({
       url: `${LOG_BASE_URL}/page`,
       method: "get",
       params: queryParams,
     });
   }
 
-  static update(id: number, data: LogsReadForm) {
+  static update(id: number, data: LogsSearchForm) {
     return request({
       url: `${LOG_BASE_URL}/${id}`,
       method: "put",
@@ -24,7 +24,7 @@ class LogsReadAPI {
     });
   }
 
-  static add(data: LogsReadForm) {
+  static add(data: LogsSearchForm) {
     return request({
       url: `${LOG_BASE_URL}/create`,
       method: "post",
@@ -33,7 +33,7 @@ class LogsReadAPI {
   }
 
   static getFormData(id: number) {
-    return request<any, LogsReadForm>({
+    return request<any, LogsSearchForm>({
       url: `${LOG_BASE_URL}/form?id=${id}`,
       method: "get",
     });
@@ -55,9 +55,9 @@ class LogsReadAPI {
   }
 }
 
-export default LogsReadAPI;
+export default LogsSearchAPI;
 
-export interface LogsReadForm {
+export interface LogsSearchForm {
   create_time?: Date;
   store?: string;
   name?: string;
@@ -72,19 +72,27 @@ export interface LogsReadForm {
 /**
  * 日志分页查询对象
  */
-export interface LogsReadPageQuery extends PageQuery {
+export interface LogsSearchPageQuery extends PageQuery {
   /** 搜索关键字 */
-  keywords?: string;
+  content?: string;
+  /** 搜索关键字 */
+  sys?: string;
+  level?: number;
   status?: number;
+  /** 开始时间 */
+  startTime?: string;
+
+  /** 结束时间 */
+  endTime?: string;
 }
 
 /**
  * 系统日志分页VO
  */
-export interface LogsReadPageVO {
+export interface LogsSearchPageVO {
   /** 主键 */
   id: number;
-  Read: string;
+  Search: string;
   name: string;
   status: number;
   sort: number;

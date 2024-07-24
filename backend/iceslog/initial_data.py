@@ -47,6 +47,9 @@ def init_menu(session: Session):
     menu = Menus(id=23, pid=2, belong="sys", type="MENU", name="日志映射", component="log/mapping/index",
                  icon="document", params="", path="mapping", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
+    menu = Menus(id=24, pid=2, belong="sys", type="MENU", name="日志查询", component="log/search/index",
+                 icon="document", params="", path="search", redirect="", sort=0, status=1, groups="1")
+    session.add(menu)
     session.commit()
 
 
@@ -114,7 +117,6 @@ def init_dict(session: Session):
     session.add(dict_map)
     session.commit()
     
-    
     dict_map = DictMap(id=3, name="存储", code="sys_store", status=1, remark="日志存储方式")
     session.add(dict_map)
     dict_map = DictMapItem(dict_id=3, label="ClickHouse", value="ClickHouse", status=1, remark="ClickHouse")
@@ -124,6 +126,28 @@ def init_dict(session: Session):
     dict_map = DictMapItem(dict_id=3, label="Es", value="Es", status=1, remark="Es")
     session.add(dict_map)
     dict_map = DictMapItem(dict_id=3, label="Kafka", value="Kafka", status=1, remark="Kafka")
+    session.add(dict_map)
+    
+    dict_map = DictMap(id=4, name="日志等级", code="sys_level", status=1, remark="日志等级")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=4, label="Error", value="1", status=1, remark="错误信息")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=4, label="Warn", value="2", status=1, remark="警告")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=4, label="Info", value="3", status=1, remark="Info")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=4, label="Debug", value="4", status=1, remark="调试")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=4, label="Trace", value="4", status=1, remark="调试")
+    session.add(dict_map)
+    
+    dict_map = DictMap(id=5, name="系统类型", code="sys_sys", status=1, remark="系统类型")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=5, label="IOS", value="IOS", status=1, remark="IOS")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=5, label="Android", value="Android", status=1, remark="安卓")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=5, label="Windows", value="Windows", status=1, remark="Windows")
     session.add(dict_map)
     session.commit()
 

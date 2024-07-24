@@ -1,4 +1,4 @@
-<!-- 日志存储管理 -->
+<!-- 日志读取管理 -->
 <template>
   <div class="app-container">
     <el-row :gutter="20">
@@ -9,7 +9,7 @@
             <el-form-item label="关键字" prop="keywords">
               <el-input
                 v-model="queryParams.keywords"
-                placeholder="存储方式/名称"
+                placeholder="读取方式/名称"
                 clearable
                 style="width: 200px"
                 @keyup.enter="handleQuery"
@@ -106,7 +106,7 @@
             />
 
             <el-table-column
-              label="存储方式"
+              label="读取方式"
               width="120"
               align="center"
               prop="store"
@@ -189,7 +189,7 @@
           <el-input v-model="formData.name" placeholder="请输入名称" />
         </el-form-item>
 
-        <el-form-item label="存储方式" prop="store">
+        <el-form-item label="读取方式" prop="store">
           <dictionary v-model="formData.store" code="sys_store" />
         </el-form-item>
 
@@ -243,11 +243,11 @@ defineOptions({
 });
 
 import UserAPI, { UserForm, UserPageQuery, UserPageVO } from "@/api/user";
-import LogsStoreAPI, {
-  LogsStoreForm,
-  LogsStorePageQuery,
-  LogsStorePageVO,
-} from "@/api/logs_store";
+import LogsReadAPI, {
+  LogsReadForm,
+  LogsReadPageVO,
+  LogsReadPageQuery,
+} from "@/api/logs_read";
 
 const queryFormRef = ref(ElForm);
 const storeFormRef = ref(ElForm);
@@ -255,11 +255,11 @@ const storeFormRef = ref(ElForm);
 const loading = ref(false);
 const removeIds = ref([]);
 const total = ref(0);
-const pageData = ref<LogsStorePageVO[]>();
+const pageData = ref<LogsReadPageVO[]>();
 /** 角色下拉选项 */
 const roleOptions = ref<OptionType[]>();
 /** 用户查询参数  */
-const queryParams = reactive<LogsStorePageQuery>({
+const queryParams = reactive<LogsReadPageQuery>({
   pageNum: 1,
   pageSize: 10,
 });
@@ -274,7 +274,7 @@ const dialog = reactive({
 const importDialogVisible = ref(false);
 
 // 用户表单数据
-const formData = reactive<LogsStoreForm>({
+const formData = reactive<LogsReadForm>({
   status: 1,
 });
 
@@ -284,13 +284,13 @@ const rules = reactive({
   connect_url: [
     { required: true, message: "连接信息不能为空", trigger: "blur" },
   ],
-  store: [{ required: true, message: "存储方式不能为空", trigger: "blur" }],
+  store: [{ required: true, message: "读取方式不能为空", trigger: "blur" }],
 });
 
 /** 查询 */
 function handleQuery() {
   loading.value = true;
-  LogsStoreAPI.getPage(queryParams)
+  LogsReadAPI.getPage(queryParams)
     .then((data) => {
       console.log("handleQuery", data);
       pageData.value = data.list;
@@ -354,7 +354,7 @@ function handleResetConnectUrl(row: { [key: string]: any }) {
   )
     .then(({ value }) => {
       console.log("ok!!");
-      LogsStoreAPI.updateConnectUrl(row.id, value).then(() => {
+      LogsReadAPI.updateConnectUrl(row.id, value).then(() => {
         ElMessage.success("链接重置成功，新链接是：" + value);
       });
     })
@@ -373,7 +373,7 @@ async function handleOpenDialog(id?: number) {
 
   if (id) {
     dialog.title = "修改用户";
-    LogsStoreAPI.getFormData(id).then((data) => {
+    LogsReadAPI.getFormData(id).then((data) => {
       Object.assign(formData, { ...data });
     });
   } else {
@@ -402,7 +402,7 @@ const handleSubmit = useThrottleFn(() => {
       const userId = formData.id;
       loading.value = true;
       if (userId) {
-        LogsStoreAPI.update(userId, formData)
+        LogsReadAPI.update(userId, formData)
           .then(() => {
             ElMessage.success("修改用户成功");
             handleCloseDialog();
@@ -410,7 +410,7 @@ const handleSubmit = useThrottleFn(() => {
           })
           .finally(() => (loading.value = false));
       } else {
-        LogsStoreAPI.add(formData)
+        LogsReadAPI.add(formData)
           .then(() => {
             ElMessage.success("新增用户成功");
             handleCloseDialog();
@@ -437,7 +437,7 @@ function handleDelete(id?: number) {
   }).then(
     function () {
       loading.value = true;
-      LogsStoreAPI.deleteByIds(userIds)
+      LogsReadAPI.deleteByIds(userIds)
         .then(() => {
           ElMessage.success("删除成功");
           handleResetQuery();

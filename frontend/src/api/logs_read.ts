@@ -1,22 +1,22 @@
 import request from "@/utils/request";
 
-const LOG_BASE_URL = "/api/v1/logs/store";
+const LOG_BASE_URL = "/api/v1/logs/read";
 
-class LogsStoreAPI {
+class LogsReadAPI {
   /**
    * 获取日志分页列表
    *
    * @param queryParams 查询参数
    */
-  static getPage(queryParams: LogsStorePageQuery) {
-    return request<any, PageResult<LogsStorePageVO[]>>({
+  static getPage(queryParams: LogsReadPageQuery) {
+    return request<any, PageResult<LogsReadPageVO[]>>({
       url: `${LOG_BASE_URL}/page`,
       method: "get",
       params: queryParams,
     });
   }
 
-  static update(id: number, data: LogsStoreForm) {
+  static update(id: number, data: LogsReadForm) {
     return request({
       url: `${LOG_BASE_URL}/${id}`,
       method: "put",
@@ -24,7 +24,7 @@ class LogsStoreAPI {
     });
   }
 
-  static add(data: LogsStoreForm) {
+  static add(data: LogsReadForm) {
     return request({
       url: `${LOG_BASE_URL}/create`,
       method: "post",
@@ -33,7 +33,7 @@ class LogsStoreAPI {
   }
 
   static getFormData(id: number) {
-    return request<any, LogsStoreForm>({
+    return request<any, LogsReadForm>({
       url: `${LOG_BASE_URL}/form?id=${id}`,
       method: "get",
     });
@@ -55,9 +55,9 @@ class LogsStoreAPI {
   }
 }
 
-export default LogsStoreAPI;
+export default LogsReadAPI;
 
-export interface LogsStoreForm {
+export interface LogsReadForm {
   create_time?: Date;
   store?: string;
   name?: string;
@@ -72,7 +72,7 @@ export interface LogsStoreForm {
 /**
  * 日志分页查询对象
  */
-export interface LogsStorePageQuery extends PageQuery {
+export interface LogsReadPageQuery extends PageQuery {
   /** 搜索关键字 */
   keywords?: string;
 }
@@ -80,10 +80,10 @@ export interface LogsStorePageQuery extends PageQuery {
 /**
  * 系统日志分页VO
  */
-export interface LogsStorePageVO {
+export interface LogsReadPageVO {
   /** 主键 */
   id: number;
-  store: string;
+  Read: string;
   name: string;
   status: number;
   sort: number;

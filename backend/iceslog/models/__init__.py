@@ -7,8 +7,8 @@ from .dictmap import *
 from .syslog import *
 from .logs.record import *
 from .logs.store import *
+from .logs.read import *
 
-# JSON payload containing access token
 class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"

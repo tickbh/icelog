@@ -20,7 +20,7 @@ from iceslog.models import (
 from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
 
-from iceslog.models.logs.store import LogsStore, LogsStoreBase, LogsStoreCreate, LogsStorePublices, LogsStoreUpdateUrl
+from iceslog.models.logs.read import LogsRead, LogsReadBase, LogsReadCreate, LogsReadPublices, LogsReadUpdateUrl
 from iceslog.models.perms import GroupPerms, GroupPermsBase, GroupPermsPublic, OnePerm, Perms, PermsPublic
 from iceslog.models.syslog import LogsPublic, SysLog
 from iceslog.utils import base_utils, cache_utils
@@ -31,14 +31,14 @@ from yarl import URL
 router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
-@router.get("/page", response_model=LogsStorePublices)
+@router.get("/page", response_model=LogsReadPublices)
 def get_logs_store(session: SessionDep, keywords: str = None, status: int = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     condition = []
     if keywords:
-        condition.append(or_(LogsStore.name.like(f"%{keywords}%"), LogsStore.store.like(f"%{keywords}%")))
+        condition.append(or_(LogsRead.name.like(f"%{keywords}%"), LogsRead.store.like(f"%{keywords}%")))
     if status != None:
-        condition.append(LogsStore.status == status)
-    logs, count = page_view_condition(session, condition, LogsStore, pageNum, pageSize, [col(LogsStore.sort).desc()])
+        condition.append(LogsRead.status == status)
+    logs, count = page_view_condition(session, condition, LogsRead, pageNum, pageSize, [col(LogsRead.sort).desc()])
     for log in logs:
         parsed_url = URL(log.connect_url)
         if not parsed_url:
@@ -49,17 +49,17 @@ def get_logs_store(session: SessionDep, keywords: str = None, status: int = None
             parsed_url = parsed_url.with_password("***")
         log.connect_url = parsed_url.human_repr()
         
-    return LogsStorePublices(list=logs, total=count)
+    return LogsReadPublices(list=logs, total=count)
 
 @router.post(
-    "/create", response_model=LogsStoreBase
+    "/create", response_model=LogsReadBase
 )
-def create_user(*, session: SessionDep, store_in: LogsStoreCreate) -> Any:
+def create_user(*, session: SessionDep, store_in: LogsReadCreate) -> Any:
     url = URL(store_in.connect_url)
     if not url or not url.scheme:
         raise HTTPException(400, "无效的url")
 
-    store = LogsStore.model_validate(store_in)
+    store = LogsRead.model_validate(store_in)
     session.add(store)
     session.commit()
     session.refresh(store)
@@ -68,11 +68,11 @@ def create_user(*, session: SessionDep, store_in: LogsStoreCreate) -> Any:
 
 @router.get(
     "/form", 
-    response_model=LogsStoreBase
+    response_model=LogsReadBase
 )
 def read_store_form(*, session: SessionDep, id: int) -> Any:
     
-    store = session.get(LogsStore, id)
+    store = session.get(LogsRead, id)
     if not store:
         return RetMsg("00001", "账号不存在")
     
@@ -80,10 +80,10 @@ def read_store_form(*, session: SessionDep, id: int) -> Any:
 
 @router.patch(
     "/url/{id}", 
-    response_model=LogsStoreBase
+    response_model=LogsReadBase
 )
-def set_store_connect_url(*, session: SessionDep, id: int, body: LogsStoreUpdateUrl) -> Any:
-    store = session.get(LogsStore, id)
+def set_store_connect_url(*, session: SessionDep, id: int, body: LogsReadUpdateUrl) -> Any:
+    store = session.get(LogsRead, id)
     if not store:
         return RetMsg("00001", "账号不存在")
     url = URL(body.connect_url)
@@ -97,19 +97,19 @@ def set_store_connect_url(*, session: SessionDep, id: int, body: LogsStoreUpdate
 
 @router.put(
     "/{id}",
-    response_model=LogsStoreBase,
+    response_model=LogsReadBase,
 )
 def update_store(
     *,
     session: SessionDep,
     id: int,
-    user_in: LogsStoreBase,
+    user_in: LogsReadBase,
 ) -> Any:
     """
     Update a user.
     """
 
-    store = session.get(LogsStore, id)
+    store = session.get(LogsRead, id)
     if not store:
         raise HTTPException(
             status_code=404,
@@ -130,7 +130,7 @@ def delete_user(
     """
     ids = base_utils.split_to_int_list(stores, ",")
     for id in ids:
-        store = session.get(LogsStore, id)
+        store = session.get(LogsRead, id)
         if not store:
             raise HTTPException(status_code=404, detail="未找到存储配置")
         session.delete(store)

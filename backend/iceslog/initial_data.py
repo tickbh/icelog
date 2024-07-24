@@ -41,7 +41,10 @@ def init_menu(session: Session):
     menu = Menus(id=21, pid=2, belong="sys", type="MENU", name="日志落库", component="log/store/index",
                  icon="document", params="", path="store", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
-    menu = Menus(id=22, pid=2, belong="sys", type="MENU", name="日志映射", component="log/mapping/index",
+    menu = Menus(id=22, pid=2, belong="sys", type="MENU", name="日志读取", component="log/read/index",
+                 icon="document", params="", path="read", redirect="", sort=0, status=1, groups="1")
+    session.add(menu)
+    menu = Menus(id=23, pid=2, belong="sys", type="MENU", name="日志映射", component="log/mapping/index",
                  icon="document", params="", path="mapping", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     session.commit()

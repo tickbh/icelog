@@ -21,6 +21,7 @@ from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
 
 from iceslog.models.logs.read import LogsRead, LogsReadBase, LogsReadCreate, LogsReadPublices, LogsReadUpdateUrl
+from iceslog.models.logs.record import RecordLogPublices
 from iceslog.models.perms import GroupPerms, GroupPermsBase, GroupPermsPublic, OnePerm, Perms, PermsPublic
 from iceslog.models.syslog import LogsPublic, SysLog
 from iceslog.utils import base_utils, cache_utils
@@ -31,23 +32,18 @@ from yarl import URL
 router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
-@router.get("/page", response_model=LogsReadPublices)
+@router.get("/page", response_model=RecordLogPublices)
 def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
-    condition = []
-    if content:
-        condition.append(or_(LogsRead.name.like(f"%{content}%"), LogsRead.store.like(f"%{content}%")))
-    logs, count = page_view_condition(session, condition, LogsRead, pageNum, pageSize, [col(LogsRead.sort).desc()])
-    for log in logs:
-        parsed_url = URL(log.connect_url)
-        if not parsed_url:
-            continue
-        if parsed_url.user:
-            parsed_url = parsed_url.with_user("***")
-        if parsed_url.password:
-            parsed_url = parsed_url.with_password("***")
-        log.connect_url = parsed_url.human_repr()
-        
-    return LogsReadPublices(list=logs, total=count)
+    data = session.get(LogsRead, read)
+    if not data:
+        raise HTTPException(400, "未找到相关的数据")
+    
+    if data.store == "ClickHouse":
+        from iceslog.drivers import clickhouse_utils
+        logs = clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
+        return RecordLogPublices(list=logs, total=100)
+        pass
+    raise HTTPException(400, "暂不支持")
 
 @router.post(
     "/create", response_model=LogsReadBase

@@ -61,13 +61,6 @@
     </div>
 
     <el-card shadow="never" class="table-container">
-      <template #header>
-        <el-button v-hasPerm="['sys:menu:add']" type="success" @click="">
-          <template #icon><i-ep-plus /></template>
-          新增</el-button
-        >
-      </template>
-
       <el-table
         v-loading="loading"
         :data="searchTableData"
@@ -80,114 +73,39 @@
           hasChildren: 'hasChildren',
         }"
       >
-        <el-table-column label="菜单名称" min-width="200">
+        <el-table-column label="时间" align="left" width="150" prop="time" />
+
+        <el-table-column label="日志等级" align="center" width="80">
           <template #default="scope">
-            <template
-              v-if="scope.row.icon && scope.row.icon.startsWith('el-icon')"
+            <el-tag v-if="scope.row.log_level === 1" type="danger">错误</el-tag>
+            <el-tag v-if="scope.row.log_level === 2" type="warning"
+              >警告</el-tag
             >
-              <el-icon style="vertical-align: -0.15em">
-                <component :is="scope.row.icon.replace('el-icon-', '')" />
-              </el-icon>
-            </template>
-            <template v-else-if="scope.row.icon">
-              <svg-icon :icon-class="scope.row.icon" />
-            </template>
-            <template v-else>
-              <svg-icon icon-class="menu" />
-            </template>
-            {{ scope.row.name }}
+            <el-tag v-if="scope.row.log_level === 3" type="success"
+              >信息</el-tag
+            >
+            <el-tag v-if="scope.row.log_level === 4" type="info">调试</el-tag>
+            <el-tag v-if="scope.row.log_level === 5" type="info">追踪</el-tag>
           </template>
         </el-table-column>
 
-        <el-table-column label="类型" align="center" width="80">
-          <template #default="scope">
-            <el-tag
-              v-if="scope.row.type === MenuTypeEnum.CATALOG"
-              type="warning"
-              >目录</el-tag
-            >
-            <el-tag v-if="scope.row.type === MenuTypeEnum.MENU" type="success"
-              >菜单</el-tag
-            >
-            <el-tag v-if="scope.row.type === MenuTypeEnum.BUTTON" type="danger"
-              >按钮</el-tag
-            >
-            <el-tag v-if="scope.row.type === MenuTypeEnum.EXTLINK" type="info"
-              >外链</el-tag
-            >
-          </template>
-        </el-table-column>
+        <el-table-column label="uid" align="left" width="150" prop="uid" />
+        <el-table-column label="内容" align="left" width="150" prop="content" />
 
         <el-table-column
-          label="归属对象"
-          align="left"
-          width="150"
-          prop="belong"
-        />
-
-        <el-table-column
-          label="路由路径"
-          align="left"
-          width="150"
-          prop="path"
-        />
-
-        <el-table-column
-          label="组件路径"
+          label="追踪id"
           align="left"
           width="250"
-          prop="component"
+          prop="trace_id"
         />
+        <el-table-column label="额外id" align="left" width="250" prop="exid" />
 
         <el-table-column
-          label="权限标识"
-          align="center"
-          width="200"
-          prop="perm"
+          label="额外信息"
+          align="left"
+          width="250"
+          prop="extra"
         />
-
-        <el-table-column label="状态" align="center" width="80">
-          <template #default="scope">
-            <el-tag v-if="scope.row.status === 1" type="success">显示</el-tag>
-            <el-tag v-else type="info">隐藏</el-tag>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="排序" align="center" width="80" prop="sort" />
-
-        <el-table-column fixed="right" align="center" label="操作" width="220">
-          <template #default="scope">
-            <el-button
-              v-if="scope.row.type == 'CATALOG' || scope.row.type == 'MENU'"
-              v-hasPerm="['sys:menu:add']"
-              type="primary"
-              link
-              size="small"
-              @click.stop=""
-            >
-              <i-ep-plus />新增
-            </el-button>
-
-            <el-button
-              v-hasPerm="['sys:menu:edit']"
-              type="primary"
-              link
-              size="small"
-              @click.stop=""
-            >
-              <i-ep-edit />编辑
-            </el-button>
-            <el-button
-              v-hasPerm="['sys:menu:delete']"
-              type="danger"
-              link
-              size="small"
-              @click.stop="handleDelete(scope.row.id)"
-              ><i-ep-delete />
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
       </el-table>
     </el-card>
   </div>

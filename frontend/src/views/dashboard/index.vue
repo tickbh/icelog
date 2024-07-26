@@ -124,11 +124,11 @@ function do_logs() {
     many.push({
       time: new Date(),
       log_level: 1,
-      trace_id: "",
-      uid: 0,
-      content: "测试日志",
-      exid: "",
-      extra: "",
+      trace_id: "aa22222222222",
+      uid: 1,
+      content: "测试日志111111111",
+      exid: "222222222222",
+      extra: "21111111111",
     });
   }
   ApiLogAPI.add_many(many);

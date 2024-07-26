@@ -29,6 +29,10 @@ class RecordLog(SQLModel):
     exid: str = None
     extra: str = None
 
+class RecordLogPublices(SQLModel):
+    list: list[RecordLog]
+    total: int
+    
 '''
 创建sql, clickhouse
 CREATE TABLE log_record (

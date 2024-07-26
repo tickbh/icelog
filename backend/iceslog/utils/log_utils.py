@@ -44,17 +44,18 @@ async def do_record_apilogs(logs):
     from iceslog.models.logs.record import RecordLog
     redis = await pool_utils.get_redis_cache()
     logs: list[RecordLog] = logs
-    log_save_utils.append_logs(logs)
+    new_logs = []
+    for log in logs:
+        new_logs.append(log.model_dump())
+    log_save_utils.append_logs(new_logs)
     key = get_apilog_key(base_utils.get_now_minute())
-    await redis.incr(key, len(logs))
+    await redis.incr(key, len(new_logs))
     await redis.expire(key, 180)
-    # await try_cache_last(redis)
 
 async def do_record_apilog(log):
     from iceslog.models.logs.record import RecordLog
     log: RecordLog = log
     await do_record_apilogs([log])
-    
    
 # 每分钟执行的定时任务
 @scheduler.scheduled_job('interval', minutes=1)

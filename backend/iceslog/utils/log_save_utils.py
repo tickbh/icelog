@@ -1,7 +1,8 @@
+import pandas
 from iceslog.utils.scheduler_utils import scheduler
 
 from sqlmodel import select
-from iceslog.utils import pool_utils
+from iceslog.utils import base_utils, pool_utils
 
 cache_logs = []
 
@@ -19,18 +20,18 @@ def get_logs_store():
     return stores
 
 async def write_to_db():
+    if len(cache_logs) == 0:
+        return
+    insert_logs = cache_logs.copy()
+    cache_logs.clear()
     from iceslog.models.logs.store import LogsStore
     stores = get_logs_store()
     
     for store in stores:
         store: LogsStore = store
         if store.store == "ClickHouse":
-            from clickhouse_driver import Client
-            client = Client.from_url(store.connect_url)
-            ret = client.execute('SHOW TABLES')
-            print(ret)
-            pass
-        pass
+            from iceslog.drivers import clickhouse_utils
+            clickhouse_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
     pass
 
 # 每分钟执行的定时任务

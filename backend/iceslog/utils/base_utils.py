@@ -8,7 +8,7 @@ import math
 import random
 from urllib.parse import unquote
 from datetime import datetime
-import sys
+import sys, pandas
 
 INT_MAX = sys.maxsize
 
@@ -190,3 +190,13 @@ def calc_step_value(start: int, now: int, step: int) -> int:
 
 def fix_step(now: int, step: int) -> int:
     return int(now / step) * step
+
+def dataframe_tolist(dataframe: pandas.DataFrame) -> list:
+    columns = dataframe.columns
+    rets = []
+    for v in dataframe.values:
+        data = {}
+        for i, c in enumerate(columns):
+            data[c] = v[i]
+        rets.append(data)
+    return rets

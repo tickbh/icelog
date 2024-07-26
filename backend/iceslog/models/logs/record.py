@@ -7,9 +7,6 @@ from sqlmodel import Field, Relationship, SQLModel, Column
 
 from iceslog.core.db import datetime_now
 
-# Database model, database table inferred from class name
-
-
 class LogFreqBase(SQLModel):
     id: int | None = Field(default=None, primary_key=True)
     module: str = Field(max_length=255, nullable=False, description="记录模块")
@@ -23,17 +20,27 @@ class LogFreq(LogFreqBase, table=True):
         UniqueConstraint("module", "log_time"),
     )
     
-    
-
-    
 class RecordLog(SQLModel):
     time: datetime = None
     log_level: int
-    traceId: str
+    trace_id: str
     uid: int
     content: str
     exid: str = None
     extra: str = None
+
+'''
+创建sql, clickhouse
+CREATE TABLE log_record (
+	log_level Int8,
+	trace_id String,
+	uid UInt64,
+	content String,
+	exid String,
+	extra String DEFAULT '{}',
+	`time` DateTime
+) ENGINE = Log;
+'''
     
 class OneLogVisit(SQLModel):
     module: str

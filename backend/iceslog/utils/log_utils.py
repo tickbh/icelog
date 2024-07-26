@@ -1,6 +1,6 @@
 from fastapi import Request
 from redis.asyncio import Redis
-from iceslog.utils import base_utils, http_utils, pool_utils
+from iceslog.utils import base_utils, http_utils, pool_utils, log_save_utils
 from iceslog.utils.scheduler_utils import scheduler
 
 
@@ -44,6 +44,7 @@ async def do_record_apilogs(logs):
     from iceslog.models.logs.record import RecordLog
     redis = await pool_utils.get_redis_cache()
     logs: list[RecordLog] = logs
+    log_save_utils.append_logs(logs)
     key = get_apilog_key(base_utils.get_now_minute())
     await redis.incr(key, len(logs))
     await redis.expire(key, 180)

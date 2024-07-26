@@ -25,7 +25,7 @@ export default ApiLogAPI;
 export interface LogForm {
   time?: Date;
   log_level: number;
-  traceId?: string;
+  trace_id?: string;
   uid: number;
   content: string;
   exid?: string;

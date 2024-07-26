@@ -110,7 +110,7 @@ function do_log() {
   ApiLogAPI.add_one({
     time: new Date(),
     log_level: 1,
-    traceId: "",
+    trace_id: "",
     uid: 0,
     content: "测试日志",
     exid: "",
@@ -124,7 +124,7 @@ function do_logs() {
     many.push({
       time: new Date(),
       log_level: 1,
-      traceId: "",
+      trace_id: "",
       uid: 0,
       content: "测试日志",
       exid: "",

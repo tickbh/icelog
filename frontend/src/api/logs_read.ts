@@ -53,6 +53,13 @@ class LogsReadAPI {
       method: "delete",
     });
   }
+
+  static options() {
+    return request<any, OptionType[]>({
+      url: `${LOG_BASE_URL}/options`,
+      method: "get",
+    });
+  }
 }
 
 export default LogsReadAPI;

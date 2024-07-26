@@ -1,0 +1,19 @@
+version: "2"
+services:
+  
+  clickhouse:
+    image: yandex/clickhouse-server:21.3.20-alpine
+    container_name: clickhouse
+    restart: always
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      # 用户配置文件
+      # - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./config.xml:/etc/clickhouse-server/docker_related_config.xml
+      - ./users.xml:/etc/clickhouse-server/users.xml
+      # 运行日志
+      - ./data/log:/var/log/clickhouse-server
+      # 数据持久
+      - ./data/data:/var/lib/clickhouse:rw

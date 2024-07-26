@@ -32,12 +32,10 @@ router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
 @router.get("/page", response_model=LogsReadPublices)
-def get_logs_store(session: SessionDep, keywords: str = None, status: int = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
+def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     condition = []
-    if keywords:
-        condition.append(or_(LogsRead.name.like(f"%{keywords}%"), LogsRead.store.like(f"%{keywords}%")))
-    if status != None:
-        condition.append(LogsRead.status == status)
+    if content:
+        condition.append(or_(LogsRead.name.like(f"%{content}%"), LogsRead.store.like(f"%{content}%")))
     logs, count = page_view_condition(session, condition, LogsRead, pageNum, pageSize, [col(LogsRead.sort).desc()])
     for log in logs:
         parsed_url = URL(log.connect_url)
@@ -136,19 +134,3 @@ def delete_user(
         session.delete(store)
         session.commit()
     return RetMsg(msg="User deleted successfully")
-
-
-@router.get(
-    "/options",
-    response_model=List[OptionType],
-)
-def get_options(
-    *,
-    session: SessionDep,
-) -> Any:
-    
-    statement = select(LogsRead).filter(LogsRead.status == 1)
-    rets = []
-    for r in session.exec(statement).all():
-        rets.append(OptionType(label=r.name, value=r.id))
-    return rets

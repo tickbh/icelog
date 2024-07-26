@@ -25,6 +25,7 @@ from iceslog.models import (
     UserUpdate,
     UserUpdateMe,
 )
+from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
 from iceslog.utils import base_utils
 from iceslog.utils.cache_table import CacheTable
@@ -44,7 +45,7 @@ def get_dict_items(id):
 
 @router.get(
     "/options",
-    response_model=List[OneDictItem],
+    response_model=List[OptionType],
 )
 def read_options(session: SessionDep, user: CurrentUser, key: str) -> Any:
     group = get_dict(key)

@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-const LOG_BASE_URL = "/api/v1/logs/read";
+const LOG_BASE_URL = "/api/v1/logs/search";
 
 class LogsSearchAPI {
   /**
@@ -75,6 +75,7 @@ export interface LogsSearchForm {
 export interface LogsSearchPageQuery extends PageQuery {
   /** 搜索关键字 */
   content?: string;
+  read?: number;
   /** 搜索关键字 */
   sys?: string;
   level?: number;

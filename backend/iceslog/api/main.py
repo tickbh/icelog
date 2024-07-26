@@ -11,9 +11,10 @@ api_router.include_router(perm.router, prefix="/perm", tags=["perm"])
 api_router.include_router(syslog.router, prefix="/syslog", tags=["syslog"])
 api_router.include_router(stats.router, prefix="/stats", tags=["stats"])
 
-from iceslog.api.routes.logs import store, read
+from iceslog.api.routes.logs import store, read, search
 api_router.include_router(store.router, prefix="/logs/store", tags=["store"])
 api_router.include_router(read.router, prefix="/logs/read", tags=["read"])
+api_router.include_router(search.router, prefix="/logs/search", tags=["search"])
 
 from iceslog.api.public_routes import log
 api_router.include_router(log.router, prefix="/pub/log", tags=["log"])

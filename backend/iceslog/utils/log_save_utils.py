@@ -31,7 +31,7 @@ async def write_to_db():
         store: LogsStore = store
         if store.store == "ClickHouse":
             from iceslog.drivers import clickhouse_utils
-            clickhouse_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
+            await clickhouse_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
     pass
 
 # 每分钟执行的定时任务

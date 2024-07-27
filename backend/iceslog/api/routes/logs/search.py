@@ -33,14 +33,14 @@ router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
 @router.get("/page", response_model=RecordLogPublices)
-def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
+async def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     data = session.get(LogsRead, read)
     if not data:
         raise HTTPException(400, "未找到相关的数据")
     
     if data.store == "ClickHouse":
         from iceslog.drivers import clickhouse_utils
-        logs, total = clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
+        logs, total = await clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
         return RecordLogPublices(list=logs, total=total)
     raise HTTPException(400, "暂不支持")
 

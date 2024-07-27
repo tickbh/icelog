@@ -17,6 +17,9 @@ service.interceptors.request.use(
     if (accessToken) {
       config.headers.Authorization = accessToken;
     }
+    if (!config.timeout) {
+      config.timeout = 10000;
+    }
     return config;
   },
   (error: any) => {
@@ -49,7 +52,7 @@ service.interceptors.response.use(
   },
   (error: any) => {
     // 异常处理
-    if (error.response.data) {
+    if (error.response && error.response.data) {
       if (error.response.status >= 400 && error.response.status < 500) {
         var { detail } = error.response.data;
         ElMessage.error(detail || "系统出错");

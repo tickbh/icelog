@@ -40,9 +40,8 @@ def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: st
     
     if data.store == "ClickHouse":
         from iceslog.drivers import clickhouse_utils
-        logs = clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
-        return RecordLogPublices(list=logs, total=100)
-        pass
+        logs, total = clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
+        return RecordLogPublices(list=logs, total=total)
     raise HTTPException(400, "暂不支持")
 
 @router.post(

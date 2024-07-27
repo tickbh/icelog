@@ -97,17 +97,6 @@
           搜索
         </el-button>
         <el-button icon="refresh" @click="handleReset">重置</el-button>
-        <!-- 展开/收起 -->
-        <el-link
-          v-if="isExpandable && formItems.length > showNumber"
-          class="ml-2"
-          type="primary"
-          :underline="false"
-          @click="isExpand = !isExpand"
-        >
-          <template v-if="isExpand"> 收起<i-ep-arrow-up /> </template>
-          <template v-else> 展开<i-ep-arrow-down /> </template>
-        </el-link>
       </el-form-item>
     </el-form>
   </el-card>

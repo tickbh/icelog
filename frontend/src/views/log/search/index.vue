@@ -65,14 +65,14 @@
         v-loading="loading"
         :data="searchTableData"
         highlight-current-row
-        row-key="id"
-        :expand-row-keys="['1']"
-        @row-click="handleRowClick"
-        :tree-props="{
-          children: 'children',
-          hasChildren: 'hasChildren',
-        }"
+        row-key="log_level"
+        :expand-row-keys="['1', '2', '3', '4', '5']"
       >
+        <el-table-column label="内容" align="left" width="50" type="expand">
+          <template #default="props">
+            <el-text>{{ props.row.content }}</el-text>
+          </template>
+        </el-table-column>
         <el-table-column label="时间" align="left" width="150" prop="time" />
 
         <el-table-column label="日志等级" align="center" width="80">
@@ -90,8 +90,8 @@
         </el-table-column>
 
         <el-table-column label="uid" align="left" width="150" prop="uid" />
-        <el-table-column label="内容" align="left" width="150" prop="content" />
 
+        <el-table-column label="系统" align="left" width="150" prop="sys" />
         <el-table-column
           label="追踪id"
           align="left"
@@ -105,8 +105,18 @@
           align="left"
           width="250"
           prop="extra"
+          show-overflow-tooltip
+          tooltip-effect="dark"
         />
       </el-table>
+
+      <pagination
+        v-if="total > 0"
+        v-model:total="total"
+        v-model:page="queryParams.pageNum"
+        v-model:limit="queryParams.pageSize"
+        @pagination="handleQuery"
+      />
     </el-card>
   </div>
 </template>
@@ -138,6 +148,7 @@ watch(dateTimeRange, (newVal) => {
   }
 });
 
+const total = ref(0);
 const loading = ref(false);
 const dialog = reactive({
   title: "新增菜单",
@@ -185,10 +196,16 @@ const selectedMenuId = ref<number | undefined>();
 
 // 查询
 function handleQuery() {
+  if (queryParams.read === undefined) {
+    ElMessage.warning("请选择读取的库");
+    return;
+  }
   loading.value = true;
+
   LogsSearchAPI.getPage(queryParams)
     .then((data) => {
       searchTableData.value = data.list;
+      total.value = data.total;
     })
     .finally(() => {
       loading.value = false;
@@ -199,12 +216,6 @@ function handleQuery() {
 function handleResetQuery() {
   queryFormRef.value.resetFields();
   handleQuery();
-}
-
-// 行点击事件
-function handleRowClick(row: MenuVO) {
-  // 记录表格选择的菜单ID，新增子菜单作为父菜单ID
-  selectedMenuId.value = row.id;
 }
 
 // 菜单类型切换
@@ -285,6 +296,6 @@ function handleCloseDialog() {
 }
 
 onMounted(() => {
-  handleQuery();
+  // handleQuery();
 });
 </script>

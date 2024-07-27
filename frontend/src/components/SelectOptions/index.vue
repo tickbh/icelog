@@ -52,6 +52,7 @@ const props = defineProps({
 const emits = defineEmits(["update:modelValue"]);
 
 const options: Ref<OptionType[]> = ref([]);
+const is_clear: Ref<Boolean> = ref(!props.must);
 
 const selectedValue = ref<string | number | undefined>();
 

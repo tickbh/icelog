@@ -109,12 +109,15 @@ import ApiLogAPI from "@/api/api_log";
 function do_log() {
   ApiLogAPI.add_one({
     time: new Date(),
-    log_level: 1,
-    trace_id: "",
-    uid: 0,
-    content: "测试日志",
-    exid: "",
-    extra: "",
+    log_level: 2,
+    trace_id: "aa22222222222",
+    uid: 1,
+    sys: "Web",
+    content:
+      "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
+    exid: "222222222222",
+    extra:
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbfffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerwqrewrwerwerew",
   });
 }
 
@@ -126,9 +129,12 @@ function do_logs() {
       log_level: 1,
       trace_id: "aa22222222222",
       uid: 1,
-      content: "测试日志111111111",
+      sys: index % 2 == 1 ? "IOS" : "Android",
+      content:
+        "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
       exid: "222222222222",
-      extra: "21111111111",
+      extra:
+        "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbfffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerwqrewrwerwerew",
     });
   }
   ApiLogAPI.add_many(many);

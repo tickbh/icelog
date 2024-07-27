@@ -26,6 +26,7 @@ class RecordLog(SQLModel):
     trace_id: str
     uid: int
     content: str
+    sys: str = None
     exid: str = None
     extra: str = None
 
@@ -40,6 +41,7 @@ CREATE TABLE log_record (
 	trace_id String,
 	uid UInt64,
 	content String,
+    sys String,
 	exid String,
 	extra String DEFAULT '{}',
 	`time` DateTime

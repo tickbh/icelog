@@ -26,6 +26,7 @@ export interface LogForm {
   time?: Date;
   log_level: number;
   trace_id?: string;
+  sys?: string;
   uid: number;
   content: string;
   exid?: string;

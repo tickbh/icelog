@@ -287,6 +287,8 @@ const rules = reactive({
   store: [{ required: true, message: "存储方式不能为空", trigger: "blur" }],
 });
 
+const notUrlStore: Array<String> = ["kafka"];
+
 /** 查询 */
 function handleQuery() {
   loading.value = true;
@@ -336,6 +338,9 @@ function handleResetConnectUrl(row: { [key: string]: any }) {
       cancelButtonText: "取消",
       beforeClose: (a, i, done) => {
         if (a == "confirm") {
+          if (notUrlStore.includes(row.store)) {
+            return true;
+          }
           if (!i.inputValue || i.inputValue.length < 6) {
             // 检查密码是否为空或少于6位
             ElMessage.warning("链接至少需要6位字符，请重新输入");
@@ -395,7 +400,11 @@ function handleCloseDialog() {
 const handleSubmit = useThrottleFn(() => {
   storeFormRef.value.validate((valid: any) => {
     if (valid) {
-      if (formData.connect_url && !check_url_right(formData.connect_url)) {
+      if (
+        notUrlStore.includes(formData.store || "") &&
+        formData.connect_url &&
+        !check_url_right(formData.connect_url)
+      ) {
         ElMessage.warning("非合法的url对象, 请重新输入");
         return false;
       }

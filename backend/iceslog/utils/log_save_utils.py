@@ -29,9 +29,14 @@ async def write_to_db():
     
     for store in stores:
         store: LogsStore = store
-        if store.store == "ClickHouse":
+        
+        if store.store.lower() == "clickhouse":
             from iceslog.drivers import clickhouse_utils
             await clickhouse_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
+        elif store.store.lower() == "kafka":
+            from iceslog.drivers import kafka_utils
+            await kafka_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
+        
     pass
 
 # 每分钟执行的定时任务

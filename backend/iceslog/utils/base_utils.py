@@ -7,8 +7,9 @@ import logging
 import math
 import random
 from urllib.parse import unquote
-from datetime import datetime
+from datetime import datetime, date
 import sys, pandas
+import pytz
 
 INT_MAX = sys.maxsize
 
@@ -48,6 +49,13 @@ def super_transfer(_type, value, default_return=0, is_log=False):
 
     return result
 
+def json_encoder(obj):
+    """提供给JSONEncoder的default方法，json将按要求序列化指定类型的对象"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, date):
+        return obj.strftime("%Y-%m-%d")
+    
 def safe_str(value, default_return="", is_log=False) -> str:
     '''
     提供安全的类型转换函数,将value转换为int类型
@@ -64,9 +72,9 @@ def safe_str(value, default_return="", is_log=False) -> str:
         if type(value) == bytes:
             return bytes.decode(value, "utf-8")
         if type(value) == dict:
-            return json.dumps(value, cls=JSONEncoder)
+            return json.dumps(value, default=json_encoder, cls=JSONEncoder)
         if type(value) == list:
-            return json.dumps(value, cls=JSONEncoder)
+            return json.dumps(value, default=json_encoder, cls=JSONEncoder)
         result = str(value)
     except:
         result = default_return
@@ -172,8 +180,9 @@ def append_split_to_str(val: str, next: any, split="|") -> str:
     else:
         return f"{val}{split}{next}"
     
+tz = pytz.timezone('Asia/Shanghai')
 def now() -> datetime:
-    return datetime.now()
+    return datetime.now(tz=tz)
 
 def get_now_minute(n:datetime = None) -> int:
     if not n:
@@ -200,3 +209,10 @@ def dataframe_tolist(dataframe: pandas.DataFrame) -> list:
             data[c] = v[i]
         rets.append(data)
     return rets
+
+def get_db_name(db: str, startTime: str = None) -> str:
+    if type(startTime) == str:
+        return db.format(date=datetime.fromisoformat(startTime))
+    elif type(startTime) == datetime:
+        return db.format(date=startTime)
+    return db.format(date=now())

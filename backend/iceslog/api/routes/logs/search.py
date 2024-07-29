@@ -38,7 +38,7 @@ async def get_logs_store(session: SessionDep, read: int,  content: str = None, s
     if not data:
         raise HTTPException(400, "未找到相关的数据")
     
-    if data.store == "ClickHouse":
+    if data.store.lower() == "clickhouse":
         from iceslog.drivers import clickhouse_utils
         logs, total = await clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
         return RecordLogPublices(list=logs, total=total)

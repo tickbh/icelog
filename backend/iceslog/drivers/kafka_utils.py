@@ -74,5 +74,5 @@ async def insert_log_datas(url, db, datas):
     finally:
         await do_cache_client(url, client, has_exception)
     
-async def read_log_page(url, db, content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
+async def read_log_page(url, db, search):
     raise HTTPException(400, "kafka 不支持查询")

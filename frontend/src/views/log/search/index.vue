@@ -2,15 +2,6 @@
   <div class="app-container">
     <div class="search-container">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
-        <el-form-item label="过滤内容" prop="keywords">
-          <el-input
-            v-model="queryParams.content"
-            placeholder="过滤内容"
-            clearable
-            @keyup.enter="handleQuery"
-          />
-        </el-form-item>
-
         <el-form-item label="创建时间">
           <el-date-picker
             class="!w-[240px]"
@@ -45,6 +36,23 @@
             v-model="queryParams.level"
             code="sys_level"
             class="!w-[140px]"
+          />
+        </el-form-item>
+        <el-form-item label="过滤内容" prop="keywords">
+          <el-input
+            v-model="queryParams.content"
+            placeholder="过滤内容"
+            clearable
+            @keyup.enter="handleQuery"
+          />
+        </el-form-item>
+
+        <el-form-item label="用户uid" prop="keywords">
+          <el-input
+            v-model="queryParams.uid"
+            placeholder="用户uid"
+            clearable
+            @keyup.enter="handleQuery"
           />
         </el-form-item>
 

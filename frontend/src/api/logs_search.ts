@@ -11,8 +11,8 @@ class LogsSearchAPI {
   static getPage(queryParams: LogsSearchPageQuery) {
     return request<any, PageResult<LogsSearchPageVO[]>>({
       url: `${LOG_BASE_URL}/page`,
-      method: "get",
-      params: queryParams,
+      method: "post",
+      data: queryParams,
     });
   }
 
@@ -76,6 +76,7 @@ export interface LogsSearchPageQuery extends PageQuery {
   /** 搜索关键字 */
   content?: string;
   read?: number;
+  uid?: string;
   /** 搜索关键字 */
   sys?: string;
   level?: number;

@@ -69,35 +69,35 @@ async def insert_log_datas(url, db, datas):
         await do_cache_client(url, client, has_exception)
     
     
-async def read_log_page(url, db, content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
-    db = base_utils.get_db_name(db, startTime)
+async def read_log_page(url, db, search):
+    from iceslog.models.logs.record import LogPageSearch
+    search: LogPageSearch = search
+    db = base_utils.get_db_name(db, search.startTime)
     # client.client_settings["connect_timeout"] = 500
     sql = f"select * from {db}"
     count_sql = f"select count(*) from {db}"
-    params = {
-        "content": content,
-        "sys": sys,
-        "level": level,
-        "startTime": startTime,
-        "endTime": endTime,
-        "offset": (pageNum.real - 1) * pageSize.real,
-        "limit": pageSize.real,
-    }
+    params = search.params()
     condition = []
-    if content:
-        params["content"] = f"%{content}%" 
+    if search.content:
+        params["content"] = f"%{search.content}%" 
         condition.append(" content like %(content)s") 
         
-    if sys:
+    if search.uid:
+        if base_utils.safe_int(search.uid) > 0:
+            condition.append(" (uid = %(uid)s or exid = %(uid)s)")
+        else:
+            condition.append(" exid = %(uid)s")
+        
+    if search.sys:
         condition.append(" sys = %(sys)s")
         
-    if level:
+    if search.level:
         condition.append(" log_level = %(level)d")
         
-    if startTime:
+    if search.startTime:
         condition.append(" time >= %(startTime)s")
         
-    if endTime:
+    if search.endTime:
         condition.append(" time <= %(endTime)s")
         
     if len(condition) > 0:
@@ -112,7 +112,7 @@ async def read_log_page(url, db, content: str = None, sys: str = None, level: in
     try:
         rets = await client.query_df(sql, params)
         count = await client.query(count_sql, params)
-        return base_utils.dataframe_tolist(rets), count.summary['read_rows']
+        return base_utils.dataframe_tolist(rets), count.first_row[0]
     except  :
         base_utils.print_exec()
         has_exception = True

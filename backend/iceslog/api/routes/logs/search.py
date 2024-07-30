@@ -21,7 +21,7 @@ from iceslog.models.base import OptionType
 from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
 
 from iceslog.models.logs.read import LogsRead, LogsReadBase, LogsReadCreate, LogsReadPublices, LogsReadUpdateUrl
-from iceslog.models.logs.record import RecordLogPublices
+from iceslog.models.logs.record import RecordLogPublices, LogPageSearch
 from iceslog.models.perms import GroupPerms, GroupPermsBase, GroupPermsPublic, OnePerm, Perms, PermsPublic
 from iceslog.models.syslog import LogsPublic, SysLog
 from iceslog.utils import base_utils, cache_utils
@@ -32,15 +32,15 @@ from yarl import URL
 router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
-@router.get("/page", response_model=RecordLogPublices)
-async def get_logs_store(session: SessionDep, read: int,  content: str = None, sys: str = None, level: int = None, startTime: str = None, endTime: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
-    data = session.get(LogsRead, read)
+@router.post("/page", response_model=RecordLogPublices)
+async def get_logs_store(session: SessionDep, search: LogPageSearch):
+    data = session.get(LogsRead, search.read)
     if not data:
         raise HTTPException(400, "未找到相关的数据")
     
     if data.store.lower() == "clickhouse":
         from iceslog.drivers import clickhouse_utils
-        logs, total = await clickhouse_utils.read_log_page(data.connect_url, data.table_name, content, sys, level, startTime, endTime, pageNum, pageSize)
+        logs, total = await clickhouse_utils.read_log_page(data.connect_url, data.table_name, search)
         return RecordLogPublices(list=logs, total=total)
     raise HTTPException(400, "暂不支持")
 

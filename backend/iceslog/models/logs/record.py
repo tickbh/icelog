@@ -4,6 +4,7 @@ from typing import Any, Self, Union
 from pydantic import ConfigDict, EmailStr
 from sqlalchemy import JSON, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel, Column
+from iceslog.models.base import PageModel
 
 from iceslog.core.db import datetime_now
 
@@ -58,3 +59,24 @@ class LogVisitInfos(SQLModel):
     times: list[int]
     module: str
     
+class LogPageSearch(PageModel):
+    read: int
+    content: str = None
+    sys: str = None
+    uid: str = None
+    level: int = None
+    startTime: str = None
+    endTime: str = None
+    
+    def params(self) -> dict:
+        return {
+            "content": self.content,
+            "sys": self.sys,
+            "level": self.level,
+            "uid": self.uid,
+            "exid": self.uid,
+            "startTime": self.startTime,
+            "endTime": self.endTime,
+            "offset": (self.pageNum.real - 1) * self.pageSize.real,
+            "limit": self.pageSize.real,
+        }

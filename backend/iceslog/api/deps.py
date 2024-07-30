@@ -13,8 +13,8 @@ from sqlmodel import Session
 from iceslog.core import security
 from iceslog.core.config import settings
 from iceslog.core.db import engine, get_db
-from iceslog.models import TokenPayload, User
 from iceslog.models.user import UserEx
+from iceslog.models import TokenPayload, User
 from iceslog.utils.pool_utils import get_redis_cache
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -26,6 +26,7 @@ TokenDep = Annotated[str, Depends(reusable_oauth2)]
 RedisDep = Annotated[Redis, Depends(get_redis_cache)]
 
 async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep) -> AsyncGenerator[UserEx, None]:
+    
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]

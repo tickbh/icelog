@@ -75,4 +75,6 @@ async def insert_log_datas(url, db, datas):
         await do_cache_client(url, client, has_exception)
     
 async def read_log_page(url, db, search):
+    from iceslog.models.logs.record import LogPageSearch
+    search: LogPageSearch = search
     raise HTTPException(400, "kafka 不支持查询")

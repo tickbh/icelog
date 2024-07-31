@@ -11,6 +11,7 @@ class LogsReadBase(SQLModel):
     id: int | None = Field(default=None, primary_key=True)
     store: str = Field(max_length=255, nullable=False, description="存储类型")
     name: str = Field(max_length=255, nullable=False, description="项目名字")
+    project: str = Field(nullable=False, default="default", description="归属项目")
     status: int = Field(nullable=False, default=1, description="状态(1启用, 0禁用)")
     sort: int = Field(default=0, description="排序")
     table_name: str = Field(max_length=255, nullable=True, default="", description="表名或者topic")

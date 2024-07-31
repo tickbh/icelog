@@ -77,6 +77,7 @@ export interface LogsSearchPageQuery extends PageQuery {
   content?: string;
   read?: number;
   uid?: string;
+  project?: string;
   /** 搜索关键字 */
   sys?: string;
   level?: number;

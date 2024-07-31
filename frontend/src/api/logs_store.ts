@@ -60,6 +60,7 @@ export default LogsStoreAPI;
 export interface LogsStoreForm {
   create_time?: Date;
   store?: string;
+  project?: string;
   name?: string;
   connect_url?: string;
   table_name?: string;
@@ -76,6 +77,7 @@ export interface LogsStorePageQuery extends PageQuery {
   /** 搜索关键字 */
   keywords?: string;
   status?: number;
+  project?: string;
 }
 
 /**

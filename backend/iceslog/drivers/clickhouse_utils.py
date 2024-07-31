@@ -73,7 +73,6 @@ async def read_log_page(url, db, search):
     from iceslog.models.logs.record import LogPageSearch
     search: LogPageSearch = search
     db = base_utils.get_db_name(db, search.startTime)
-    # client.client_settings["connect_timeout"] = 500
     sql = f"select * from {db}"
     count_sql = f"select count(*) from {db}"
     params = search.params()

@@ -67,6 +67,7 @@ export default LogsReadAPI;
 export interface LogsReadForm {
   create_time?: Date;
   store?: string;
+  project?: string;
   name?: string;
   connect_url?: string;
   table_name?: string;
@@ -82,6 +83,7 @@ export interface LogsReadForm {
 export interface LogsReadPageQuery extends PageQuery {
   /** 搜索关键字 */
   keywords?: string;
+  project?: string;
   status?: number;
 }
 

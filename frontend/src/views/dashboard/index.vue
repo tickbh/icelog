@@ -3,7 +3,7 @@
     <!-- github角标 -->
     <github-corner class="github-corner" />
 
-    <el-card shadow="never">
+    <!-- <el-card shadow="never">
       <el-row justify="space-between">
         <el-col :span="18" :xs="24">
           <div class="flex h-full items-center">
@@ -38,7 +38,7 @@
           </div>
         </el-col>
       </el-row>
-    </el-card>
+    </el-card> -->
 
     <el-button icon="el-icon-arrow-left" class="pan-back-btn" @click="do_log">
       小量日志
@@ -49,7 +49,7 @@
     </el-button>
 
     <!-- 数据卡片 -->
-    <el-row :gutter="10" class="mt-5">
+    <!-- <el-row :gutter="10" class="mt-5">
       <el-col
         :xs="24"
         :sm="12"
@@ -84,7 +84,7 @@
           </div>
         </el-card>
       </el-col>
-    </el-row>
+    </el-row> -->
 
     <!-- Echarts 图表 -->
     <el-row :gutter="10" class="mt-5">

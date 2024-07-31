@@ -13,6 +13,14 @@
             value-format="YYYY-MM-DD"
           />
         </el-form-item>
+        <!-- 
+        <el-form-item label="项目">
+          <dictionary
+            v-model="queryParams.project"
+            code="project"
+            class="!w-[140px]"
+          />
+        </el-form-item> -->
 
         <el-form-item label="系统">
           <dictionary

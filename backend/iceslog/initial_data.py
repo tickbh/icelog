@@ -44,10 +44,7 @@ def init_menu(session: Session):
     menu = Menus(id=22, pid=2, belong="sys", type="MENU", name="日志读取", component="log/read/index",
                  icon="document", params="", path="read", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
-    menu = Menus(id=23, pid=2, belong="sys", type="MENU", name="日志映射", component="log/mapping/index",
-                 icon="document", params="", path="mapping", redirect="", sort=0, status=1, groups="1")
-    session.add(menu)
-    menu = Menus(id=24, pid=2, belong="sys", type="MENU", name="日志查询", component="log/search/index",
+    menu = Menus(id=23, pid=2, belong="sys", type="MENU", name="日志查询", component="log/search/index",
                  icon="document", params="", path="search", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
     session.commit()
@@ -148,6 +145,13 @@ def init_dict(session: Session):
     dict_map = DictMapItem(dict_id=5, label="Android", value="Android", status=1, remark="安卓")
     session.add(dict_map)
     dict_map = DictMapItem(dict_id=5, label="Windows", value="Windows", status=1, remark="Windows")
+    session.add(dict_map)
+    
+    dict_map = DictMap(id=11, name="项目代号", code="project", status=1, remark="项目代号")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=11, label="默认", value="default", status=1, remark="默认")
+    session.add(dict_map)
+    dict_map = DictMapItem(dict_id=11, label="ices日志", value="iceslog", status=1, remark="ices日志")
     session.add(dict_map)
     session.commit()
 

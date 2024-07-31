@@ -32,12 +32,15 @@ router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 
 @router.get("/page", response_model=LogsStorePublices)
-def get_logs_store(session: SessionDep, keywords: str = None, status: int = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
+def get_logs_store(session: SessionDep, keywords: str = None, status: int = None, project: str = None, pageNum: PageNumType = 0, pageSize: PageSizeType = 100):
     condition = []
     if keywords:
         condition.append(or_(LogsStore.name.like(f"%{keywords}%"), LogsStore.store.like(f"%{keywords}%")))
     if status != None:
         condition.append(LogsStore.status == status)
+    if project != None:
+        condition.append(LogsStore.project == project)
+        
     logs, count = page_view_condition(session, condition, LogsStore, pageNum, pageSize, [col(LogsStore.sort).desc()])
     for log in logs:
         parsed_url = URL(log.connect_url)

@@ -23,6 +23,7 @@ class LogFreq(LogFreqBase, table=True):
     
 class RecordLog(SQLModel):
     time: datetime = None
+    project: str = "default"
     log_level: int
     trace_id: str
     uid: int
@@ -61,6 +62,7 @@ class LogVisitInfos(SQLModel):
     
 class LogPageSearch(PageModel):
     read: int
+    project: str = "default"
     content: str = None
     sys: str = None
     uid: str = None

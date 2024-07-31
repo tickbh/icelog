@@ -16,6 +16,14 @@
               />
             </el-form-item>
 
+            <el-form-item label="项目">
+              <dictionary
+                v-model="queryParams.project"
+                code="project"
+                class="!w-[140px]"
+              />
+            </el-form-item>
+
             <el-form-item label="状态" prop="status">
               <el-select
                 v-model="queryParams.status"
@@ -80,6 +88,17 @@
               align="center"
               prop="name"
             />
+
+            <el-table-column
+              label="归属项目"
+              width="120"
+              align="center"
+              prop="project"
+            >
+              <template #default="scope">
+                <label-options code="project" :value="scope.row.project" />
+              </template>
+            </el-table-column>
 
             <el-table-column
               key="connect_url"
@@ -187,6 +206,10 @@
       >
         <el-form-item label="名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入名称" />
+        </el-form-item>
+
+        <el-form-item label="归属项目" prop="project">
+          <dictionary v-model="formData.project" code="project" />
         </el-form-item>
 
         <el-form-item label="存储方式" prop="store">
@@ -325,7 +348,6 @@ function check_url_right(url: string): boolean {
   } catch (error) {
     return false;
   }
-  return false;
 }
 
 /** 重置密码 */

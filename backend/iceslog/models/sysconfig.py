@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import Union
-from pydantic import ConfigDict, EmailStr
-from sqlalchemy import JSON
-from sqlmodel import Field, Relationship, SQLModel, Column
+
+from pydantic import ConfigDict
+from sqlmodel import Field, SQLModel
 
 from iceslog.core.db import datetime_now
-from iceslog.models.base import RetMsg
 
 # Database model, database table inferred from class name
 

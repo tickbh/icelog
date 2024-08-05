@@ -1,9 +1,8 @@
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, select
+from sqlmodel import col, select
 
-from iceslog import models
 from iceslog.api.deps import (
     CurrentUser,
     PageNumType,
@@ -12,16 +11,12 @@ from iceslog.api.deps import (
     check_has_perm,
     get_current_active_superuser,
 )
-from iceslog.core.config import settings
-from iceslog.core.security import get_password_hash, verify_password
 from iceslog.models import (
     RetMsg,
 )
 from iceslog.models.base import OptionType
-from iceslog.models.dictmap import DictMap, DictMapItem, MsgDictItemsPublic, MsgEditDictMap, OneDictItem, OneEditDictMap
 from iceslog.models.perms import GroupPerms, OnePerm, Perms, PermsPublic
-from iceslog.utils import base_utils, cache_utils
-from iceslog.utils.cache_table import CacheTable
+from iceslog.utils import base_utils
 from iceslog.utils.utils import page_view_condition
 
 router = APIRouter(

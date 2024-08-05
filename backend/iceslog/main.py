@@ -1,13 +1,10 @@
-import sys
 import time
-from typing import Union
 
 from fastapi import FastAPI, Request
 from iceslog.core.config import settings
 
 from iceslog.api.main import api_router
 import contextlib
-from starlette.applications import Starlette
 from iceslog.utils.scheduler_utils import scheduler
 from loguru import logger
 

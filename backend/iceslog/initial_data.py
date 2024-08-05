@@ -34,6 +34,10 @@ def init_menu(session: Session):
     menu = Menus(id=15, pid=1, belong="sys", type="MENU", name="系统日志", component="system/log/index",
                  icon="document", params="", path="log", redirect="", sort=0, status=1, groups="1")
     session.add(menu)
+    menu = Menus(id=16, pid=1, belong="sys", type="MENU", name="系统配置", component="system/config/index",
+                 icon="document", params="", path="config", redirect="", sort=0, status=1, groups="1")
+    session.add(menu)
+    
     
     menu = Menus(id=2, belong="sys", type="MENU", name="日志管理", component="Layout", icon="el-icon-Document",
                  params="", pid=0, path="/log", redirect="/log/user", sort=0, status=1, groups="1")

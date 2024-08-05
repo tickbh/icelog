@@ -8,6 +8,7 @@ from .syslog import *
 from .logs.record import *
 from .logs.store import *
 from .logs.read import *
+from .sysconfig import *
 
 class Token(SQLModel):
     access_token: str

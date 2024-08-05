@@ -7,12 +7,10 @@ from iceslog.utils import base_utils, pool_utils
 cache_logs = []
 cache_dict_logs = {}
 
-def append_logs(logs: list):
-    for log in logs:
-        project = log["project"]
-        if not project in cache_dict_logs:
-            cache_dict_logs[project] = []
-        cache_dict_logs[project].append(log)
+def append_logs(project, logs: list):
+    if not project in cache_dict_logs:
+        cache_dict_logs[project] = []
+    cache_dict_logs[project].extend(logs)  
     
 def get_logs_store(project):
     from iceslog.models.logs.store import LogsStore

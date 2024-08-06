@@ -24,11 +24,11 @@ export default ApiLogAPI;
 
 export interface LogForm {
   time?: Date;
-  log_level: number;
-  trace_id?: string;
+  lv: number;
+  tid?: string;
   sys?: string;
   uid: number;
-  content: string;
+  msg: string;
   exid?: string;
   extra?: string;
 }

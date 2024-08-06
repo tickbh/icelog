@@ -1,8 +1,6 @@
-import pandas
 from iceslog.utils.scheduler_utils import scheduler
 
 from sqlmodel import select
-from iceslog.utils import base_utils, pool_utils
 
 cache_logs = []
 cache_dict_logs = {}
@@ -25,7 +23,8 @@ def get_logs_store(project):
 async def write_to_db():
     if len(cache_dict_logs) == 0:
         return
-    for project in cache_dict_logs:
+    temp = cache_dict_logs.copy()
+    for project in temp:
         insert_logs = cache_dict_logs[project]
         del cache_dict_logs[project]
         

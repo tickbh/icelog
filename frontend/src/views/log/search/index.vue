@@ -2,6 +2,17 @@
   <div class="app-container">
     <div class="search-container">
       <el-form ref="queryFormRef" :model="queryParams" :inline="true">
+        <el-form-item label="读取库">
+          <select-options
+            v-model="queryParams.read"
+            code=""
+            rule="logs_read"
+            class="!w-[140px]"
+          />
+        </el-form-item>
+
+        <br />
+
         <el-form-item label="创建时间">
           <el-date-picker
             class="!w-[240px]"
@@ -26,15 +37,6 @@
           <dictionary
             v-model="queryParams.sys"
             code="sys_sys"
-            class="!w-[140px]"
-          />
-        </el-form-item>
-
-        <el-form-item label="读取库">
-          <select-options
-            v-model="queryParams.read"
-            code=""
-            rule="logs_read"
             class="!w-[140px]"
           />
         </el-form-item>
@@ -81,12 +83,12 @@
         v-loading="loading"
         :data="searchTableData"
         highlight-current-row
-        row-key="log_level"
+        row-key="lv"
         :expand-row-keys="['1', '2', '3', '4', '5']"
       >
         <el-table-column label="内容" align="left" width="50" type="expand">
           <template #default="props">
-            <el-text>{{ props.row.content }}</el-text>
+            <el-text>{{ props.row.msg }}</el-text>
           </template>
         </el-table-column>
         <el-table-column label="时间" align="left" width="150" prop="time" />
@@ -108,12 +110,7 @@
         <el-table-column label="uid" align="left" width="150" prop="uid" />
 
         <el-table-column label="系统" align="left" width="150" prop="sys" />
-        <el-table-column
-          label="追踪id"
-          align="left"
-          width="250"
-          prop="trace_id"
-        />
+        <el-table-column label="追踪id" align="left" width="250" prop="tid" />
         <el-table-column label="额外id" align="left" width="250" prop="exid" />
 
         <el-table-column

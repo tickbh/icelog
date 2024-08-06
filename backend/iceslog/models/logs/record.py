@@ -23,11 +23,10 @@ class LogFreq(LogFreqBase, table=True):
     
 class RecordLog(SQLModel):
     time: datetime = None
-    project: str = "default"
-    log_level: int
-    trace_id: str
+    lv: int
+    tid: str
     uid: int
-    content: str
+    msg: str
     sys: str = None
     exid: str = None
     extra: str = None
@@ -39,10 +38,10 @@ class RecordLogPublices(SQLModel):
 '''
 创建sql, clickhouse
 CREATE TABLE log_record (
-	log_level Int8,
-	trace_id String,
+	lv Int8,
+	tid String,
 	uid UInt64,
-	content String,
+	msg String,
     sys String,
 	exid String,
 	extra String DEFAULT '{}',

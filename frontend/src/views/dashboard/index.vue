@@ -109,12 +109,11 @@ import ApiLogAPI from "@/api/api_log";
 function do_log() {
   ApiLogAPI.add_one({
     time: new Date(),
-    log_level: 2,
-    trace_id: "aa22222222222",
+    lv: 2,
+    tid: "aa22222222222",
     uid: 1,
     sys: "Web",
-    content:
-      "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
+    msg: "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
     exid: "222222222222",
     extra:
       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbfffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerwqrewrwerwerew",
@@ -126,12 +125,11 @@ function do_logs() {
   for (let index = 0; index < 5; index++) {
     many.push({
       time: new Date(),
-      log_level: 1,
-      trace_id: "aa22222222222",
+      lv: 1,
+      tid: "aa22222222222",
       uid: 1,
       sys: index % 2 == 1 ? "IOS" : "Android",
-      content:
-        "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
+      msg: "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
       exid: "222222222222",
       extra:
         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbfffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerwqrewrwerwerew",

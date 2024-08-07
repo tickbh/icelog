@@ -32,13 +32,10 @@
       </div>
       <template #dropdown>
         <el-dropdown-menu>
-          <a
-            target="_blank"
-            href="https://gitee.com/youlaiorg/vue3-element-admin"
-          >
+          <a target="_blank" href="https://github.com/tickbh/iceslog">
             <el-dropdown-item>{{ $t("navbar.gitee") }}</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://juejin.cn/post/7228990409909108793">
+          <a target="_blank" href="https://github.com/tickbh/iceslog">
             <el-dropdown-item>{{ $t("navbar.document") }}</el-dropdown-item>
           </a>
           <el-dropdown-item divided @click="logout">

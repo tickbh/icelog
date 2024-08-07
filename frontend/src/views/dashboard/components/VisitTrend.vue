@@ -67,10 +67,10 @@ const setChartOptions = (data: VisitTrendVO) => {
     tooltip: {
       trigger: "axis",
     },
-    legend: {
-      data: ["浏览量(PV)", "IP"],
-      bottom: 0,
-    },
+    // legend: {
+    //   data: ["浏览量(PV)", "IP"],
+    //   bottom: 0,
+    // },
     grid: {
       left: "1%",
       right: "5%",

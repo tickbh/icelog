@@ -5,6 +5,7 @@ from iceslog.core.config import settings
 
 from iceslog.api.main import api_router
 import contextlib
+from iceslog.middleware.cors import LogCORSMiddleware
 from iceslog.utils.scheduler_utils import scheduler
 from loguru import logger
 
@@ -25,7 +26,14 @@ async def lifespan(app):
     scheduler.shutdown()
         
 app = FastAPI(lifespan=lifespan)
-
+app.add_middleware(
+    LogCORSMiddleware,
+    allow_origins = ["*"],
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+    allow_regex_paths = ["/api/v1/pub/(.*)"],
+    allow_credentials = True,
+)
 app.celery = scheduler
 
 # # 设置celery的代理路径与结果存储路径，此处均使用 Redis

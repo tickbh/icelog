@@ -84,7 +84,7 @@ async def read_log_page(url, db, search):
         
     if search.uid:
         if base_utils.safe_int(search.uid) > 0:
-            condition.append(" (uid = %(uid)s or exid = %(uid)s)")
+            condition.append(" (uid = %(uid)d or exid = %(uid)s)")
         else:
             condition.append(" exid = %(uid)s")
         

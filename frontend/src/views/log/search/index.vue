@@ -87,7 +87,7 @@
             <el-text>{{ props.row.msg }}</el-text>
           </template>
         </el-table-column>
-        <el-table-column label="时间" align="left" width="150" prop="time" />
+        <el-table-column label="时间" align="left" width="150" prop="create" />
 
         <el-table-column label="日志等级" align="center" width="80">
           <template #default="scope">

@@ -1,4 +1,4 @@
-(function () {
+var LogIces = (function () {
   var original_trace = console.trace;
   var original_log = console.log;
   var original_info = console.info;
@@ -29,6 +29,8 @@
       request_sys: "unknow",
       heart_time: undefined,
       repeat_idx: 0,
+      // 当累计失败3次后不再继续发送数据
+      fail_times: 0,
       append_log: function (level, msg) {
         this.log_array.push({
           lv: level,
@@ -46,6 +48,11 @@
         if (this.log_array.length == 0) {
           return;
         }
+        // 清除数据且不在发送
+        if (this.fail_times >= 3) {
+          this.log_array = [];
+          return;
+        }
         if (this.log_array.length * 1 < this.repeat_idx && this.repeat_idx < 5) {
           return;
         }
@@ -61,9 +68,13 @@
         // 4. 调用 send 函数
         xhr.send(data)
         // 5. 监听事件
+        var self = this
         xhr.onreadystatechange = function () {
           if (xhr.readyState === 4 && xhr.status === 200) {
             // console.log(xhr.responseText)
+            self.fail_times = 0;
+          } else {
+            self.fail_times += 1;
           }
         }
       },
@@ -86,6 +97,7 @@
         this.request_exid = exid || "";
         this.request_sys = sys || "unknow"
         this.is_init = true;
+        this.fail_times = 0;
         function setHeartTimer() {
           if (!self.is_init || self.heart_time) {
             return;
@@ -191,3 +203,5 @@
     }
   };
 })();
+
+window.LogIces = LogIces

@@ -42,15 +42,11 @@
         </el-form-item>
 
         <el-form-item label="日志等级">
-          <dictionary
-            v-model="queryParams.level"
-            code="sys_level"
-            class="!w-[140px]"
-          />
+          <dictionary v-model="queryParams.lv" code="lv" class="!w-[140px]" />
         </el-form-item>
         <el-form-item label="过滤内容" prop="keywords">
           <el-input
-            v-model="queryParams.content"
+            v-model="queryParams.msg"
             placeholder="过滤内容"
             clearable
             @keyup.enter="handleQuery"
@@ -95,15 +91,11 @@
 
         <el-table-column label="日志等级" align="center" width="80">
           <template #default="scope">
-            <el-tag v-if="scope.row.log_level === 1" type="danger">错误</el-tag>
-            <el-tag v-if="scope.row.log_level === 2" type="warning"
-              >警告</el-tag
-            >
-            <el-tag v-if="scope.row.log_level === 3" type="success"
-              >信息</el-tag
-            >
-            <el-tag v-if="scope.row.log_level === 4" type="info">调试</el-tag>
-            <el-tag v-if="scope.row.log_level === 5" type="info">追踪</el-tag>
+            <el-tag v-if="scope.row.lv === 1" type="danger">错误</el-tag>
+            <el-tag v-if="scope.row.lv === 2" type="warning">警告</el-tag>
+            <el-tag v-if="scope.row.lv === 3" type="success">信息</el-tag>
+            <el-tag v-if="scope.row.lv === 4" type="info">调试</el-tag>
+            <el-tag v-if="scope.row.lv === 5" type="info">追踪</el-tag>
           </template>
         </el-table-column>
 

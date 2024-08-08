@@ -6,7 +6,7 @@ from iceslog.utils import base_utils
 
 class CacheTable:
     model: SQLModel
-    def __init__(self, model, use_cache=False, expire_time = 60 * 60, attribs=[], groups=[], check_redis=True, redis_expire_time=30):
+    def __init__(self, model, use_cache=False, expire_time = 60, attribs=[], groups=[], check_redis=True, redis_expire_time=30):
         self.model = model
         self.cache_time = 0
         self.expire_time = expire_time

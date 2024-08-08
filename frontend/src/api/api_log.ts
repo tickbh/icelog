@@ -23,7 +23,7 @@ class ApiLogAPI {
 export default ApiLogAPI;
 
 export interface LogForm {
-  time?: Date;
+  create?: Date;
   lv: number;
   tid?: string;
   sys?: string;

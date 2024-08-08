@@ -42,7 +42,7 @@ async def insert_log_datas(url, db, datas):
         if len(cache_datas) == 0 and len(datas) < 1000:
             client = await get_cache_client(url)
             df = pandas.DataFrame.from_records(datas)
-            ret = await client.insert_df(db + "1", df)
+            ret = await client.insert_df(db, df)
             print(ret)
         else:
             cache_datas.extend(datas)
@@ -65,6 +65,7 @@ async def insert_log_datas(url, db, datas):
         if len(cache_datas) > 1000000:
             cache_datas = cache_datas[-1000000:]
         pass
+        base_utils.print_exec()
     finally:
         await do_cache_client(url, client, has_exception)
     
@@ -77,9 +78,9 @@ async def read_log_page(url, db, search):
     count_sql = f"select count(*) from {db}"
     params = search.params()
     condition = []
-    if search.content:
-        params["content"] = f"%{search.content}%" 
-        condition.append(" content like %(content)s") 
+    if search.msg:
+        params["msg"] = f"%{search.msg}%" 
+        condition.append(" msg like %(msg)s") 
         
     if search.uid:
         if base_utils.safe_int(search.uid) > 0:
@@ -90,21 +91,21 @@ async def read_log_page(url, db, search):
     if search.sys:
         condition.append(" sys = %(sys)s")
         
-    if search.level:
-        condition.append(" log_level = %(level)d")
+    if search.lv:
+        condition.append(" lv = %(lv)d")
         
     if search.startTime:
-        condition.append(" time >= %(startTime)s")
+        condition.append(" create >= %(startTime)s")
         
     if search.endTime:
-        condition.append(" time <= %(endTime)s")
+        condition.append(" create <= %(endTime)s")
         
     if len(condition) > 0:
         sql += " WHERE " + " AND ".join(condition)
         count_sql += " WHERE " + " AND ".join(condition)
     
     
-    sql += " order by time desc"
+    sql += " order by create desc"
     sql += " LIMIT %(limit)d OFFSET %(offset)d"
     client = await get_cache_client(url)      
     has_exception = False

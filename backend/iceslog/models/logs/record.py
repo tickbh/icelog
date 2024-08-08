@@ -22,7 +22,7 @@ class LogFreq(LogFreqBase, table=True):
     )
     
 class RecordLog(SQLModel):
-    time: datetime = None
+    create: datetime = None
     lv: int
     tid: str
     uid: int
@@ -45,8 +45,10 @@ CREATE TABLE log_record (
     sys String,
 	exid String,
 	extra String DEFAULT '{}',
-	`time` DateTime
-) ENGINE = Log;
+	create DateTime
+) ENGINE = MergeTree()
+PARTITION BY toYYYYMMDD(create)
+ORDER BY (create, uid);
 '''
     
 class OneLogVisit(SQLModel):
@@ -62,18 +64,18 @@ class LogVisitInfos(SQLModel):
 class LogPageSearch(PageModel):
     read: int
     project: str = "default"
-    content: str = None
+    msg: str = None
     sys: str = None
     uid: str = None
-    level: int = None
+    lv: int = None
     startTime: str = None
     endTime: str = None
     
     def params(self) -> dict:
         return {
-            "content": self.content,
+            "msg": self.msg,
             "sys": self.sys,
-            "level": self.level,
+            "lv": self.lv,
             "uid": self.uid,
             "exid": self.uid,
             "startTime": self.startTime,

@@ -45,7 +45,10 @@ async def do_record_apilogs(project, logs):
     redis = await pool_utils.get_redis_cache()
     logs: list[RecordLog] = logs
     new_logs = []
+    now = base_utils.now()
     for log in logs:
+        if not log.create:
+            log.create = now
         new_logs.append(log.model_dump())
     log_save_utils.append_logs(project, new_logs)
     key = get_apilog_key(base_utils.get_now_minute())

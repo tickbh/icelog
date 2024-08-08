@@ -108,7 +108,7 @@ import ApiLogAPI from "@/api/api_log";
 
 function do_log() {
   ApiLogAPI.add_one({
-    time: new Date(),
+    create: new Date(),
     lv: 2,
     tid: "aa22222222222",
     uid: 1,
@@ -124,7 +124,7 @@ function do_logs() {
   var many = [];
   for (let index = 0; index < 5; index++) {
     many.push({
-      time: new Date(),
+      create: new Date(),
       lv: 1,
       tid: "aa22222222222",
       uid: 1,

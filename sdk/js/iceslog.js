@@ -32,7 +32,7 @@
       append_log: function (level, msg) {
         this.log_array.push({
           lv: level,
-          time: new Date(),
+          create: new Date(),
           tid: guid(),
           uid: this.request_uid,
           exid: this.request_exid,

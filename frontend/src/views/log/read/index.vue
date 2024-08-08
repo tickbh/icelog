@@ -208,8 +208,8 @@
         <el-form-item label="连接信息" prop="connect_url" v-if="!formData.id">
           <el-input
             v-model="formData.connect_url"
-            placeholder="请输入密码, 6位到50位"
-            maxlength="50"
+            placeholder="数据库连接信息,如redis://xx.com:6379"
+            maxlength="255"
           />
         </el-form-item>
 
@@ -293,6 +293,7 @@ const formData = reactive<LogsReadForm>({
 /** 用户表单校验规则  */
 const rules = reactive({
   name: [{ required: true, message: "名称不能为空", trigger: "blur" }],
+  project: [{ required: true, message: "归属项目不能为空", trigger: "blur" }],
   connect_url: [
     { required: true, message: "连接信息不能为空", trigger: "blur" },
   ],

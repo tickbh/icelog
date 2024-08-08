@@ -220,7 +220,7 @@
           <el-input
             v-model="formData.connect_url"
             placeholder="请输入密码, 6位到50位"
-            maxlength="50"
+            maxlength="255"
           />
         </el-form-item>
 

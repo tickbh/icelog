@@ -74,13 +74,13 @@ export interface LogsSearchForm {
  */
 export interface LogsSearchPageQuery extends PageQuery {
   /** 搜索关键字 */
-  content?: string;
+  msg?: string;
   read?: number;
   uid?: string;
   project?: string;
   /** 搜索关键字 */
   sys?: string;
-  level?: number;
+  lv?: number;
   status?: number;
   /** 开始时间 */
   startTime?: string;

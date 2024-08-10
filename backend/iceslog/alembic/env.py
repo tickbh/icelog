@@ -51,7 +51,7 @@ def get_url():
     # port = os.getenv("POSTGRES_PORT", "5432")
     # db = os.getenv("POSTGRES_DB", "app")
     # return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
-    return "sqlite:///./sql_app.db"
+    return os.getenv("SQLITE_DB", "sqlite:///./sql_app.db")
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.

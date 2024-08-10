@@ -19,3 +19,8 @@ api_router.include_router(search.router, prefix="/logs/search", tags=["search"])
 
 from iceslog.api.public_routes import log
 api_router.include_router(log.router, prefix="/pub/log", tags=["log"])
+
+root_router = APIRouter()
+@root_router.get("/")
+async def record_log() -> str:
+    return "iceslog"

@@ -3,7 +3,7 @@ import time
 from fastapi import FastAPI, Request
 from iceslog.core.config import settings
 
-from iceslog.api.main import api_router
+from iceslog.api.main import api_router, root_router
 import contextlib
 from iceslog.middleware.cors import LogCORSMiddleware
 from iceslog.utils.scheduler_utils import scheduler
@@ -50,6 +50,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(root_router, prefix="")
 
 # logger.add(sys.stdout, colorize=True, format="<green>{time}</green> <level>{message}</level>")
 logger.add("logs/iceslog_{time:YY-MM-DD_HH_mm}.log", rotation="500 MB")

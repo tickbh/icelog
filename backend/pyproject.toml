@@ -6,9 +6,9 @@ authors = ["Admin <admin@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-uvicorn = {extras = ["standard"], version = "^0.24.0.post1"}
-fastapi = "^0.109.1"
-python-multipart = "^0.0.7"
+uvicorn = {version = "0.30.5"}
+fastapi = "^0.112.0"
+python-multipart = "^0.0.9"
 email-validator = "^2.1.0.post1"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 tenacity = "^8.2.3"
@@ -46,6 +46,12 @@ ruff = "^0.2.2"
 pre-commit = "^3.6.2"
 types-passlib = "^1.7.7.20240106"
 coverage = "^7.4.3"
+
+
+[[tool.poetry.source]]
+name = "mirror"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
 
 [build-system]
 requires = ["poetry>=0.12"]

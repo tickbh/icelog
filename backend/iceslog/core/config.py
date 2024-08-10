@@ -1,12 +1,13 @@
 
 from typing import Union
+from loguru import logger
 from pydantic import HttpUrl, PostgresDsn, computed_field
 from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", 
+        env_file=(".local_env", ), 
         env_ignore_empty=True, extra="ignore"
     )
     FIRST_SUPER_USER: str = "admin"
@@ -15,7 +16,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     SECRET_KEY: str = "change this secert"
     
-    REDIS_URL: str = "redis://i.haode.fit:6379"
+    REDIS_URL: str = "redis://redis_db:6379"
     
     SQLITE_NAME: Union[str, None] = None
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12
@@ -38,3 +39,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore
+logger.info("redis url = {0}", settings.REDIS_URL)

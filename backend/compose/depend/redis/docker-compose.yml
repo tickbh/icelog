@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+
+
+  redis_db:
+    image: redis
+    container_name: redis-docker
+    volumes:
+      - ./store/redis/:/data:rw
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./store/redis/logs:/logs:rw
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - 127.0.0.1:6379:6379
+    deploy:
+     resources:
+        limits:
+           memory: 250M
+        reservations:
+           memory: 100M
+
+
+networks:
+  default:
+    external: true
+    name: my-server-network
+    attachable: true

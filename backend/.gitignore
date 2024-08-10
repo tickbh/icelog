@@ -1,3 +1,5 @@
 logs/*
 compose/depend/clickhouse/data/*
 compose/nginx/dist/
+compose/depend/redis/store/*
+.local_env

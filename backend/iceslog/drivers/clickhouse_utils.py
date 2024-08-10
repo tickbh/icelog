@@ -107,9 +107,10 @@ async def read_log_page(url, db, search):
     
     sql += " order by create desc"
     sql += " LIMIT %(limit)d OFFSET %(offset)d"
-    client = await get_cache_client(url)      
     has_exception = False
+    client = None
     try:
+        client = await get_cache_client(url)      
         rets = await client.query_df(sql, params)
         count = await client.query(count_sql, params)
         return base_utils.dataframe_tolist(rets), count.first_row[0]

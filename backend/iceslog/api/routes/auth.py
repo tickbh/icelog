@@ -11,6 +11,7 @@ from iceslog.utils import base_utils, log_utils
 router = APIRouter()
 
 
+
 @router.get("/captcha")
 async def get_captcha(redis: RedisDep) -> AuthCaptcha:
     img, text = img_captcha(img_byte="base64")
@@ -27,8 +28,14 @@ async def do_login(request: Request, session: SessionDep, redis: RedisDep, usern
     if not value:
         raise HTTPException(400, "验证码已过期")
     
-    # if captchaCode.lower() != value.lower():
-    #     raise HTTPException(400, "验证码错误")
+    if settings.ENABLE_CAPTCHA and captchaCode.lower() != value.lower() :
+        raise HTTPException(400, "验证码错误")
+    
+    key = f"login:{username}"
+    times = await redis.incr(key)
+    if times > 5:
+        raise HTTPException(400, "请不要频繁登陆")
+    redis.expire(key, 60)
     
     log_utils.do_record_syslog(request, "LOGIN", f"{username}请求登陆")
     user = cruds.user.authenticate(

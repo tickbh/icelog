@@ -37,6 +37,5 @@ async def get_visit(session: SessionDep, startDate: datetime, endDate: datetime,
     for val in range(start_time, end_time, min_step):
         infos.dates.append(base_utils.minute_to_datetime(val))
         infos.times.append(hash_tables.get(val, 0))
-    print("start:",startDate)
     return infos
 # .build_message()

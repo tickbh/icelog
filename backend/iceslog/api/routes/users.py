@@ -1,8 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import all_
-from sqlmodel import and_, col, delete, func, or_, select
+from sqlmodel import or_
 
 from iceslog import cruds
 from iceslog.api.deps import (
@@ -13,21 +12,17 @@ from iceslog.api.deps import (
     check_has_perm,
     get_current_active_superuser,
 )
-from iceslog.core.config import settings
-from iceslog.core.security import get_password_hash, verify_password
+from iceslog.core.security import get_password_hash
 from iceslog.models import (
     RetMsg,
-    UpdatePassword,
     User,
     UserCreate,
     UserPublic,
-    UserRegister,
     UsersPublic,
     UserUpdate,
-    UserUpdateMe,
 )
 from iceslog.models.user import MsgUserPublic, UserMePublic
-from iceslog.utils import base_utils, cache_utils, generate_new_account_email, send_email
+from iceslog.utils import base_utils, cache_utils
 from iceslog.utils.utils import page_view_condition
 
 router = APIRouter(
@@ -75,7 +70,6 @@ def read_user_form(*, session: SessionDep, user_id: int) -> Any:
 
 @router.get("/me", response_model=UserMePublic)
 def read_user_me(current_user: CurrentUser) -> Any:
-    print("me!!!!!!!!!!!!!!!!!")
     """
     Get current user.
     """

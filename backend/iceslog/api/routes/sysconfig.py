@@ -47,7 +47,6 @@ def read_options(session: SessionDep, user: CurrentUser) -> Any:
 
 @router.get(
     "/form/{data_id}",
-    dependencies=[Depends(get_current_active_superuser)],
     response_model=SysConfigBase,
 )
 def get_form_data(session: SessionDep, data_id: int) -> Any:

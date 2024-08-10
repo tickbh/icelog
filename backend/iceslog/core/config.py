@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     
     REDIS_URL: str = "redis://redis_db:6379"
     
+    ENABLE_CAPTCHA: bool = True
+    
     SQLITE_NAME: Union[str, None] = None
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 12
     

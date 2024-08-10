@@ -1,0 +1,28 @@
+version: '3.5'
+services:
+  iceslog-nginx:
+    container_name: iceslog-nginx-docker        # 指定容器的名称
+    image: nginx
+  
+    volumes:
+      - ../nginx/:/mnt/nginx:rw
+      - ../nginx/html/:/etc/nginx/html:rw
+      - ../nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
+      - ./dist/:/app:rw
+    ports:
+      - "13737:13737"
+    restart: always
+
+networks:
+  default:
+    name: my-server-network
+    external: true
+
+# docker ps -a | grep "Exited" | awk '{print $1 }'|xargs docker stop
+# docker ps -a | grep "Exited" | awk '{print $1 }'|xargs docker rm
+# docker images|grep none|awk '{print $3 }'|xargs docker rmi
+
+# docker rmi $(docker images -q | awk '/^<none>/ { print $3 }')
+
+
+# docker exec -it poker-web-docker /bin/bash

@@ -160,7 +160,7 @@ export interface UserInfo {
   /** 权限 */
   perms: string[];
 
-  user_type: string;
+  user_type?: string;
 }
 
 /**

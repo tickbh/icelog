@@ -84,3 +84,8 @@ class CacheTable:
         for it in self.cache_table:
             yield self.cache_table[it]
 
+    def clear(self):
+        self.cache_table = {}
+        self.cache_group_table = {}
+        self.cache_time = 0
+        self.redis_cache_time = 0

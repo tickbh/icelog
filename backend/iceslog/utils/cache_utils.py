@@ -3,6 +3,13 @@ from iceslog import models
 from iceslog.utils import base_utils
 from iceslog.utils.cache_table import CacheTable
 
+config_cache_table = CacheTable(models.SysConfig, attribs=["id", "key"])
+def get_config(id):
+    return config_cache_table.get_value(id)
+
+def clear_config():
+    config_cache_table.clear()
+
 perm_cache_table = CacheTable(models.Perms, attribs=["id", "route"])
 def get_perm(id):
     return perm_cache_table.get_value(id)

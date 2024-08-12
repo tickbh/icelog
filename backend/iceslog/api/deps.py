@@ -53,9 +53,9 @@ async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep
     if not user_ex:    
         user = session.get(User, token_data.sub)
         if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+            raise HTTPException(status_code=404, detail="用户不存在")
         if user.status != 1:
-            raise HTTPException(status_code=400, detail="Inactive user")
+            raise HTTPException(status_code=400, detail="该用户未激活")
         user_ex = UserEx.model_validate(user)
         await redis.set(cache_key, user_ex.model_dump_json(), ex=3600 * 3)
     yield user_ex

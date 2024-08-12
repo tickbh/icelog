@@ -200,7 +200,6 @@ def create_user(*, session: SessionDep, user_in: UserCreate) -> Any:
 
 @router.put(
     "/{user_id}",
-    dependencies=[Depends(get_current_active_superuser)],
     response_model=MsgUserPublic,
 )
 def update_user(

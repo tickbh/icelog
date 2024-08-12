@@ -217,16 +217,9 @@
           />
         </el-form-item>
 
-        <!-- <el-form-item label="所属部门" prop="deptId">
-          <el-tree-select
-            v-model="formData.deptId"
-            placeholder="请选择所属部门"
-            :data="deptOptions"
-            filterable
-            check-strictly
-            :render-after-expand="false"
-          />
-        </el-form-item> -->
+        <el-form-item label="权限分组" prop="group_pem">
+          <perm-multi v-model:value="formData.group_pem" />
+        </el-form-item>
 
         <el-form-item label="性别" prop="gender">
           <dictionary v-model="formData.gender" code="sys_gender" />
@@ -345,6 +338,14 @@ const rules = reactive({
     {
       pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/,
       message: "请输入正确的邮箱地址",
+      trigger: "blur",
+    },
+  ],
+  group_pem: [
+    {
+      required: true,
+      pattern: /\d+/,
+      message: "请输入正确的权限",
       trigger: "blur",
     },
   ],

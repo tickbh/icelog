@@ -18,6 +18,7 @@ class Token(SQLModel):
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: int | None = None
+    rand: str | None = None
 
 # Contents of JWT token
 class AuthCaptcha(SQLModel):

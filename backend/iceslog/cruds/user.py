@@ -23,7 +23,7 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
         hashed_password = get_password_hash(password)
         extra_data["hashed_password"] = hashed_password
     db_user.sqlmodel_update(user_data, update=extra_data)
-    session.add(db_user)
+    session.merge(db_user)
     session.commit()
     session.refresh(db_user)
     return db_user

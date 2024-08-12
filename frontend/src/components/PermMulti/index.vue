@@ -17,7 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import DictAPI from "@/api/dict";
 import PermAPI from "@/api/perm";
 
 const props = defineProps({
@@ -28,7 +27,7 @@ const props = defineProps({
     type: String,
   },
   value: {
-    type: String,
+    type: [String, Number],
   },
   placeholder: {
     type: String,
@@ -38,11 +37,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  // computed: {
-  //   total() {
-  //     return "";
-  //   },
-  // },
 });
 
 const emits = defineEmits(["update:modelValue", "update:value"]);
@@ -65,7 +59,7 @@ watch([options, () => props.modelValue], ([newOptions, newModelValue]) => {
 
 watch([props.value, () => props.value], ([newOptions, newModelValue]) => {
   var values = [];
-  for (let v of props.value?.split("|") || []) {
+  for (let v of props.value?.toString().split("|") || []) {
     values.push(parseInt(v));
   }
   selectedValues.value = values;
@@ -82,7 +76,7 @@ onBeforeMount(() => {
   // 根据字典编码获取字典项
   PermAPI.getGroupOptions().then((data) => {
     var values = [];
-    for (var v in props.value?.split("|")) {
+    for (var v in props.value?.toString().split("|")) {
       values.push(parseInt(v));
     }
     options.value = data;

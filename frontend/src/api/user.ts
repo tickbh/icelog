@@ -233,4 +233,6 @@ export interface UserForm {
   username?: string;
   /** 密码 */
   password?: string;
+
+  group_pem?: number;
 }

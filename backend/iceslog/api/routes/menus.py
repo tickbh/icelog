@@ -6,7 +6,7 @@ from fastapi.responses import ORJSONResponse
 from sqlmodel import select
 from iceslog.api.deps import CurrentUser, SessionDep, check_has_perm
 from iceslog.models.menu import Menus, OneEditMenu, OneLabelMenu
-from iceslog.utils import PidTable
+from iceslog.utils.pid_table import PidTable
 router = APIRouter(
     dependencies=[Depends(check_has_perm)])
 

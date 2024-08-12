@@ -38,7 +38,7 @@ async def get_current_user(session: SessionDep, token: TokenDep, redis: RedisDep
             detail="用户验证失败,请重新登陆",
         )
         
-    cache_key = f"user:{token_data.sub}"
+    cache_key = f"user:{token_data.sub}:{token_data.rand}"
     cache_user = await redis.get(cache_key)
     user_ex: UserEx = None
     if cache_user:

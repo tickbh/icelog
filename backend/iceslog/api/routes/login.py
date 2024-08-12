@@ -1,22 +1,10 @@
-from datetime import timedelta
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from iceslog import cruds
-from iceslog.api.deps import CurrentUser, SessionDep, get_current_active_superuser
-from iceslog.core import security
-from iceslog.core.config import settings
-from iceslog.core.security import get_password_hash
-from iceslog.models import RetMsg, NewPassword, Token, UserPublic
-from iceslog.utils import (
-    generate_password_reset_token,
-    generate_reset_password_email,
-    send_email,
-    verify_password_reset_token,
-)
+from iceslog.api.deps import SessionDep
+from iceslog.models import Token
 
 router = APIRouter()
 

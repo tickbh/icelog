@@ -105,12 +105,19 @@ defineOptions({
 import { useUserStore } from "@/store/modules/user";
 import { useTransition, TransitionPresets } from "@vueuse/core";
 import ApiLogAPI from "@/api/api_log";
+function guid() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
 
 function do_log() {
   ApiLogAPI.add_one({
     create: new Date(),
     lv: 2,
-    tid: "aa22222222222",
+    tid: guid(),
     uid: 1,
     sys: "Web",
     msg: "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
@@ -126,10 +133,13 @@ function do_logs() {
     many.push({
       create: new Date(),
       lv: 1,
-      tid: "aa22222222222",
+      tid: guid(),
       uid: 1,
       sys: index % 2 == 1 ? "IOS" : "Android",
-      msg: "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb",
+      msg:
+        index % 2 == 1
+          ? "测试日志111111111xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbb"
+          : "我是测试内容ccc",
       exid: "222222222222",
       extra:
         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbfffffffffffffffffffffffffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerwqrewrwerwerew",

@@ -42,7 +42,11 @@
         </el-form-item>
 
         <el-form-item label="日志等级">
-          <dictionary v-model="queryParams.lv" code="lv" class="!w-[140px]" />
+          <dictionary
+            v-model="queryParams.lv"
+            code="sys_level"
+            class="!w-[140px]"
+          />
         </el-form-item>
         <el-form-item label="过滤内容" prop="keywords">
           <el-input

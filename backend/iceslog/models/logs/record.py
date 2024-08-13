@@ -83,3 +83,9 @@ class LogPageSearch(PageModel):
             "offset": (self.pageNum.real - 1) * self.pageSize.real,
             "limit": self.pageSize.real,
         }
+    
+    def get_offset(self):
+        return (self.pageNum.real - 1) * self.pageSize.real
+    
+    def get_limit(self):
+        return self.pageSize.real

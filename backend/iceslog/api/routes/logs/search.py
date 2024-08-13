@@ -42,6 +42,10 @@ async def get_logs_store(session: SessionDep, search: LogPageSearch):
         from iceslog.drivers import clickhouse_utils
         logs, total = await clickhouse_utils.read_log_page(data.connect_url, data.table_name, search)
         return RecordLogPublices(list=logs, total=total)
+    elif data.store.lower() == "es":
+        from iceslog.drivers import es_utils
+        logs, total = await es_utils.read_log_page(data.connect_url, data.table_name, search)
+        return RecordLogPublices(list=logs, total=total)
     raise HTTPException(400, "暂不支持")
 
 @router.post(

@@ -40,6 +40,9 @@ async def write_to_db():
             elif store.store.lower() == "kafka":
                 from iceslog.drivers import kafka_utils
                 await kafka_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
+            elif store.store.lower() == "es":
+                from iceslog.drivers import es_utils
+                await es_utils.insert_log_datas(store.connect_url, store.table_name, insert_logs)
         
     pass
 

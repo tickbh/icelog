@@ -36,10 +36,30 @@ async def do_cache_client(url, client: AsyncElasticsearch, has_exception=False):
 async def ensure_exist(client: AsyncElasticsearch, db: str):
     if db in exist_caches:
         return True
-    if client.indices.exists(index=db):
+    val = await  client.indices.exists(index=db)
+    print(val)
+    
+    if await client.indices.exists(index=db):
         exist_caches[db] = True
         return True
-    succ = await client.indices.create(index=db)
+    succ = await client.indices.create(index=db, 
+            # mappings={
+            #     "properties": {
+            #         "msg": {
+            #             "type": "wildcard"
+            #         },
+            #         "sys": {
+            #             "type": "wildcard"
+            #         },
+            #         "exid": {
+            #             "type": "wildcard"
+            #         },
+            #         "extra": {
+            #             "type": "wildcard"
+            #         },
+            #     }
+            # }
+                                       )
     if succ:
         exist_caches[db] = True
         return True
@@ -101,8 +121,14 @@ async def read_log_page(url, db, search):
     }
     
     if search.msg:
+        # condition["wildcard"] = condition.get("wildcard", {})
+        # condition["wildcard"]["msg"] = f"*{search.msg}*"
+        
         condition["match"] = condition.get("match", {})
-        condition["match"]["msg"] = search.msg
+        condition["match"]["msg"] = {
+            "query": search.msg,
+            "operator": "and"
+        }
         
     if search.uid:
         condition["bool"] = condition.get("bool", {"must": [], "must_not": [], "should": []})

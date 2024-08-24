@@ -16,6 +16,9 @@ iceslog 主要处理和日志相关的数据信息整合。
 
 ## 系统界面
 
+### 日志每分钟
+![日志每分钟请求数](./screen/log_per_min.png)
+
 ### 日志落库配置
 可配置项目区分到消息队列Kafka或者ClickHouse中
 ![日志落库](./screen/log_save_config.png)

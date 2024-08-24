@@ -48,7 +48,8 @@ CREATE TABLE log_record (
 	create DateTime
 ) ENGINE = MergeTree()
 PARTITION BY toYYYYMMDD(create)
-ORDER BY (create, uid);
+ORDER BY (create, uid)
+TTL create + toIntervalDay(5);
 '''
     
 class OneLogVisit(SQLModel):
